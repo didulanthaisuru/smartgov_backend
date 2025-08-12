@@ -16,6 +16,8 @@ class user(BaseModel):
     user_id: int
     email: str
 
+
+
 class services(BaseModel):
     service_name: str
     service_id: int
@@ -27,7 +29,12 @@ class booking(BaseModel):
     booking_id: int
     service_id: int
     doc_states: Dict[str, str]  # or Dict[str, bool] depending on your data
-    date: date
-    time: time
+    date_booking: date
+    time_booking: time
     booking_state: str
     predicted_duration: time
+
+class admin(BaseModel):
+    admin_id: int
+    admin_name: str
+    service_id: str
