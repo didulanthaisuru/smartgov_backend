@@ -1,9 +1,6 @@
 from pydantic import BaseModel
 from typing import List
 
-class TotalAppointmentsResponse(BaseModel):
-    totalAppointments: int    
-
 class AppointmentItem(BaseModel):
     bookingId: str
     userName: str
