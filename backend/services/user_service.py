@@ -12,23 +12,20 @@ class UserService:
         self.collection: Collection = db["users"]
         # Create unique indexes
         self.collection.create_index("email", unique=True)
-        self.collection.create_index("nic", unique=True)  # NIC is primary key
+        self.collection.create_index("nic", unique=True)
     
     def create_user(self, user_data: UserRegister) -> Optional[UserResponse]:
         """Create a new user"""
         try:
             # Check if user already exists
-            if self.get_user_by_email(user_data.email):
-                return None
-            
-            if self.get_user_by_nic(user_data.nic):
+            if self.get_user_by_email(user_data.email) or self.get_user_by_nic(user_data.nic):
                 return None
             
             # Hash password and create user
             hashed_password = get_password_hash(user_data.passcode)
             
             user_doc = {
-                "nic": user_data.nic,  # Primary identifier
+                "nic": user_data.nic,
                 "first_name": user_data.first_name,
                 "last_name": user_data.last_name,
                 "phone_number": user_data.phone_number,
@@ -74,47 +71,18 @@ class UserService:
     
     def get_user_by_id(self, nic: str) -> Optional[UserInDB]:
         """Get user by NIC (primary identifier)"""
-        user_doc = self.collection.find_one({"nic": nic})
-        if user_doc:
-            return UserInDB(**user_doc)
-        return None
+        return self.get_user_by_nic(nic)
     
-    def authenticate_user(self, email: str, password: str) -> Optional[UserInDB]:
-        """Authenticate user with email and password"""
-        user = self.get_user_by_email(email)
-        if not user:
-            return None
-        
-        if not user.is_active:
+    def authenticate_user_by_nic(self, nic: str, password: str) -> Optional[UserInDB]:
+        """Authenticate user with NIC and password"""
+        user = self.get_user_by_nic(nic)
+        if not user or not user.is_active:
             return None
             
         if not verify_password(password, user.hashed_password):
             return None
             
         return user
-    
-    def update_user_last_login(self, nic: str):
-        """Update user's last login timestamp"""
-        self.collection.update_one(
-            {"nic": nic},
-            {"$set": {"last_login": datetime.utcnow(), "updated_at": datetime.utcnow()}}
-        )
-    
-    def deactivate_user(self, nic: str) -> bool:
-        """Deactivate a user"""
-        result = self.collection.update_one(
-            {"nic": nic},
-            {"$set": {"is_active": False, "updated_at": datetime.utcnow()}}
-        )
-        return result.modified_count > 0
-    
-    def activate_user(self, nic: str) -> bool:
-        """Activate a user"""
-        result = self.collection.update_one(
-            {"nic": nic},
-            {"$set": {"is_active": True, "updated_at": datetime.utcnow()}}
-        )
-        return result.modified_count > 0
 
 # Create service instance
 user_service = UserService()

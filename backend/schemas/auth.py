@@ -1,9 +1,9 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
 class UserLogin(BaseModel):
-    email: str = Field(..., description="User email address")
+    nic: str = Field(..., description="User NIC")
     passcode: str = Field(..., min_length=6, description="User password")
 
 class UserRegister(BaseModel):
@@ -15,7 +15,7 @@ class UserRegister(BaseModel):
     passcode: str = Field(..., min_length=6, description="User password")
 
 class UserResponse(BaseModel):
-    nic: str  # Primary identifier
+    nic: str
     first_name: str
     last_name: str
     phone_number: str
@@ -27,14 +27,3 @@ class Token(BaseModel):
     token_type: str = "bearer"
     expires_in: int
     user: UserResponse
-
-class TokenData(BaseModel):
-    nic: Optional[str] = None
-    email: Optional[str] = None
-
-class LoginResponse(BaseModel):
-    message: str
-    user: UserResponse
-    access_token: str
-    token_type: str = "bearer"
-    expires_in: int
