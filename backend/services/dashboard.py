@@ -2,52 +2,66 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from typing import List, Dict, Any, Optional
 
-COLLECTION_NAME = "services"
-
-# --- Route 1 Operation ---
+# Get all main services 
 async def get_all_main_services(db: AsyncIOMotorClient) -> List[Dict[str, Any]]:
-    """
-    Retrieves a list of all main services for the dashboard.
-    It only fetches the fields needed for the main service list.
-    """
-    projection = {"_id": 1, "service_name": 1, "icon_name": 1}
-    services = await db[COLLECTION_NAME].find({}, projection).to_list(1000)
-    # Rename '_id' to 'id' to match the Pydantic schema
+    """Retrieves a list of all main services."""
+    services= await db["main_services"].find({}, {"_id": 1, "service_name": 1, "icon_name": 1}).to_list(1000)
+
+    # Convert ObjectId to string
     for service in services:
-        service['id'] = str(service['_id'])
+        service["_id"] = str(service["_id"])
+    
     return services
 
-# Operation for Endpoint 1: Get sub-service list
+# Get sub-service list for a main service 
 async def get_sub_services_for_main_service(db: AsyncIOMotorClient, main_service_id: str) -> Optional[List[Dict[str, Any]]]:
-    """
-    Finds a main service by its ID and returns its list of sub-services.
-    """
-    if not ObjectId.is_valid(main_service_id):
-        return None
+    """Finds a main service and joins its sub-services using $lookup."""
+    if not ObjectId.is_valid(main_service_id): return None
     
-    main_service = await db[COLLECTION_NAME].find_one(
-        {"_id": ObjectId(main_service_id)},
-        {"sub_services": 1, "_id": 0} # Projection: only get the sub_services array
-    )
-    return main_service.get("sub_services") if main_service else None
-
-
-# Operation for Endpoint 2: Get single sub-service details
-async def get_sub_service_details(db: AsyncIOMotorClient, main_service_id: str, sub_service_id: int) -> Optional[Dict[str, Any]]:
-    """
-    Finds a specific sub-service within a main service document.
-    """
-    if not ObjectId.is_valid(main_service_id):
-        return None
-
-    # This query finds the main document and filters the sub_services array
-    # to return only the element that matches the sub_service_id.
-    main_service = await db[COLLECTION_NAME].find_one(
-        {"_id": ObjectId(main_service_id), "sub_services.service_sub_id": sub_service_id},
-        {"sub_services.$": 1, "_id": 0} # Projection: get only the matching sub-service
-    )
-
-    if main_service and "sub_services" in main_service and len(main_service["sub_services"]) > 0:
-        return main_service["sub_services"][0] # Return the first (and only) element
+    pipeline = [
+        {"$match": {"_id": ObjectId(main_service_id)}},
+        {"$lookup": {"from": "sub_services", "localField": "sub_services", "foreignField": "_id", "as": "sub_services_full"}},
+        {"$project": {"_id": 0, "sub_services": "$sub_services_full"}}
+    ]
+    result = await db["main_services"].aggregate(pipeline).to_list(1)
+    
+    if result:
+        sub_services = result[0].get("sub_services", [])
+        # Convert ObjectId to string for each sub-service
+        for sub_service in sub_services:
+            if "_id" in sub_service:
+                sub_service["_id"] = str(sub_service["_id"])
+            if "required_docs" in sub_service:
+                sub_service["required_docs"] = [str(doc_id) for doc_id in sub_service["required_docs"]]
+        return sub_services
     return None
 
+# Get details for a specific sub-service 
+async def get_sub_service_details(db: AsyncIOMotorClient, main_service_id: str, sub_service_id: str) -> Optional[Dict[str, Any]]:
+    """Finds a sub-service and joins its required documents using $lookup."""
+    if not ObjectId.is_valid(sub_service_id): return None
+        
+    pipeline = [
+        {"$match": {"_id": ObjectId(sub_service_id)}},
+        {"$lookup": {"from": "required_documents", "localField": "required_docs", "foreignField": "_id", "as": "required_docs_full"}},
+        {"$project": {
+            "_id": 1, 
+            "service_name": 1, 
+            "payment_amount": 1, 
+            "required_docs": "$required_docs_full"
+        }}
+    ]
+    result = await db["sub_services"].aggregate(pipeline).to_list(1)
+    
+    if result:
+        service = result[0]
+        # Convert ObjectId to string
+        service["_id"] = str(service["_id"])
+        
+        # Convert ObjectId to string for required documents
+        for doc in service.get("required_docs", []):
+            if "_id" in doc:
+                doc["_id"] = str(doc["_id"])
+        
+        return service
+    return None

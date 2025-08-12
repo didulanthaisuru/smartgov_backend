@@ -26,24 +26,24 @@ class booking(BaseModel):
     booking_state: str
     predicted_duration: time
 
-class required_documents_model(BaseModel):
-    doc_id: int = Field(...)  
-    doc_name: str = Field(...) 
-    description: Optional[str] = None # e.g., "Must be issued by the hospital within 3 months"
+class required_documents(BaseModel):
+    doc_id: str = Field(...)
+    doc_name: str = Field(...)
+    description: Optional[str] = None
 
 # Model for an individual sub-service
-class sub_service_model(BaseModel):
-    service_sub_id: int = Field(...) # The unique ID for the sub-service
+class sub_service(BaseModel):
+    service_sub_id: str = Field(...) # The unique ID for the sub-service
     service_name: str = Field(...)
-    required_documents: List[required_documents_model] = []
+    required_docs: List[str] = []
     payment_amount: float = Field(default=0.0) 
 
 # Model for the main service document that will be stored in the database
-class main_service_model(BaseModel):
-    service_main_id:  int = Field(...) # The unique ID for the main-service
-    service_name: str = Field(...) # e.g., "Business registration"
-    department_id: int = Field(...)
+class main_service(BaseModel):
+    service_main_id:  str = Field(...) # The unique ID for the main-service
+    service_name: str = Field(...)
+    department_id: str = Field(...)
     icon_name: Optional[str] = None # For the UI icon
-    sub_services: List[sub_service_model] = []
+    sub_services: List[str] = []
 
 

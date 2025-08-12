@@ -1,35 +1,46 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
+from bson import ObjectId
 
-class RequiredDocSchema(BaseModel):
-    doc_id: int
+class required_doc_response(BaseModel):
+    doc_id: str = Field(..., alias="_id")
     doc_name: str
     description: Optional[str] = None
 
-# --- Schemas for Sub-Services ---
-class SubServiceResponseSchema(BaseModel):
-    service_id: int
-    service_name: str
-    required_documents: List[RequiredDocSchema] # This now uses the updated schema
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
-# --- Schemas for Main Services ---
-
-# Schema for the dashboard list (Route 1)
-# We only send the essential info to keep the initial load fast.
-class MainServiceInfoSchema(BaseModel):
-    id: str # The main service ID
+# Schema for the dashboard list 
+class main_service_info_response(BaseModel):
+    service_main_id: str = Field(..., alias="_id")
     service_name: str
     icon_name: Optional[str] = None
 
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
-# Endpoint 1: Schema for listing sub-services
-class SubServiceInfoSchema(BaseModel):
-    service_sub_id: int
+# Schema for listing sub-services
+class sub_service_info_response(BaseModel):
+    service_sub_id: str = Field(..., alias="_id")
     service_name: str
 
-# Endpoint 2: Schema for the details of a single sub-service
-class SubServiceDetailSchema(BaseModel):
-    service_sub_id: int
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+# Schema for the details of a single sub-service
+class sub_service_detail_response(BaseModel):
+    service_sub_id: str = Field(..., alias="_id")
     service_name: str
-    required_documents: List[RequiredDocSchema]
+    required_documents: List[required_doc_response] = Field(..., alias="required_docs")
     payment_amount: float
+
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
