@@ -10,11 +10,10 @@ router = APIRouter(
     tags=["Admin Dashboard"]  # This groups the endpoints in the API docs
 )
 
-
-@router.get("/total_appointment", response_model=TotalAppointmentsResponse)
-def get_total_appointments():
+@router.get("/total_appointment/{admin_id}", response_model=TotalAppointmentsResponse)
+def get_total_appointments_by_admin(admin_id: int):
     """
-    Gets the total count of all appointments.
+    Gets the total count of non-completed appointments for a specific admin.
     """
-    count = dashboard_service.get_total_appointments_count()
+    count = dashboard_service.get_total_appointments_count_for_admin(admin_id=admin_id)
     return {"totalAppointments": count}

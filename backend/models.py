@@ -40,6 +40,7 @@ class admin(BaseModel):
     service_id: str
 
 class appointment(BaseModel):
+    admin_id:int
     appointment_id:int
     booking_id:int
     date:date
