@@ -1,7 +1,31 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from routes.qr_scanner import router as qr_scanner_router
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"message": "SmartGov API is running"}
+app = FastAPI(
+    title="SmartGov",
+    description="Smart Government app for managing citizen services and government operations.",
+    version="1.0.0",
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
+# Include API routes
+app.include_router(qr_scanner_router)
+
+
+
+# Simple health endpoint
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
