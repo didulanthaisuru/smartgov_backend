@@ -23,7 +23,7 @@ class services(BaseModel):
     department_id: int
     required_documents: List[str]  # list of document names
 
-class Booking(BaseModel):
+class booking(BaseModel):
     booking_id: int
     service_id: int
     doc_states: Dict[str, str]  # or Dict[str, bool] depending on your data
