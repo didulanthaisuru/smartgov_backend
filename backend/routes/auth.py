@@ -1,15 +1,57 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, OAuth2PasswordRequestForm
 from datetime import timedelta
 from typing import Dict, Any
 
-from schemas.auth import UserLogin, UserRegister, LoginResponse, UserResponse
+from schemas.auth import UserLogin, UserRegister, LoginResponse, UserResponse, Token
 from models import UserInDB
 from services.user_service import user_service
 from dependencies.auth import get_current_user, get_current_active_user
 from utils.auth import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+@router.post("/token", response_model=Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    OAuth2 compatible token endpoint for Swagger UI authentication
+    Use email as username
+    """
+    # Authenticate user (form_data.username will be the email)
+    user = user_service.authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Create access token
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"nic": user.nic, "email": user.email},
+        expires_delta=access_token_expires
+    )
+    
+    # Update last login
+    user_service.update_user_last_login(user.nic)
+    
+    # Prepare user response
+    user_response = UserResponse(
+        nic=user.nic,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        phone_number=user.phone_number,
+        email=user.email,
+        created_at=user.created_at
+    )
+    
+    return Token(
+        access_token=access_token,
+        token_type="bearer",
+        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # in seconds
+        user=user_response
+    )
 
 @router.post("/register", response_model=Dict[str, Any], status_code=status.HTTP_201_CREATED)
 async def register_user(user_data: UserRegister):
@@ -101,14 +143,14 @@ async def get_current_user_info(current_user: UserInDB = Depends(get_current_act
     )
 
 @router.post("/logout")
-async def logout_user(current_user: UserInDB = Depends(get_current_user)):
+async def logout_user(current_user: UserInDB = Depends(get_current_active_user)):
     """
     Logout user (in a real app, you might want to blacklist the token)
     """
     return {"message": f"User {current_user.first_name} logged out successfully"}
 
 @router.put("/deactivate")
-async def deactivate_account(current_user: UserInDB = Depends(get_current_user)):
+async def deactivate_account(current_user: UserInDB = Depends(get_current_active_user)):
     """
     Deactivate current user account
     """
@@ -122,7 +164,7 @@ async def deactivate_account(current_user: UserInDB = Depends(get_current_user))
     return {"message": "Account deactivated successfully"}
 
 @router.get("/test-protected")
-async def test_protected_route(current_user: UserInDB = Depends(get_current_user)):
+async def test_protected_route(current_user: UserInDB = Depends(get_current_active_user)):
     """
     Test route to verify JWT authentication is working
     """
