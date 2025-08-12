@@ -51,3 +51,18 @@ class admin(BaseModel):
     admin_id: int
     admin_name: str
     service_id: str
+    email: str
+    passcode: str  # This will be hashed
+    is_active: Optional[bool] = True
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+class AdminInDB(BaseModel):
+    admin_id: int
+    admin_name: str
+    service_id: str
+    email: str
+    hashed_password: str  # Stored hashed password
+    is_active: bool = True
+    created_at: datetime
+    updated_at: datetime
