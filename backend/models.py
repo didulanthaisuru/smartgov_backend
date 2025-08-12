@@ -38,3 +38,10 @@ class admin(BaseModel):
     admin_id: int
     admin_name: str
     service_id: str
+
+class appointment(BaseModel):
+    appointment_id:int
+    booking_id:int
+    date:date
+    user_id:int
+    status:str
