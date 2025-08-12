@@ -3,8 +3,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from typing import List
 
 # Import your schemas and database functions
-from schemas.service_schemas import MainServiceInfoSchema, SubServiceInfoSchema, SubServiceDetailSchema
-from services import service_operations
+from schemas.dashboard import MainServiceInfoSchema, SubServiceInfoSchema, SubServiceDetailSchema
+from services import dashboard
 from database_config import get_database 
 
 router = APIRouter(
@@ -20,7 +20,7 @@ router = APIRouter(
     description="Provides a list of all main service categories for the dashboard view."
 )
 async def get_main_services_list(db: AsyncIOMotorClient = Depends(get_database)):
-    services = await service_operations.get_all_main_services(db)
+    services = await dashboard.get_all_main_services(db)
     return services
 
 # --- NEW Endpoint 1: Get list of sub-services for a main service ---
@@ -29,7 +29,7 @@ async def get_sub_service_list(main_service_id: str, db: AsyncIOMotorClient = De
     """
     Provides a list of all sub-services available under a specific main service.
     """
-    sub_services = await service_operations.get_sub_services_for_main_service(db, main_service_id)
+    sub_services = await dashboard.get_sub_services_for_main_service(db, main_service_id)
     if sub_services is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -45,7 +45,7 @@ async def get_sub_service_detail(main_service_id: str, sub_service_id: int, db: 
     Retrieves the full details for a single sub-service, including required
     documents and payment amount.
     """
-    details = await service_operations.get_sub_service_details(db, main_service_id, sub_service_id)
+    details = await dashboard.get_sub_service_details(db, main_service_id, sub_service_id)
     if details is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

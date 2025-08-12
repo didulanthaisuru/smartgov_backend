@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes.service_routes import router as service_router
+from routes.dashboard import router as service_router
 from database_config import connect_to_mongo, close_mongo_connection
 
 app = FastAPI()

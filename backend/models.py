@@ -28,7 +28,7 @@ class booking(BaseModel):
 
 class required_documents_model(BaseModel):
     doc_id: int = Field(...)  
-    doc_name: str = Field(...) # A user-friendly name, e.g., "Hospital Birth Report"
+    doc_name: str = Field(...) 
     description: Optional[str] = None # e.g., "Must be issued by the hospital within 3 months"
 
 # Model for an individual sub-service
