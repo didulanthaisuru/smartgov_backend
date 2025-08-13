@@ -48,6 +48,7 @@ async def approve_appointment(appointment_id: int):
             }
         }
     )
+    
 
     if update_result.modified_count == 0:
         raise HTTPException(status_code=500, detail="Failed to approve appointment")
