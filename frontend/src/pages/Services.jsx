@@ -222,7 +222,7 @@ const Services = () => {
 
       <button 
         onClick={() => setShowButtons(!showButtons)}
-        className="fixed bottom-6 right-6 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-yellow-600 transition-colors z-50"
+        className="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-yellow-600 transition-colors z-50"
       >
         <MessageCircle className="w-6 h-6" />
       </button>
