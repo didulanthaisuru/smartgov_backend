@@ -7,11 +7,6 @@ from routes.admin import dashboard_routes,appointment_routes
 
 
 
-
-
-
-
-
 app = FastAPI(
     title="SmartGov",
     description="Smart Government app for managing citizen services and government operations.",
