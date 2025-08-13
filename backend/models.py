@@ -1,3 +1,4 @@
+from bson import ObjectId
 from pydantic import BaseModel,Field
 from typing import Optional
 from datetime import datetime
@@ -15,9 +16,6 @@ class user(BaseModel):
     passcode: str
     user_id: int
     email: str
-
-
-
 class services(BaseModel):
     service_name: str
     service_id: int
@@ -33,6 +31,27 @@ class booking(BaseModel):
     time_booking: time
     booking_state: str
     predicted_duration: time
+
+class required_documents(BaseModel):
+    doc_id: str = Field(...)
+    doc_name: str = Field(...)
+    description: Optional[str] = None
+
+# Model for an individual sub-service
+class sub_service(BaseModel):
+    service_sub_id: str = Field(...)
+    service_id: str
+    service_name: str = Field(...)
+    required_docs: List[str] = []
+    payment_amount: float = Field(default=0.0) 
+
+# Model for the main service document that will be stored in the database
+class main_service(BaseModel):
+    service_main_id:  str = Field(...) # The unique ID for the main-service
+    service_name: str = Field(...)
+    department_id: str = Field(...)
+    icon_name: Optional[str] = None # For the UI icon
+    sub_services: List[str] = []
 
 class admin(BaseModel):
     admin_id: int
