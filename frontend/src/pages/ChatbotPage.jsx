@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
 
 const ChatbotPage = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [language, setLanguage] = useState('English');
+  const [showSidebar, setShowSidebar] = useState(false);
 
   const handleSendMessage = () => {
     if (message.trim()) {
@@ -20,15 +22,30 @@ const ChatbotPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
+      {/* Sidebar */}
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+
       {/* Header */}
       <div className="flex justify-between items-center p-4">
-        {/* Hamburger Menu */}
+        {/* Enhanced Hamburger Menu */}
         <button
-          onClick={() => navigate('/services')}
-          className="w-9 h-9 bg-gray-200 rounded flex items-center justify-center"
+          onClick={() => setShowSidebar(true)}
+          className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition-colors shadow-sm border border-gray-300"
         >
-          <div className="w-6 h-6 bg-gray-600 rounded-sm"></div>
+          <svg
+            className="w-6 h-6 text-gray-700"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
         </button>
 
         {/* Logo */}
@@ -45,15 +62,25 @@ const ChatbotPage = () => {
       </div>
 
       {/* Chat Messages Container */}
-      <div className="flex-1 px-4 py-6 space-y-6">
+      <div className="flex-1 px-4 py-6 space-y-6 pb-32">
+        {/* Bot Avatar Icons */}
+        <div className="flex justify-between px-4">
+          <div className="w-7 h-7 bg-teal-200 rounded-lg flex items-center justify-center">
+            <div className="w-5 h-5 bg-gray-400 rounded"></div>
+          </div>
+          <div className="w-7 h-7 bg-orange-200 rounded-lg flex items-center justify-center">
+            <div className="w-5 h-5 bg-gray-400 rounded"></div>
+          </div>
+        </div>
+
         {/* Bot Avatar and Introduction Message */}
         <div className="flex items-start space-x-3">
           <div className="w-7 h-7 bg-teal-300 rounded-full flex items-center justify-center">
             <div className="w-5 h-5 bg-white rounded-full"></div>
           </div>
-          <div className="max-w-96 bg-white border border-gray-300 rounded-lg p-3 shadow-sm">
-            <div className="w-1 h-16 bg-blue-900 absolute -ml-4 mt-0"></div>
-            <p className="text-sm text-gray-700 leading-relaxed">
+          <div className="max-w-96 bg-white border border-gray-300 rounded-lg p-3 shadow-sm relative">
+            <div className="w-1 h-16 bg-blue-900 absolute -left-1 top-0 rounded-l-lg"></div>
+            <p className="text-sm text-gray-700 leading-relaxed ml-2">
               This AI chatbot has been developed to optimize communication and simplify work processes, ultimately leading to smoother operations.
             </p>
           </div>
@@ -61,9 +88,9 @@ const ChatbotPage = () => {
 
         {/* User Message */}
         <div className="flex justify-end items-start space-x-3">
-          <div className="max-w-28 bg-white border border-gray-300 rounded-lg p-3 shadow-sm">
-            <div className="w-1 h-11 bg-black absolute -mr-4 mt-0 ml-24"></div>
-            <p className="text-sm text-gray-700">Thank You :)</p>
+          <div className="max-w-28 bg-white border border-gray-300 rounded-lg p-3 shadow-sm relative">
+            <div className="w-1 h-11 bg-black absolute -right-1 top-0 rounded-r-lg"></div>
+            <p className="text-sm text-gray-700 mr-2">Thank You :)</p>
           </div>
           <div className="w-7 h-7 bg-orange-300 rounded-full flex items-center justify-center">
             <div className="w-6 h-6 bg-white rounded-full"></div>
@@ -72,7 +99,7 @@ const ChatbotPage = () => {
       </div>
 
       {/* Profile Avatar */}
-      <div className="absolute bottom-20 left-5">
+      <div className="fixed bottom-24 left-5">
         <div className="w-14 h-14 bg-gray-300 rounded-full"></div>
       </div>
 
@@ -91,9 +118,11 @@ const ChatbotPage = () => {
               />
               <button
                 onClick={handleSendMessage}
-                className="w-7 h-7 bg-gray-400 rounded hover:bg-gray-500 transition-colors"
+                className="w-7 h-7 bg-gray-400 rounded hover:bg-gray-500 transition-colors flex items-center justify-center"
               >
-                <span className="text-white text-xs">→</span>
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
               </button>
             </div>
           </div>

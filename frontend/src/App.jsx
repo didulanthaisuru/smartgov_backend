@@ -31,6 +31,7 @@ import OngoingActivitiesPage from './pages/OngoingActivitiesPage';
 import IncompleteActivitiesPage from './pages/IncompleteActivitiesPage';
 import PreviousActivitiesPage from './pages/PreviousActivitiesPage';
 import UpdateInformationPage from './pages/UpdateInformationPage';
+import AnalyticsDashboardPage from './pages/AnalyticsDashboardPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -264,6 +265,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <UpdateInformationPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/analytics" 
+              element={
+                <ProtectedRoute>
+                  <AnalyticsDashboardPage />
                 </ProtectedRoute>
               } 
             />

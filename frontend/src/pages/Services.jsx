@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 import searchIcon from '../assets/images/figma/search_icon_services.png';
 import supplyChainIcon from '../assets/images/figma/supply_chain_icon.png';
 import contactIcon from '../assets/images/figma/contact_icon.png';
@@ -13,6 +15,7 @@ const Services = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showSidebar, setShowSidebar] = useState(false);
 
   const recentServices = [
     {
@@ -126,28 +129,17 @@ const Services = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
+      {/* Sidebar */}
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+      
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4">
-        {/* Profile Button */}
-        <button 
-          onClick={() => navigate('/profile')}
-          className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-        </button>
-
-        {/* Smart Gov Title */}
-        <h1 className="text-2xl font-medium text-black">Smart Gov</h1>
-
-        {/* Language Selector */}
-        <div className="flex items-center bg-white bg-opacity-20 border border-black rounded-xl px-4 py-2">
-          <span className="text-sm font-normal text-black mr-2">English</span>
-          <img src={logoIcon} alt="Language" className="w-6 h-6" />
-        </div>
-      </div>
+      <Header 
+        title="Government Services" 
+        setShowSidebar={setShowSidebar} 
+        showLanguageSelector={true}
+        language="EN"
+      />
 
       {/* Divider Line */}
       <div className="w-full h-px bg-black"></div>
