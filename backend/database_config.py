@@ -49,4 +49,9 @@ if __name__ == "__main__":
             await close_mongo_connection()
 
     # Run the async main function
+<<<<<<< HEAD
     asyncio.run(main())
+=======
+    asyncio.run(main())
+
+>>>>>>> 3081573dc5c2b19c6461ddfe6f563bfed7b61e6c
