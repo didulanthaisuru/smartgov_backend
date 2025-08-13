@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from routes.admin import admin_view_completed
 from fastapi.middleware.cors import CORSMiddleware
 from routes.qr_scanner import router as qr_scanner_router
 from routes.admin import dashboard_routes,appointment_routes
@@ -35,6 +36,8 @@ app.include_router(chat_routes.router)
 
 
 
+
+app.include_router(admin_view_completed.router) 
 
 @app.get("/")
 def read_root():

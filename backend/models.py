@@ -23,12 +23,12 @@ class services(BaseModel):
     service_id: int
     main_service: str
     department_id: int
-    required_documents: List[str]  # list of document names
+    required_documents: List[str]  
 
 class booking(BaseModel):
     booking_id: int
     service_id: int
-    doc_states: Dict[str, str]  # or Dict[str, bool] depending on your data
+    doc_states: Dict[str, str]  
     date_booking: date
     time_booking: time
     booking_state: str
@@ -41,10 +41,13 @@ class admin(BaseModel):
     service_id: str
 
 class appointment(BaseModel):
-    admin_id:int
-    appointment_id:int
-    booking_id:int
-    date:date
-    user_id:int
-    status:str
-    rating:int
+    appointment_id: str = Field(..., alias="_id") 
+    user_id: int
+    user_name: str 
+    admin_id: int
+    completion_date: str 
+    time: str 
+    duration_in_minutes: int 
+    status: str 
+    rating: Optional[int] = None 
+    message: Optional[str] = None
