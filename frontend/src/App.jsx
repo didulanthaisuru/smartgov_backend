@@ -25,6 +25,9 @@ import QRCodePage from './pages/QRCodePage';
 import ChatbotPage from './pages/ChatbotPage';
 import ContactUsPage from './pages/ContactUsPage';
 import ContactUsSuccessPage from './pages/ContactUsSuccessPage';
+import DocumentUploadPage from './pages/DocumentUploadPage';
+import ProfilePage from './pages/ProfilePage';
+import OngoingActivitiesPage from './pages/OngoingActivitiesPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -158,7 +161,7 @@ function App() {
             
             {/* Additional routes */}
             <Route 
-              path="/profile" 
+              path="/dashboard" 
               element={
                 <ProtectedRoute>
                   <DashboardPage />
@@ -210,6 +213,30 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ContactUsSuccessPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/document-upload/:serviceId" 
+              element={
+                <ProtectedRoute>
+                  <DocumentUploadPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ongoing-activities" 
+              element={
+                <ProtectedRoute>
+                  <OngoingActivitiesPage />
                 </ProtectedRoute>
               } 
             />

@@ -157,6 +157,16 @@ const ServiceDetailBooking = () => {
           </button>
         </div>
 
+        {/* Document Upload Link */}
+        <div className="flex justify-center mb-4">
+          <button 
+            onClick={() => navigate(`/document-upload/${serviceId}`)}
+            className="text-sm text-blue-600 hover:text-blue-800 transition-colors underline"
+          >
+            Upload additional documents
+          </button>
+        </div>
+
         {/* Need Help Section */}
         <div className="flex justify-center">
           <button 

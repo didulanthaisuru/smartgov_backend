@@ -129,13 +129,13 @@ const Services = () => {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
-        {/* Back Button / Home */}
+        {/* Profile Button */}
         <button 
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/profile')}
           className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors"
         >
           <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         </button>
 
