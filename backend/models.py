@@ -38,3 +38,15 @@ class admin(BaseModel):
     admin_id: int
     admin_name: str
     service_id: str
+
+class DailyMetrics(BaseModel):
+    date: date
+    day_of_week: str
+    service_id: int
+    main_service_id: int
+    total_appointments: int
+    appointment_ids: Dict[str, Dict[str, str]]  # appointment_id -> {time_slot: "...", predicted_appointment_time: "..."}
+    no_appointment_user_count: int
+    average_processing_time: time
+    no_show_count: int
+
