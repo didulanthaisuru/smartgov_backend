@@ -262,11 +262,27 @@ const Services = () => {
       </div>
 
       {/* Chat with AI Button */}
-      <div className="px-8 mb-8">
-        <div className="bg-[#F8CA92] border border-black rounded-xl p-4 shadow-inner flex items-center justify-between">
+      <div className="px-8 mb-4">
+        <button 
+          onClick={() => navigate('/chatbot')}
+          className="w-full bg-[#F8CA92] border border-black rounded-xl p-4 shadow-inner flex items-center justify-between hover:bg-[#F7C485] transition-colors"
+        >
           <span className="text-sm font-normal text-black">Chat with AI</span>
           <img src={logoIcon} alt="AI" className="w-7 h-7" />
-        </div>
+        </button>
+      </div>
+
+      {/* Contact Us Button */}
+      <div className="px-8 mb-8">
+        <button 
+          onClick={() => navigate('/contact-us')}
+          className="w-full bg-[#E8F5E8] border border-[#4CAF50] rounded-xl p-4 shadow-inner flex items-center justify-between hover:bg-[#E0F0E0] transition-colors"
+        >
+          <span className="text-sm font-normal text-[#4CAF50]">Contact Us</span>
+          <svg className="w-6 h-6 text-[#4CAF50]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26c.31.17.69.17 1-.01L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </button>
       </div>
     </div>
   );

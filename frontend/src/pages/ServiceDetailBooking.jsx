@@ -148,7 +148,7 @@ const ServiceDetailBooking = () => {
         </div>
 
         {/* Book Appointment Button */}
-        <div className="flex justify-center">
+        <div className="flex justify-center mb-4">
           <button
             onClick={handleBookAppointment}
             className="bg-[#8B3C2B] text-white px-16 py-4 rounded-xl text-2xl font-normal hover:bg-[#7A3024] transition-colors"
@@ -157,11 +157,28 @@ const ServiceDetailBooking = () => {
           </button>
         </div>
 
+        {/* Need Help Section */}
+        <div className="flex justify-center">
+          <button 
+            onClick={() => navigate('/contact-us')}
+            className="text-sm text-gray-600 hover:text-gray-800 transition-colors underline"
+          >
+            Need help with this service? Contact Support
+          </button>
+        </div>
+
         {/* Chat Button */}
         <div className="fixed bottom-6 right-6">
-          <button className="bg-[#F8CA92] border border-black rounded-xl px-4 py-3 shadow-inner flex items-center">
+          <button 
+            onClick={() => navigate('/chatbot')}
+            className="bg-[#F8CA92] border border-black rounded-xl px-4 py-3 shadow-inner flex items-center hover:bg-[#F7C485] transition-colors"
+          >
             <span className="text-sm font-normal text-black mr-2">Chat</span>
-            <div className="w-7 h-7 bg-gray-300 rounded"></div>
+            <div className="w-7 h-7 bg-gray-300 rounded flex items-center justify-center">
+              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
           </button>
         </div>
       </div>

@@ -22,6 +22,9 @@ import PaymentPage from './pages/PaymentPage';
 import AppointmentBookingPage from './pages/AppointmentBookingPage';
 import AppointmentConfirmationPage from './pages/AppointmentConfirmationPage';
 import QRCodePage from './pages/QRCodePage';
+import ChatbotPage from './pages/ChatbotPage';
+import ContactUsPage from './pages/ContactUsPage';
+import ContactUsSuccessPage from './pages/ContactUsSuccessPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -155,7 +158,7 @@ function App() {
             
             {/* Additional routes */}
             <Route 
-              path="/profile/*" 
+              path="/profile" 
               element={
                 <ProtectedRoute>
                   <DashboardPage />
@@ -183,6 +186,30 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AppointmentsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/chatbot" 
+              element={
+                <ProtectedRoute>
+                  <ChatbotPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/contact-us" 
+              element={
+                <ProtectedRoute>
+                  <ContactUsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/contact-success" 
+              element={
+                <ProtectedRoute>
+                  <ContactUsSuccessPage />
                 </ProtectedRoute>
               } 
             />

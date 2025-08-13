@@ -378,6 +378,46 @@ const ServiceDetail = () => {
             </div>
           </div>
         )}
+
+        {/* Help & Support Section */}
+        <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Need Help?</h2>
+          <p className="text-gray-600 mb-6">Get assistance with your application or ask questions about this service.</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Chatbot Link */}
+            <button 
+              onClick={() => navigate('/chatbot')}
+              className="bg-white border border-blue-300 rounded-lg p-4 hover:bg-blue-50 transition-colors flex items-center space-x-3"
+            >
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="font-medium text-gray-900">Chat with AI</h3>
+                <p className="text-sm text-gray-600">Get instant answers to common questions</p>
+              </div>
+            </button>
+
+            {/* Contact Us Link */}
+            <button 
+              onClick={() => navigate('/contact-us')}
+              className="bg-white border border-green-300 rounded-lg p-4 hover:bg-green-50 transition-colors flex items-center space-x-3"
+            >
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26c.31.17.69.17 1-.01L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="font-medium text-gray-900">Contact Support</h3>
+                <p className="text-sm text-gray-600">Reach out to our support team</p>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

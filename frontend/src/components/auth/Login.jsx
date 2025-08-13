@@ -21,8 +21,8 @@ const Login = () => {
     localStorage.setItem('token', 'dummy-auth-token');
     localStorage.setItem('user', JSON.stringify(userData));
     
-    // Navigate to dashboard
-    navigate('/dashboard');
+    // Navigate to services page (main entry point)
+    navigate('/services');
   };
 
   return (
