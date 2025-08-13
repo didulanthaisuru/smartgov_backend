@@ -23,6 +23,11 @@ async def get_incomplete_appointments(user_req: user_request, db: AsyncIOMotorCl
     """Gets a list of a user's INCOMPLETE appointments (date has NOT been set)."""
     return await user_appointment_get.get_user_appointments_by_status(db, user_req.user_id, is_ongoing=False)
 
+@router.post("/previous", response_model=List[appointment_summary_response])
+async def get_previous_appointments(user_req: user_request, db: AsyncIOMotorClient = Depends(get_database)):
+    """Gets a list of a user's PREVIOUS (fully completed) appointments."""
+    return await user_appointment_get.get_previous_appointments(db, user_req.user_id)
+
 # @router.post("/{appointment_id}/details", response_model=AppointmentDetailResponse)
 # async def get_user_appointment(appointment_id: str, user_req: UserRequest, db: AsyncIOMotorClient = Depends(get_database)):
 #     """Retrieves the detailed state of a specific appointment for a specific user."""

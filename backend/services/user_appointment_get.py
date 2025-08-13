@@ -78,3 +78,25 @@ async def get_user_appointments_by_status(db: AsyncIOMotorClient, user_id: str, 
         }}
     ]
     return await db[APPOINTMENTS_COLLECTION].aggregate(pipeline).to_list(None)
+
+async def get_previous_appointments(db: AsyncIOMotorClient, user_id: str) -> List[Dict[str, Any]]:
+    """Gets a list of a user's PREVIOUS (fully completed) appointments."""
+    pipeline = [
+        # Find all appointments for the user that are fully completed
+        {"$match": {"user_id": user_id, "is_fully_completed": True}},
+        # Join with sub_services to get the service name
+        {"$lookup": {
+            "from": SUB_SERVICES_COLLECTION,
+            "localField": "sub_service_id",
+            "foreignField": "_id",
+            "as": "sub_service_info"
+        }},
+        {"$unwind": "$sub_service_info"},
+        # Project the summary shape
+        {"$project": {
+            "_id": 0, "appointment_id": {"$toString": "$_id"}, "service_name": "$sub_service_info.service_name",
+            "appointment_date": 1, "is_fully_completed": 1
+        }}
+    ]
+    return await db[APPOINTMENTS_COLLECTION].aggregate(pipeline).to_list(None)
+
