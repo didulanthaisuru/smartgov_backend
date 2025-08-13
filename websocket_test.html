@@ -157,9 +157,9 @@
         <!-- Connection Info -->
         <div class="test-section">
             <h3>Connection Info</h3>
-            <p><strong>WebSocket URL:</strong> <code>ws://127.0.0.1:8001/ws/notifications</code></p>
-            <p><strong>Backend API:</strong> <code>http://127.0.0.1:8001</code></p>
-            <p><strong>Swagger Docs:</strong> <a href="http://127.0.0.1:8001/docs" target="_blank">http://127.0.0.1:8001/docs</a></p>
+            <p><strong>WebSocket URL:</strong> <code>ws://127.0.0.1:8002/ws/notifications</code></p>
+            <p><strong>Backend API:</strong> <code>http://127.0.0.1:8002</code></p>
+            <p><strong>Swagger Docs:</strong> <a href="http://127.0.0.1:8002/docs" target="_blank">http://127.0.0.1:8002/docs</a></p>
         </div>
     </div>
 
@@ -204,7 +204,7 @@
             addMessage('Attempting to connect to WebSocket...', 'info');
 
             try {
-                websocket = new WebSocket('ws://127.0.0.1:8001/ws/notifications');
+                websocket = new WebSocket('ws://127.0.0.1:8002/ws/notifications');
 
                 websocket.onopen = function(event) {
                     updateStatus('✅ Connected', 'connected');
@@ -231,7 +231,7 @@
 
                 websocket.onerror = function(error) {
                     updateStatus('❌ Connection Error', 'disconnected');
-                    addMessage('WebSocket error occurred. Check if the server is running on port 8001.', 'error');
+                    addMessage('WebSocket error occurred. Check if the server is running on port 8002.', 'error');
                     connectBtn.disabled = false;
                     disconnectBtn.disabled = true;
                 };
@@ -258,7 +258,7 @@
 
             try {
                 addMessage(`Testing approve for appointment ${appointmentId}...`, 'info');
-                const response = await fetch(`http://127.0.0.1:8001/api/admin/appointments/${appointmentId}/approve`, {
+                const response = await fetch(`http://127.0.0.1:8002/api/admin/appointments/${appointmentId}/approve`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -285,7 +285,7 @@
 
             try {
                 addMessage(`Testing decline for appointment ${appointmentId}...`, 'info');
-                const response = await fetch(`http://127.0.0.1:8001/api/admin/appointments/${appointmentId}/decline`, {
+                const response = await fetch(`http://127.0.0.1:8002/api/admin/appointments/${appointmentId}/decline`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
