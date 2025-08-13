@@ -86,9 +86,9 @@ const ServiceDetailBooking = () => {
                                             {doc.status === 'uploaded' ? (
                                                 <span className="font-medium text-gray-700">Uploaded</span>
                                             ) : (
-                                                <button onClick={() => handleUploadClick(doc.id)} className="bg-[#FFF5E9] text-black text-xs font-medium px-2 py-1.5 rounded-md flex items-center justify-center gap-1.5 mx-auto">
+                                                <button onClick={() => handleUploadClick(doc.id)} className="bg-[#F8CA92] text-black text-xs font-medium px-2 py-1.5 rounded-md flex items-center justify-center gap-1.5 mx-auto">
                                                     <span>📄</span>
-                                                    <span>Upload digital copy</span>
+                                                    <span>Upload </span>
                                                 </button>
                                             )}
                                         </div>
