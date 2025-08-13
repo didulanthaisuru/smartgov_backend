@@ -67,7 +67,7 @@ const PaymentPage = () => {
     setTimeout(() => {
       setIsProcessing(false);
       alert('Payment successful! Your application has been submitted.');
-      navigate('/services');
+      navigate(`/services/${serviceId}/confirmation`);
     }, 3000);
   };
 

@@ -19,6 +19,9 @@ import ServiceDetail from './pages/ServiceDetail';
 import ServiceDetailBooking from './pages/ServiceDetailBooking';
 import UploadPage from './pages/UploadPage';
 import PaymentPage from './pages/PaymentPage';
+import AppointmentBookingPage from './pages/AppointmentBookingPage';
+import AppointmentConfirmationPage from './pages/AppointmentConfirmationPage';
+import QRCodePage from './pages/QRCodePage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -96,6 +99,30 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PaymentPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/services/:serviceId/booking" 
+              element={
+                <ProtectedRoute>
+                  <AppointmentBookingPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/services/:serviceId/confirmation" 
+              element={
+                <ProtectedRoute>
+                  <AppointmentConfirmationPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/services/:serviceId/qr-code" 
+              element={
+                <ProtectedRoute>
+                  <QRCodePage />
                 </ProtectedRoute>
               } 
             />
