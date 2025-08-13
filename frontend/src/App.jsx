@@ -18,6 +18,7 @@ import Services from './pages/Services';
 import ServiceDetail from './pages/ServiceDetail';
 import ServiceDetailBooking from './pages/ServiceDetailBooking';
 import UploadPage from './pages/UploadPage';
+import PaymentPage from './pages/PaymentPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -87,6 +88,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <UploadPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/services/:serviceId/payment" 
+              element={
+                <ProtectedRoute>
+                  <PaymentPage />
                 </ProtectedRoute>
               } 
             />

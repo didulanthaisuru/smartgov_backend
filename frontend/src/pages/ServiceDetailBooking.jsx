@@ -19,7 +19,7 @@ const ServiceDetailBooking = () => {
   };
 
   const handleBookAppointment = () => {
-    navigate(`/services/${serviceId}/booking`);
+    navigate(`/services/${serviceId}/payment`);
   };
 
   const getAccuracyColor = (accuracy) => {
@@ -147,13 +147,13 @@ const ServiceDetailBooking = () => {
           </div>
         </div>
 
-        {/* Book Appointment Button */}
+        {/* Proceed to Payment Button */}
         <div className="flex justify-center">
           <button
             onClick={handleBookAppointment}
             className="bg-[#8B3C2B] text-white px-16 py-4 rounded-xl text-2xl font-normal hover:bg-[#7A3024] transition-colors"
           >
-            Book An Appointment
+            Proceed to Payment
           </button>
         </div>
 
