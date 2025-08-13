@@ -1,9 +1,10 @@
 from fastapi import FastAPI
+from routes import appointments, apointmentdetails,chat_routes
 from routes.admin import admin_view_completed
 from fastapi.middleware.cors import CORSMiddleware
 from routes.qr_scanner import router as qr_scanner_router
 from routes.admin import dashboard_routes,appointment_routes
-from routes import chat_routes
+
 
 
 
@@ -32,15 +33,13 @@ app.include_router(qr_scanner_router)
 app.include_router(dashboard_routes.router)
 app.include_router(appointment_routes.router)
 app.include_router(chat_routes.router)
-
-
-
-
-
+app.include_router(appointments.router)
+app.include_router(apointmentdetails.router)
 app.include_router(admin_view_completed.router) 
 
+
 @app.get("/")
-def read_root():
+def root():
     return {"message": "SmartGov API is running"}
 
 
