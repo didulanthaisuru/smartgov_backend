@@ -1,6 +1,7 @@
 from fastapi import HTTPException, UploadFile
 import base64
 from database_config import db
+from datetime import datetime
 
 users_collection = db["users"]
 
@@ -24,21 +25,26 @@ def get_user(nic: str):
     return user_to_dict(user)
 
 # Update user profile
-async def update_user(nic: str, first_name: str, phone_number: str, address: str, profile_picture: UploadFile = None):
+async def update_user(nic: str, first_name: str = None, phone_number: str = None,
+                      address: str = None, profile_picture: UploadFile = None):
     user = users_collection.find_one({"nic": nic})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    update_data = {
-        "first_name": first_name,
-        "phone_number": phone_number,
-        "address": address
-    }
+    update_data = {}
 
+    if first_name is not None:
+        update_data["first_name"] = first_name
+    if phone_number is not None:
+        update_data["phone_number"] = phone_number
+    if address is not None:
+        update_data["address"] = address
     if profile_picture:
         content = await profile_picture.read()
-        encoded_string = base64.b64encode(content).decode("utf-8")
-        update_data["profile_picture"] = encoded_string
+        update_data["profile_picture"] = base64.b64encode(content).decode("utf-8")
 
-    users_collection.update_one({"nic": nic}, {"$set": update_data})
-    return {"message": "Profile updated successfully"}
+    if update_data:
+        update_data["updated_at"] = datetime.utcnow()
+        users_collection.update_one({"nic": nic}, {"$set": update_data})
+
+    return {"message": "Profile updated successfully", "updated_at": update_data.get("updated_at")}
