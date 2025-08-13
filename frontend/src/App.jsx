@@ -16,6 +16,8 @@ import AppointmentsPage from './pages/AppointmentsPage';
 import MessagesPage from './pages/MessagesPage';
 import Services from './pages/Services';
 import ServiceDetail from './pages/ServiceDetail';
+import ServiceDetailBooking from './pages/ServiceDetailBooking';
+import UploadPage from './pages/UploadPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -26,7 +28,7 @@ const ProtectedRoute = ({ children }) => {
 // Public Route Component (redirect if authenticated)
 const PublicRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
-  return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
+  return !isAuthenticated ? children : <Navigate to="/services" replace />;
 };
 
 function App() {
@@ -38,8 +40,6 @@ function App() {
             {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/welcome" element={<WelcomePage />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/services/:serviceId" element={<ServiceDetail />} />
             <Route 
               path="/login" 
               element={
@@ -54,6 +54,40 @@ function App() {
                 <PublicRoute>
                   <SignUpPage />
                 </PublicRoute>
+              } 
+            />
+
+            {/* Protected Routes - Services as main dashboard */}
+            <Route 
+              path="/services" 
+              element={
+                <ProtectedRoute>
+                  <Services />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/services/:serviceId" 
+              element={
+                <ProtectedRoute>
+                  <ServiceDetail />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/services/:serviceId/detail" 
+              element={
+                <ProtectedRoute>
+                  <ServiceDetailBooking />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/services/:serviceId/upload/:docId" 
+              element={
+                <ProtectedRoute>
+                  <UploadPage />
+                </ProtectedRoute>
               } 
             />
 

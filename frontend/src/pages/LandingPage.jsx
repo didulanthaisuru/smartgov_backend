@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import logoIcon from '../assets/images/figma/logo.png';
+import searchIcon from '../assets/images/figma/search_icon.png';
+import heroImage from '../assets/images/figma/hero_image.png';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -25,30 +28,6 @@ const LandingPage = () => {
     setContactForm({ name: '', nic: '', contactNo: '', message: '' });
   };
 
-  const services = [
-    {
-      id: 1,
-      title: 'Birth certificates',
-      description: 'Apply for a new official birth certificate quickly and securely online.',
-      icon: '/src/assets/images/figma/logo.png',
-      category: 'Personal Documents'
-    },
-    {
-      id: 2,
-      title: 'Business Registration',
-      description: 'Easily register your business with just a few clicks.',
-      icon: '/src/assets/images/figma/logo.png',
-      category: 'Business Services'
-    },
-    {
-      id: 3,
-      title: 'Government Jobs',
-      description: 'Apply for current government job openings and track your application status.',
-      icon: '/src/assets/images/figma/logo.png',
-      category: 'Employment'
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -57,7 +36,7 @@ const LandingPage = () => {
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12">
             <img 
-              src="/src/assets/images/figma/logo.png" 
+              src={logoIcon} 
               alt="Smart Gov Logo"
               className="w-full h-full object-contain"
             />
@@ -70,7 +49,7 @@ const LandingPage = () => {
           <span className="text-sm text-black">{language}</span>
           <div className="w-6 h-6">
             <img 
-              src="/src/assets/images/figma/search_icon.png" 
+              src={searchIcon} 
               alt="Language"
               className="w-full h-full object-contain"
             />
@@ -82,20 +61,23 @@ const LandingPage = () => {
       <section className="px-6 py-8">
         {/* Search Bar */}
         <div className="mb-6">
-          <div className="bg-orange-200 rounded-xl px-4 py-3 flex items-center space-x-3 max-w-sm">
+          <div 
+            onClick={() => navigate('/login')}
+            className="bg-orange-200 rounded-xl px-4 py-3 flex items-center space-x-3 max-w-sm cursor-pointer hover:bg-orange-300 transition-colors"
+          >
             <img 
-              src="/src/assets/images/figma/search_icon.png" 
+              src={searchIcon} 
               alt="Search"
               className="w-4 h-4"
             />
-            <span className="text-black text-opacity-50">Search</span>
+            <span className="text-black text-opacity-50">Get started with services...</span>
           </div>
         </div>
 
         {/* Hero Image */}
         <div className="mb-8">
           <img 
-            src="/src/assets/images/figma/hero_image.png" 
+            src={heroImage} 
             alt="E-Governance"
             className="w-full max-w-md mx-auto rounded-lg"
           />
@@ -119,35 +101,6 @@ const LandingPage = () => {
           >
             Get started
           </button>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section className="px-6 py-8">
-        <h2 className="text-4xl font-normal text-black text-center mb-8">Services</h2>
-        
-        {/* Services Slider */}
-        <div className="overflow-x-auto pb-4">
-          <div className="flex space-x-6 min-w-max">
-            {services.map((service) => (
-              <div key={service.id} className="bg-orange-100 rounded-3xl p-6 w-80 flex-shrink-0">
-                {/* Service Icon */}
-                <div className="w-20 h-20 bg-orange-100 rounded-xl mb-4 flex items-center justify-center">
-                  <img 
-                    src={service.icon} 
-                    alt={service.title}
-                    className="w-12 h-12 object-contain"
-                  />
-                </div>
-                
-                {/* Service Content */}
-                <h3 className="text-xl font-normal text-black mb-3">{service.title}</h3>
-                <p className="text-sm font-normal text-black leading-relaxed">
-                  {service.description}
-                </p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -245,8 +198,16 @@ const LandingPage = () => {
             <div>
               <h3 className="text-sm font-normal text-black mb-4">Quick Access</h3>
               <ul className="space-y-2 text-sm font-normal text-black">
-                <li>- Home</li>
-                <li>- Services</li>
+                <li>
+                  <button onClick={() => navigate('/')} className="hover:text-blue-600 transition-colors">
+                    - Home
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate('/login')} className="hover:text-blue-600 transition-colors">
+                    - Login
+                  </button>
+                </li>
                 <li>- How It Works</li>
                 <li>- Contact</li>
               </ul>
