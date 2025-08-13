@@ -1,63 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const MessagesPage = () => {
+const PreviousActivitiesPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFeedback, setShowFeedback] = useState(false);
 
-  const messages = [
+  const previousActivities = [
     {
       id: 1,
-      from: 'BR Admin',
-      date: '2025-07-11',
-      content: 'Hi Imasha Jayarathne, we are regret to inform that your birth certificate doesn\'t match our requirement. Please upload another one.',
-      type: 'error'
-    },
-    {
-      id: 2,
-      from: 'NIC Admin', 
-      date: '2025-07-10',
-      content: 'Hi Imasha Jayarathne, we are happy to inform you that your grama niladari approval got verified and now have gone to the permit processing stage.',
-      type: 'success'
-    },
-    {
-      id: 3,
-      from: 'License Admin',
-      date: '2025-07-09', 
-      content: 'Hi Imasha Jayarathne, we are happy to inform you that your business registration is at the final stage and it will be send to the final signature on 13th monday. you can borrow it on 2.00 pm',
-      type: 'info'
+      title: 'Permit for timber transport',
+      status: 'Completed',
+      description: 'Permit Issued successfully',
+      completedDate: '2025-07-05',
+      rating: 0
     }
   ];
-
-  const getMessageIcon = (type) => {
-    switch (type) {
-      case 'success': return CheckCircle;
-      case 'warning': return AlertCircle;
-      case 'info': return Bell;
-      default: return MessageSquare;
-    }
-  };
-
-  const getMessageColor = (type) => {
-    switch (type) {
-      case 'success': return 'text-green-600';
-      case 'warning': return 'text-orange-600';
-      case 'info': return 'text-blue-600';
-      default: return 'text-gray-600';
-    }
-  };
-
-  const filteredMessages = messages.filter(message =>
-    message.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    message.from.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-48 -left-48 w-[720px] h-[620px] rounded-full bg-blue-100 opacity-30"></div>
-        <div className="absolute bottom-[-500px] -left-48 w-[720px] h-[620px] rounded-full bg-blue-100 opacity-30"></div>
+        <div className="absolute -top-40 -left-40 w-[800px] h-[730px] rounded-full bg-blue-100 opacity-30"></div>
       </div>
 
       {/* Header */}
@@ -70,10 +34,11 @@ const MessagesPage = () => {
         </button>
 
         <div className="flex items-center">
-          {/* Messages Icon */}
+          {/* History Icon */}
           <div className="w-8 h-8 flex items-center justify-center mr-4 bg-white shadow-md rounded-lg">
-            <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            <svg className="w-6 h-6 text-black" stroke="currentColor" fill="none" viewBox="0 0 24 24" strokeWidth="2.5">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12,6 12,12 16,14"/>
             </svg>
           </div>
           
@@ -91,8 +56,8 @@ const MessagesPage = () => {
 
       {/* Title and Summary */}
       <div className="relative z-10 px-10 py-6">
-        <h2 className="text-4xl font-normal text-black mb-4">Messages</h2>
-        <p className="text-sm text-black mb-6">You have 3 unread Messages</p>
+        <h2 className="text-4xl font-normal text-black mb-4">Previous Activities</h2>
+        <p className="text-sm text-black mb-6">View your previous activities here</p>
       </div>
 
       {/* Main Content Area */}
@@ -101,7 +66,7 @@ const MessagesPage = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1 mr-4">
             <div className="relative bg-[#F8CB93] rounded-xl px-6 py-3 flex items-center shadow-md">
-              <span className="text-sm text-black opacity-25 mr-3">Search Messages</span>
+              <span className="text-sm text-black opacity-25 mr-3">Search activities</span>
               <svg className="w-4 h-4 text-black opacity-25" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
               </svg>
@@ -116,22 +81,48 @@ const MessagesPage = () => {
           </div>
         </div>
 
-        {/* Messages List */}
-        <div className="space-y-4">
-          {filteredMessages.map((message) => (
-            <div key={message.id} className="bg-[#F8CB93] rounded-xl p-6 shadow-md">
-              <div className="flex items-start justify-between mb-4">
-                <div className="text-xs text-black opacity-50">
-                  By {message.from}
-                </div>
-                <div className="text-xs text-black opacity-50">
-                  {message.date}
+        {/* Previous Activities List */}
+        <div className="space-y-6">
+          {previousActivities.map((activity) => (
+            <div key={activity.id} className="bg-[#F8CB93] rounded-xl p-6 shadow-md">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex-1">
+                  <h3 className="text-sm font-normal text-black mb-1">{activity.title}</h3>
+                  <p className="text-sm text-black">{activity.status}</p>
                 </div>
               </div>
-              
-              <p className="text-sm text-black leading-relaxed">
-                {message.content}
-              </p>
+
+              <div className="mb-6">
+                <p className="text-sm font-bold text-black">
+                  {activity.description}
+                </p>
+              </div>
+
+              {/* Rating Section */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-bold text-black">Rate our service -</span>
+                  <div className="flex items-center space-x-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <svg
+                        key={star}
+                        className="w-6 h-6 text-yellow-400 cursor-pointer"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+                
+                <button 
+                  onClick={() => setShowFeedback(true)}
+                  className="w-full bg-white rounded-xl py-3 px-4 shadow-md"
+                >
+                  <span className="text-sm text-gray-500">Feedback</span>
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -162,10 +153,37 @@ const MessagesPage = () => {
         </div>
       </div>
 
+      {/* Feedback Modal */}
+      {showFeedback && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 m-6 max-w-sm w-full">
+            <h3 className="text-lg font-medium text-black mb-4">Leave Feedback</h3>
+            <textarea 
+              className="w-full h-24 p-3 border border-gray-300 rounded-lg text-sm"
+              placeholder="Please share your experience..."
+            />
+            <div className="flex space-x-3 mt-4">
+              <button 
+                onClick={() => setShowFeedback(false)}
+                className="flex-1 py-2 px-4 bg-gray-200 text-gray-700 rounded-lg text-sm"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => setShowFeedback(false)}
+                className="flex-1 py-2 px-4 bg-[#8C322A] text-white rounded-lg text-sm"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Bottom Padding */}
       <div className="h-8"></div>
     </div>
   );
 };
 
-export default MessagesPage;
+export default PreviousActivitiesPage;

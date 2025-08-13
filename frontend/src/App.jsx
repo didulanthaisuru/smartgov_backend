@@ -29,6 +29,8 @@ import DocumentUploadPage from './pages/DocumentUploadPage';
 import ProfilePage from './pages/ProfilePage';
 import OngoingActivitiesPage from './pages/OngoingActivitiesPage';
 import IncompleteActivitiesPage from './pages/IncompleteActivitiesPage';
+import PreviousActivitiesPage from './pages/PreviousActivitiesPage';
+import UpdateInformationPage from './pages/UpdateInformationPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -246,6 +248,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <IncompleteActivitiesPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/previous-activities" 
+              element={
+                <ProtectedRoute>
+                  <PreviousActivitiesPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/update-information" 
+              element={
+                <ProtectedRoute>
+                  <UpdateInformationPage />
                 </ProtectedRoute>
               } 
             />
