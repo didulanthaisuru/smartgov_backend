@@ -28,6 +28,7 @@ import ContactUsSuccessPage from './pages/ContactUsSuccessPage';
 import DocumentUploadPage from './pages/DocumentUploadPage';
 import ProfilePage from './pages/ProfilePage';
 import OngoingActivitiesPage from './pages/OngoingActivitiesPage';
+import IncompleteActivitiesPage from './pages/IncompleteActivitiesPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -237,6 +238,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <OngoingActivitiesPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/incomplete-activities" 
+              element={
+                <ProtectedRoute>
+                  <IncompleteActivitiesPage />
                 </ProtectedRoute>
               } 
             />
