@@ -1,22 +1,30 @@
 from fastapi import HTTPException
 from datetime import datetime
 from bson import ObjectId
-from ..database_config import db
+from motor.motor_asyncio import AsyncIOMotorClient
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+
+# Async MongoDB setup
+MONGO_URI = os.getenv("MONGO_URI")
+client = AsyncIOMotorClient(MONGO_URI)
+db = client["SmartGov"]
 appointment_collection = db["appointmentdetails"]
 
 def serialize_doc(doc):
     doc["_id"] = str(doc["_id"])
     return doc
 
-def get_appointment_by_id(appointment_id: int):
-    doc = appointment_collection.find_one({"appointment_id": appointment_id})
+async def get_appointment_by_id(appointment_id: int):
+    doc = await appointment_collection.find_one({"appointment_id": appointment_id})
     if not doc:
         raise HTTPException(status_code=404, detail="Appointment not found")
     return serialize_doc(doc)
 
-def get_document_metadata(appointment_id: int, doc_id: str):
-    appointment = appointment_collection.find_one({"appointment_id": appointment_id})
+async def get_document_metadata(appointment_id: int, doc_id: str):
+    appointment = await appointment_collection.find_one({"appointment_id": appointment_id})
     if not appointment:
         raise HTTPException(status_code=404, detail="Appointment not found")
     
@@ -25,12 +33,12 @@ def get_document_metadata(appointment_id: int, doc_id: str):
         raise HTTPException(status_code=404, detail="Document not found")
     return document
 
-def approve_appointment(appointment_id: int):
-    appointment = appointment_collection.find_one({"appointment_id": appointment_id})
+async def approve_appointment(appointment_id: int):
+    appointment = await appointment_collection.find_one({"appointment_id": appointment_id})
     if not appointment:
         raise HTTPException(status_code=404, detail="Appointment not found")
 
-    update_result = appointment_collection.update_one(
+    update_result = await appointment_collection.update_one(
         {"appointment_id": appointment_id},
         {
             "$set": {
@@ -50,12 +58,12 @@ def approve_appointment(appointment_id: int):
         "approved_at": datetime.utcnow().isoformat()
     }
 
-def decline_appointment(appointment_id: int):
-    appointment = appointment_collection.find_one({"appointment_id": appointment_id})
+async def decline_appointment(appointment_id: int):
+    appointment = await appointment_collection.find_one({"appointment_id": appointment_id})
     if not appointment:
         raise HTTPException(status_code=404, detail="Appointment not found")
 
-    update_result = appointment_collection.update_one(
+    update_result = await appointment_collection.update_one(
         {"appointment_id": appointment_id},
         {
             "$set": {
