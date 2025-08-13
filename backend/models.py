@@ -33,8 +33,18 @@ class booking(BaseModel):
     time_booking: time
     booking_state: str
     predicted_duration: time
+    user_id:int
 
 class admin(BaseModel):
     admin_id: int
     admin_name: str
     service_id: str
+
+class appointment(BaseModel):
+    admin_id:int
+    appointment_id:int
+    booking_id:int
+    date:date
+    user_id:int
+    status:str
+    rating:int
