@@ -1,17 +1,22 @@
 from fastapi import APIRouter
-from database_config import db
-from services.insights import get_daily_subservice_wise_matrix
-from services.insights import get_appointment_count
-from schemas.insights import DailySubserviceMatrixRequest, DailySubserviceMatrixResponse
-from motor.motor_asyncio import AsyncIOMotorDatabase
-
+from schemas.insights import InsightQuery, InsightDetail
+from services.insights import get_insights_by_date_sub_service, get_insights_by_date_main_service
 
 router = APIRouter()
 
-@router.post("/daily_subservice_matrix", response_model=list[DailySubserviceMatrixResponse])
-async def daily_subservice_matrix(request: DailySubserviceMatrixRequest):
-	return await get_daily_subservice_wise_matrix(db, request)
+@router.post("/view-service_insights", response_model=list[InsightDetail])
+def view_insights(query: InsightQuery):
+	return get_insights_by_date_sub_service(query)
 
-@router.post("/appointment_count")
-async def appointment_count(request: DailySubserviceMatrixRequest):
-	return await get_appointment_count(request)
+
+
+
+# New route: filter by date and main_service_id only
+from services.insights import get_insights_by_date_main_service
+from datetime import date
+
+from schemas.insights import MainServiceQuery
+
+@router.post("/view-mainservice-insights", response_model=list[InsightDetail])
+def view_mainservice_insights(query: MainServiceQuery):
+	return get_insights_by_date_main_service(query)

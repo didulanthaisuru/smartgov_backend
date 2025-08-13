@@ -69,15 +69,11 @@ class Appointment(BaseModel):
     predicted_duration: Optional[int] = None
 
 class DailyMetrics(BaseModel):
-    id: str = Field(default=None, alias="_id")
     matrics_id: str = Field(..., alias="matrics_id")
     date: date
     day_of_week: str
     service_id: int
     main_service_id: int
-    total_appointments: int
-    appointment_ids: Dict[str, Dict[str, str]]  # appointment_id -> {time_slot: "...", predicted_appointment_time: "..."}
-    no_appointment_user_count: int
     average_processing_time: time
     no_show_count: int
 
