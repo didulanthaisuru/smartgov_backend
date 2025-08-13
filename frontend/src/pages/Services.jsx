@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 import searchIcon from '../assets/images/figma/search_icon_services.png';
 import supplyChainIcon from '../assets/images/figma/supply_chain_icon.png';
 import contactIcon from '../assets/images/figma/contact_icon.png';
@@ -15,6 +17,7 @@ const Services = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showSidebar, setShowSidebar] = useState(false);
   const [showButtons, setShowButtons] = useState(false);
 
   const recentServices = [
@@ -131,8 +134,17 @@ const Services = () => {
 );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
+      {/* Sidebar */}
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+      
       {/* Header */}
+      <Header 
+        title="Government Services" 
+        setShowSidebar={setShowSidebar} 
+        showLanguageSelector={true}
+        language="EN"
+      />
       <div className="flex items-center justify-between px-6 py-4">
         {/* Profile Button */}
         <button 

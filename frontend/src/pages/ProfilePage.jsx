@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const [showSidebar, setShowSidebar] = useState(false);
 
   const menuItems = [
     {
@@ -52,6 +55,17 @@ const ProfilePage = () => {
     },
     {
       id: 5,
+      title: 'Analytics Dashboard',
+      description: 'View service statistics and reports',
+      icon: (
+        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.25c.69 0 1.25-.56 1.25-1.25V6c0-.69-.56-1.25-1.25-1.25H5.5C4.81 4.75 4.25 5.31 4.25 6v12c0 .69.56 1.25 1.25 1.25h14z"/>
+        </svg>
+      ),
+      onClick: () => navigate('/analytics')
+    },
+    {
+      id: 6,
       title: 'Update Information',
       description: '',
       icon: (
@@ -65,6 +79,9 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* Sidebar */}
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+      
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-blue-100 opacity-30"></div>
@@ -72,23 +89,11 @@ const ProfilePage = () => {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-6 py-6">
-        <button 
-          onClick={() => navigate('/services')}
-          className="w-9 h-9 flex items-center justify-center"
-        >
-          <div className="w-9 h-9 bg-gray-300 rounded"></div>
-        </button>
-
-        <div className="flex items-center">
-          <div className="w-15 h-20 bg-gray-300 rounded mr-4"></div>
-          <h1 className="text-2xl font-medium text-black">Smart Gov</h1>
-        </div>
-
-        <div className="flex items-center bg-white bg-opacity-20 border border-black rounded-xl px-4 py-2">
-          <span className="text-sm font-normal text-black mr-2">English</span>
-          <div className="w-6 h-6 bg-gray-300 rounded"></div>
-        </div>
+      <div className="relative z-10">
+        <Header 
+          title="My Profile" 
+          setShowSidebar={setShowSidebar} 
+        />
       </div>
 
       {/* Profile Section */}

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 const ContactUsPage = () => {
   const navigate = useNavigate();
   const [language, setLanguage] = useState('English');
+  const [showSidebar, setShowSidebar] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     nic: '',
@@ -39,6 +42,9 @@ const ContactUsPage = () => {
 
   return (
     <div className="min-h-screen bg-white relative">
+      {/* Sidebar */}
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+      
       {/* Blurred Background Elements */}
       <div className="absolute inset-0 filter blur-lg pointer-events-none">
         <div className="absolute -left-64 top-56 w-240 h-240 bg-blue-100 bg-opacity-53 rounded-full"></div>
@@ -46,26 +52,13 @@ const ContactUsPage = () => {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 flex justify-between items-center p-6">
-        {/* Hamburger Menu */}
-        <button
-          onClick={() => navigate('/services')}
-          className="w-9 h-9 bg-gray-200 rounded flex items-center justify-center"
-        >
-          <div className="w-6 h-6 bg-gray-600 rounded-sm"></div>
-        </button>
-
-        {/* Logo */}
-        <div className="flex items-center space-x-2">
-          <div className="w-15 h-20 bg-orange-500 rounded"></div>
-          <span className="text-2xl font-medium text-black">Smart Gov</span>
-        </div>
-
-        {/* Language Selector */}
-        <div className="flex items-center space-x-1 bg-white bg-opacity-20 border border-black rounded-xl px-3 py-2">
-          <span className="text-sm text-black">{language}</span>
-          <div className="w-6 h-6 bg-gray-400 rounded-sm"></div>
-        </div>
+      <div className="relative z-10">
+        <Header 
+          title="Contact Us" 
+          setShowSidebar={setShowSidebar} 
+          showLanguageSelector={true}
+          language={language}
+        />
       </div>
 
       {/* Main Content */}

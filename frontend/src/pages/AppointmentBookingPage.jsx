@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Calendar from '../components/Calendar';
+import BarChart from '../components/BarChart';
 import logoIcon from '../assets/images/figma/logo.png';
 
 const AppointmentBookingPage = () => {
   const { serviceId } = useParams();
   const navigate = useNavigate();
 
-  const [selectedDate, setSelectedDate] = useState(6);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState('8.30');
-  const [selectedMonth, setSelectedMonth] = useState('January');
   const [paymentMethod, setPaymentMethod] = useState('');
 
   const timeSlots = [
@@ -18,11 +19,11 @@ const AppointmentBookingPage = () => {
     { time: '2.30', available: true, traffic: 'medium' }
   ];
 
-  const visitorTrafficByTime = [
-    { timeRange: '8.30-10.30', level: 85 },
-    { timeRange: '10.30-12.30', level: 65 },
-    { timeRange: '12.30-2.30', level: 40 },
-    { timeRange: '2.30-4.30', level: 55 }
+  const visitorTrafficData = [
+    { value: 85, color: '#F8CA92' },
+    { value: 65, color: '#F2622E' },
+    { value: 40, color: '#F8CA92' },
+    { value: 55, color: '#F8CA92' }
   ];
 
   const calendarDays = [
@@ -53,16 +54,6 @@ const AppointmentBookingPage = () => {
     } else {
       navigate(`/services/${serviceId}/confirmation`);
     }
-  };
-
-  const getTrafficColor = (level) => {
-    if (level > 70) return 'bg-red-400';
-    if (level > 50) return 'bg-orange-400';
-    return 'bg-yellow-400';
-  };
-
-  const isCurrentMonth = (date) => {
-    return date >= 1 && date <= 31;
   };
 
   return (
@@ -100,78 +91,17 @@ const AppointmentBookingPage = () => {
         {/* Visitor Traffic By Day Chart */}
         <div className="mb-8">
           <h3 className="text-2xl font-normal text-black mb-4">Visitor traffic By Day</h3>
-          <div className="flex items-end justify-center gap-2 h-40 mb-4">
-            {visitorTrafficByTime.map((item, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div 
-                  className={`w-6 ${getTrafficColor(item.level)} opacity-50 rounded-sm`}
-                  style={{ height: `${item.level}px` }}
-                ></div>
-                <span className="text-xs text-black mt-2 transform -rotate-90 origin-center w-16">
-                  {item.timeRange}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Month Selector */}
-        <div className="mb-6">
-          <div className="bg-white bg-opacity-20 border border-black rounded-xl px-4 py-2 w-32">
-            <select 
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-transparent text-black text-sm w-full focus:outline-none"
-            >
-              <option value="January">January</option>
-              <option value="February">February</option>
-              <option value="March">March</option>
-            </select>
-          </div>
+          <BarChart data={visitorTrafficData} selectedIndex={1} className="mb-4" />
         </div>
 
         {/* Calendar */}
         <div className="mb-8">
-          <div className="border border-gray-200 rounded-xl overflow-hidden">
-            {/* Calendar Header */}
-            <div className="grid grid-cols-7 bg-gray-50">
-              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
-                <div key={day} className="p-3 text-center text-sm text-gray-600 border-r border-gray-200 last:border-r-0">
-                  {day}
-                </div>
-              ))}
-            </div>
-            
-            {/* Calendar Body */}
-            {calendarDays.map((week, weekIndex) => (
-              <div key={weekIndex} className="grid grid-cols-7">
-                {week.map((date, dateIndex) => (
-                  <button
-                    key={`${weekIndex}-${dateIndex}`}
-                    onClick={() => handleDateSelect(date)}
-                    className={`p-3 text-center text-sm border-r border-b border-gray-200 last:border-r-0 hover:bg-blue-50 transition-colors ${
-                      selectedDate === date && isCurrentMonth(date)
-                        ? 'bg-orange-500 text-white border-orange-500'
-                        : isCurrentMonth(date)
-                        ? 'text-black'
-                        : 'text-gray-400'
-                    }`}
-                  >
-                    <div className="w-9 h-9 flex items-center justify-center rounded-full mx-auto">
-                      {date}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            ))}
-          </div>
+          <Calendar 
+            selectedDate={selectedDate}
+            onDateSelect={handleDateSelect}
+            className="w-full"
+          />
         </div>
-
-        {/* Recommended Time */}
-        <div className="mb-6 text-center">
-          <p className="text-sm text-[#8B3C2B]">Recommended date and time - 2025/08/07 10.30 time slot</p>
-        </div>
-
         {/* Time Slots */}
         <div className="mb-6">
           <h3 className="text-2xl font-normal text-black mb-4">Visitor traffic By Time</h3>
@@ -192,6 +122,11 @@ const AppointmentBookingPage = () => {
           </div>
         </div>
 
+        {/* Recommended Time */}
+        <div className="mb-6 text-center">
+          <p className="text-sm text-[#8B3C2B]">Recommended date and time - 2025/08/07 10.30 time slot</p>
+        </div>
+
         {/* Important Notice */}
         <div className="mb-8 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
           <p className="text-sm text-red-500 font-medium">!important notice</p>
@@ -203,7 +138,7 @@ const AppointmentBookingPage = () => {
           <div className="text-sm text-black leading-relaxed">
             <p><span className="font-medium">Service</span> - Birth certificate issue/new</p>
             <p><span className="font-medium">Location</span> - Kandy branch</p>
-            <p><span className="font-medium">Date & Time</span> - 2025/08/{selectedDate.toString().padStart(2, '0')} {selectedTime}</p>
+            <p><span className="font-medium">Date & Time</span> - {selectedDate.getFullYear()}/{(selectedDate.getMonth() + 1).toString().padStart(2, '0')}/{selectedDate.getDate().toString().padStart(2, '0')} {selectedTime}</p>
             <p><span className="font-medium">Expected Duration</span> - 2 hrs</p>
           </div>
         </div>
