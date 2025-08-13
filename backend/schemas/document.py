@@ -6,7 +6,7 @@ from datetime import datetime
 class UploadDocumentRequest(BaseModel):
     booking_id: int
     doc_id: int
-    file_name: str
+    
 
 class UploadDocumentResponse(BaseModel):
     success: bool = True
@@ -18,3 +18,5 @@ class DocumentUpload(BaseModel):
     file_path: str
     status: str
     timestamp: datetime
+
+
