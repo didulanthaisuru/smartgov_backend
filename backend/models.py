@@ -47,11 +47,17 @@ class UploadedDocument(BaseModel):
 class Appointment(BaseModel):
     appointment_id: Optional[int] = Field(default=None, description="Unique identifier for the appointment")
     user_id: int = Field(..., description="ID of the user making the appointment")
-    sub_service_id: int = Field(..., description="ID of the service being booked")
+    sub_service_id: str = Field(..., description="ID of the service being booked")
     created_at: datetime = Field(default_factory=datetime.now, description="Timestamp when the appointment was created")
-    doc_states: dict = Field(..., description="Dictionary of document states required for the appointment")
-    sub_service_state: str = Field(..., description="State of the service (e.g., 'active', 'inactive')")
+    sub_service_steps: List[dict] = Field(..., description="State of the service (e.g., 'active', 'inactive')")
     is_fully_complered: Optional[bool] = Field(..., description="Flag indicating if the appointment is fully completed")
     appointment_date: Optional[datetime] = Field(..., description="Date and time of the appointment")
     appoinment_time: Optional[datetime] = Field(..., description="Time of the appointment")
     predicted_duration: Optional[datetime] = Field(..., description="Predicted duration of the appointment")
+
+
+class SubServiceSchema(BaseModel):
+    service_name: str
+    payment_amount: float
+    required_docs: List[str] = Field(default_factory=list)
+    steps: List[dict] = Field(default_factory=list)

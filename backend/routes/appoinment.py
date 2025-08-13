@@ -1,12 +1,9 @@
-from fastapi import APIRouter, HTTPException
-from services.appoinment import create_appointment
+from fastapi import APIRouter
 from schemas.appoinment import AppointmentAdd
+from services.appoinment import create_appointment_service
 
-router = APIRouter()
+router = APIRouter(prefix="/appointments", tags=["Appointments"])
 
-@router.post("/appointments")
-async def add_appointment(appointment: AppointmentAdd):
-    try:
-        return await create_appointment(appointment)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@router.post("/")
+async def create_appointment(data: AppointmentAdd):
+    return await create_appointment_service(data)
