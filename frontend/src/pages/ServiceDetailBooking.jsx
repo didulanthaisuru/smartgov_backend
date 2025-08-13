@@ -1,199 +1,131 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import logoIcon from '../assets/images/figma/logo.png';
+import { Menu, ChevronDown, QrCode, MessageSquare } from 'lucide-react';
+
+// Assume logoIcon is correctly imported from your assets
+import logoIcon from '../assets/images/logo2.png';
 
 const ServiceDetailBooking = () => {
-  const { serviceId } = useParams();
-  const navigate = useNavigate();
-  
-  const [documents, setDocuments] = useState([
-    { id: 1, name: 'Doc 1', status: 'uploaded', accuracy: '86.36%', documentStatus: 'pending' },
-    { id: 2, name: 'Doc 2', status: 'pending', accuracy: '63.36%', documentStatus: 'pending' },
-    { id: 3, name: 'Doc 3', status: 'uploaded', accuracy: '83.36%', documentStatus: 'pending' },
-    { id: 4, name: 'Doc 4', status: 'pending', accuracy: '-', documentStatus: 'pending' },
-    { id: 5, name: 'Doc 5', status: 'pending', accuracy: '80.36%', documentStatus: 'pending' }
-  ]);
+    const { serviceId } = useParams();
+    const navigate = useNavigate();
 
-  const handleUploadClick = (docId) => {
-    navigate(`/services/${serviceId}/upload/${docId}`);
-  };
+    // State for the document list, matching the data in the image
+    const [documents, setDocuments] = useState([
+        { id: 1, name: 'Doc 1', status: 'uploaded', accuracy: '86.36%', documentStatus: 'Pending' },
+        { id: 2, name: 'Doc 2', status: 'pending', accuracy: '63.36%', documentStatus: 'Pending', note: '1 accuracy is too low, please resubmit' },
+        { id: 3, name: 'Doc 3', status: 'uploaded', accuracy: '83.36%', documentStatus: 'Pending', note: 'Officer needs to be approved' },
+        { id: 4, name: 'Doc 4', status: 'pending', accuracy: '-', documentStatus: 'Pending' },
+        { id: 5, name: 'Doc 5', status: 'pending', accuracy: '80.36%', documentStatus: 'Pending' },
+    ]);
 
-  const handleBookAppointment = () => {
-    navigate(`/services/${serviceId}/booking`);
-  };
+    const handleUploadClick = (docId) => {
+        navigate(`/services/${serviceId}/upload/${docId}`);
+    };
 
-  const getAccuracyColor = (accuracy) => {
-    if (accuracy === '-') return 'text-black';
-    const value = parseFloat(accuracy);
-    if (value < 70) return 'text-red-500';
-    if (value < 80) return 'text-orange-500';
-    return 'text-black';
-  };
+    const handleBookAppointment = () => {
+        navigate(`/services/${serviceId}/booking`);
+    };
 
-  const getStatusMessage = (accuracy) => {
-    if (accuracy === '-') return '';
-    const value = parseFloat(accuracy);
-    if (value < 70) return 'accuracy is too low, please resubmit';
-    if (value < 85) return 'Officer needs to be approved.';
-    return '';
-  };
+    // Helper function to determine the color of the accuracy text
+    const getAccuracyColor = (accuracy) => {
+        if (accuracy === '-') return 'text-gray-500';
+        const value = parseFloat(accuracy);
+        if (value < 70) return 'text-red-500';
+        if (value < 85) return 'text-orange-500';
+        return 'text-green-600';
+    };
 
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3">
-        <button 
-          onClick={() => navigate('/services')}
-          className="w-9 h-9 flex items-center justify-center"
-        >
-          <img src={logoIcon} alt="Back" className="w-full h-full object-contain" />
-        </button>
+    return (
+        // This outer div creates the desktop-friendly container
+        <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center p-4">
 
-        <div className="flex items-center">
-          <img src={logoIcon} alt="Logo" className="w-15 h-20 mr-4" />
-          <h1 className="text-2xl font-medium text-black">Smart Gov</h1>
-        </div>
+            {/* This is the main component window, styled to look like a phone screen on desktop */}
+            <div className="w-full max-w-sm bg-white shadow-2xl rounded-2xl overflow-hidden relative">
 
-        <div className="flex items-center bg-white bg-opacity-20 border border-black rounded-xl px-4 py-2">
-          <span className="text-sm font-normal text-black mr-2">English</span>
-          <img src={logoIcon} alt="Language" className="w-6 h-6" />
-        </div>
-      </div>
+                {/* Main scrollable content area */}
+                <div className="h-[calc(100vh-2rem)] max-h-[812px] overflow-y-auto pb-28">
+                    {/* Header */}
+                    <header className="sticky top-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-between p-4 border-b border-gray-200">
+                        <button>
+                            <Menu className="w-7 h-7 text-black" />
+                        </button>
+                        <button className="flex items-center gap-1 border border-gray-400 rounded-md px-3 py-1.5 text-sm">
+                            English
+                            <ChevronDown className="w-5 h-5" />
+                        </button>
+                    </header>
 
-      {/* Service Title */}
-      <div className="px-5 py-4">
-        <h2 className="text-2xl font-normal text-black">Birth Certificate new/issue</h2>
-      </div>
+                    <main className="px-4">
+                        {/* Page Title */}
+                        <div className="text-center py-4">
+                            <img src={logoIcon} alt="Service Logo" className="w-14 h-14 mx-auto" />
+                            <h2 className="text-black text-2xl font-semibold mt-2">Birth Certificate new/issue</h2>
+                        </div>
 
-      {/* Divider */}
-      <div className="w-full h-px bg-black mx-0"></div>
+                        {/* Document Checklist Section */}
+                        <div>
+                            <div className="flex justify-between items-center mb-3">
+                                <h3 className="text-lg font-semibold text-black">Document checklist</h3>
+                                <QrCode className="w-6 h-6 text-gray-600" />
+                            </div>
 
-      {/* Document Checklist Section */}
-      <div className="px-7 py-4">
-        <h3 className="text-2xl font-normal text-black mb-4">Document checklist</h3>
-        
-        {/* Orange header bar */}
-        <div className="bg-[#F8CA92] bg-opacity-50 rounded-xl px-4 py-2 mb-4">
-          <div className="text-center text-black opacity-60">Document verification in progress</div>
-        </div>
+                            {/* Document Table */}
+                            <div className="w-full text-xs border rounded-lg overflow-hidden shadow-sm">
+                                {/* Table Header */}
+                                <div className="grid grid-cols-4 text-gray-600 text-center font-semibold border-b bg-gray-50 py-2">
+                                    <div>Document name</div>
+                                    <div>Uploaded Status</div>
+                                    <div>Accuracy</div>
+                                    <div>Document status</div>
+                                </div>
+                                {/* Table Rows */}
+                                {documents.map((doc) => (
+                                    <div key={doc.id} className="grid grid-cols-4 items-center text-center border-b last:border-b-0 py-2 min-h-[60px] bg-white">
+                                        <div className="font-semibold text-gray-800">{doc.name}</div>
+                                        <div>
+                                            {doc.status === 'uploaded' ? (
+                                                <span className="font-medium text-gray-700">Uploaded</span>
+                                            ) : (
+                                                <button onClick={() => handleUploadClick(doc.id)} className="bg-[#FFF5E9] text-black text-xs font-medium px-2 py-1.5 rounded-md flex items-center justify-center gap-1.5 mx-auto">
+                                                    <span>📄</span>
+                                                    <span>Upload digital copy</span>
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <span className={`font-semibold ${getAccuracyColor(doc.accuracy)}`}>{doc.accuracy}</span>
+                                            {doc.note && <div className="text-[10px] text-red-500 mt-0.5 px-1">! {doc.note}</div>}
+                                        </div>
+                                        <div className="font-medium text-gray-700">{doc.documentStatus}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
 
-        {/* Document Table */}
-        <div className="bg-white border border-black">
-          {/* Table Header */}
-          <div className="grid grid-cols-4 border-b border-black">
-            <div className="p-3 border-r border-black">
-              <span className="text-sm font-normal text-black">Document name</span>
-            </div>
-            <div className="p-3 border-r border-black">
-              <span className="text-sm font-normal text-black">Uploaded Status</span>
-            </div>
-            <div className="p-3 border-r border-black">
-              <span className="text-sm font-normal text-black">Accuracy</span>
-            </div>
-            <div className="p-3">
-              <span className="text-sm font-normal text-black">Document status</span>
-            </div>
-          </div>
-
-          {/* Table Rows */}
-          {documents.map((doc, index) => (
-            <div key={doc.id}>
-              <div className="grid grid-cols-4 border-b border-gray-200">
-                <div className="p-3 border-r border-gray-200">
-                  <span className="text-sm font-normal text-black">{doc.name}</span>
+                        {/* Total Payment & Chat Button */}
+                        <div className="mt-6">
+                            <div className="text-center">
+                                <p className="text-xl font-bold text-black">Total Payment - Rs . 1800</p>
+                            </div>
+                            <div className="flex justify-end my-4">
+                                <button onClick={() => navigate('/chatbot')} className="bg-[#FEF3E6] border border-black rounded-lg px-3 py-1.5 flex items-center gap-2 shadow-sm">
+                                    <span className="text-sm font-medium">Chat</span>
+                                    <MessageSquare className="w-5 h-5 text-black" strokeWidth={1.5} />
+                                </button>
+                            </div>
+                        </div>
+                    </main>
                 </div>
-                <div className="p-3 border-r border-gray-200">
-                  {doc.status === 'uploaded' ? (
-                    <span className="text-xs font-normal text-black">Uploaded</span>
-                  ) : (
-                    <button
-                      onClick={() => handleUploadClick(doc.id)}
-                      className="bg-[#F8CA92] rounded-xl px-4 py-1 text-xs text-black border border-gray-300"
-                    >
-                      Upload digital copy
-                      <span className="block text-xs">📄</span>
+
+                {/* "Book An Appointment" Button now positioned correctly */}
+                <footer className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
+                    <button onClick={handleBookAppointment} className="w-full bg-[#8B3C2B] text-white py-3 rounded-lg text-lg font-semibold hover:bg-[#7a3424] transition-colors shadow-lg">
+                        Book An Appointment
                     </button>
-                  )}
-                </div>
-                <div className="p-3 border-r border-gray-200">
-                  <span className={`text-xs font-normal ${getAccuracyColor(doc.accuracy)}`}>
-                    {doc.accuracy}
-                  </span>
-                  {getStatusMessage(doc.accuracy) && (
-                    <div className="text-[8px] text-red-500 mt-1">
-                      !{getStatusMessage(doc.accuracy)}
-                    </div>
-                  )}
-                </div>
-                <div className="p-3">
-                  <span className="text-xs font-normal text-black capitalize">{doc.documentStatus}</span>
-                </div>
-              </div>
+                </footer>
             </div>
-          ))}
         </div>
-
-        {/* Payment Section */}
-        <div className="mt-6 text-center">
-          <p className="text-2xl font-normal text-black mb-6">
-            Total Payment - Rs. 1800
-          </p>
-        </div>
-
-        {/* QR Code */}
-        <div className="flex justify-end mb-6">
-          <div className="w-6 h-6 border border-black flex items-center justify-center">
-            <div className="w-4 h-4 bg-black opacity-30"></div>
-          </div>
-        </div>
-
-        {/* Book Appointment Button */}
-        <div className="flex justify-center mb-4">
-          <button
-            onClick={handleBookAppointment}
-            className="bg-[#8B3C2B] text-white px-16 py-4 rounded-xl text-2xl font-normal hover:bg-[#7A3024] transition-colors"
-          >
-            Book An Appointment
-          </button>
-        </div>
-
-        {/* Document Upload Link */}
-        <div className="flex justify-center mb-4">
-          <button 
-            onClick={() => navigate(`/document-upload/${serviceId}`)}
-            className="text-sm text-blue-600 hover:text-blue-800 transition-colors underline"
-          >
-            Upload additional documents
-          </button>
-        </div>
-
-        {/* Need Help Section */}
-        <div className="flex justify-center">
-          <button 
-            onClick={() => navigate('/contact-us')}
-            className="text-sm text-gray-600 hover:text-gray-800 transition-colors underline"
-          >
-            Need help with this service? Contact Support
-          </button>
-        </div>
-
-        {/* Chat Button */}
-        <div className="fixed bottom-6 right-6">
-          <button 
-            onClick={() => navigate('/chatbot')}
-            className="bg-[#F8CA92] border border-black rounded-xl px-4 py-3 shadow-inner flex items-center hover:bg-[#F7C485] transition-colors"
-          >
-            <span className="text-sm font-normal text-black mr-2">Chat</span>
-            <div className="w-7 h-7 bg-gray-300 rounded flex items-center justify-center">
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default ServiceDetailBooking;
