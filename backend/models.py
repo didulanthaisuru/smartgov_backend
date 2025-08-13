@@ -6,6 +6,7 @@ from typing import List
 from typing import Dict
 from datetime import date, time
 
+
  
 class user(BaseModel):
     first_name: str
@@ -26,8 +27,20 @@ class services(BaseModel):
 class booking(BaseModel):
     booking_id: int
     service_id: int
-    doc_states: Dict[str, str]  # or Dict[str, bool] depending on your data
+    document_list: List[str]  
     date: date
     time: time
     booking_state: str
     predicted_duration: time
+
+
+class UploadedDocument(BaseModel):
+    booking_id: int
+    doc_id: int
+    required_doc_id: Optional[int] = None
+    file_name: str
+    file_path: str
+    accuracy: Optional[float] = None
+    doc_status: str = "pending"
+    uploaded_at: datetime = Field(default_factory=datetime.now)
+   
