@@ -1,4 +1,3 @@
-from bson import ObjectId
 from pydantic import BaseModel,Field
 from typing import Optional
 from datetime import datetime
@@ -23,14 +22,6 @@ class services(BaseModel):
     department_id: int
     required_documents: List[str]  # list of document names
 
-class booking(BaseModel):
-    booking_id: int
-    service_id: int
-    doc_states: Dict[str, str]  # or Dict[str, bool] depending on your data
-    date_booking: date
-    time_booking: time
-    booking_state: str
-    predicted_duration: time
 
 class required_documents(BaseModel):
     doc_id: str = Field(...)
@@ -58,7 +49,28 @@ class admin(BaseModel):
     admin_name: str
     service_id: str
 
+
+# Placeholder for SubServiceStepState
+class SubServiceStepState(BaseModel):
+    step_name: str
+    completed: bool = False
+
+class Appointment(BaseModel):
+    # This model is for the AppointmentNew collection.
+    # It is now much simpler and only tracks the overall process.
+    appointment_id: str
+    user_id: str = Field(...)
+    sub_service_id: str # Links to the sub_service
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    sub_service_states: List[SubServiceStepState] = []
+    is_fully_completed: bool = Field(default=False)
+    appointment_date: Optional[date] = None
+    appointment_time: Optional[time] = None
+    predicted_duration: Optional[int] = None
+
 class DailyMetrics(BaseModel):
+    id: str = Field(default=None, alias="_id")
+    matrics_id: str = Field(..., alias="matrics_id")
     date: date
     day_of_week: str
     service_id: int
@@ -68,4 +80,5 @@ class DailyMetrics(BaseModel):
     no_appointment_user_count: int
     average_processing_time: time
     no_show_count: int
+
 
