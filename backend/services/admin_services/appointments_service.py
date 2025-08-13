@@ -1,28 +1,22 @@
 from database_config import db
 from typing import Optional
 
-
-def get_appointments_list(date: Optional[str]):
+async def get_appointments_list(date: Optional[str]):
     """
-    Builds a MongoDB aggregation pipeline to fetch appointments,
-    filtered by date.
+    Builds and executes an async MongoDB aggregation pipeline 
+    to fetch appointments, filtered by date.
     """
-    appointments_collection = db.appointment
-
     pipeline = []
 
     # Stage 1: Match by 'completion_date' if a date is provided.
-    # This is the primary fix for your filter.
     if date:
         pipeline.append({"$match": {"completion_date": date}})
 
     # Stage 2: Project the data to match the desired output format.
-    # This now uses the correct field names from your collection.
     pipeline.append(
         {
             "$project": {
                 "_id": 0,
-                # Using the document's _id as the bookingId
                 "bookingId": {"$toString": "$_id"},
                 "userName": "$user_name",
                 "time": "$time",
@@ -32,8 +26,12 @@ def get_appointments_list(date: Optional[str]):
         }
     )
 
-    # Execute the pipeline
-    appointments = list(appointments_collection.aggregate(pipeline))
+    # --- THIS IS THE CORRECTED PART ---
+    # 1. Execute the pipeline (this returns an awaitable cursor)
+    appointments_cursor = db.appointment.aggregate(pipeline)
     
-    # Return the results and the total count
+    # 2. Convert the cursor to a list using motor's async method
+    appointments = await appointments_cursor.to_list(length=None) # length=None gets all documents
+    
+    # Return the final results
     return {"appointments": appointments, "total": len(appointments)}

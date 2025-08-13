@@ -9,13 +9,13 @@ router = APIRouter(
 )
 
 @router.get("/appointments", response_model=AppointmentsListResponse)
-def list_appointments(
+async def list_appointments(
     date: Optional[str] = None
 ):
     """
     Get a paginated list of appointments, with optional filters for date and status.
     """
-    result = get_appointments_list(
+    result = await get_appointments_list(
         date=date
     )
     return result

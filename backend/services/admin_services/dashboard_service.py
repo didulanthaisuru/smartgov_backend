@@ -1,7 +1,7 @@
 # Import the 'db' object from your new config file
 from database_config import db
 
-def get_total_appointments_count_for_admin(admin_id: int):
+async def get_total_appointments_count_for_admin(admin_id: int):
     """
     Retrieves the count of appointments from MongoDB for a specific admin
     where the status is not 'completed'.
@@ -17,6 +17,6 @@ def get_total_appointments_count_for_admin(admin_id: int):
     }
 
     # Execute the query and count the matching documents
-    count = appointments_collection.count_documents(query)
+    count = await appointments_collection.count_documents(query)
 
     return count
