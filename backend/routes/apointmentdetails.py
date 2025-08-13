@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from ..services.apointmentdetails_services import (
+from services.apointmentdetails_services import (
     get_appointment_by_id,
     get_document_metadata,
     approve_appointment,
