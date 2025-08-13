@@ -138,32 +138,15 @@ const Services = () => {
       {/* Sidebar */}
       <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       
-      {/* Header */}
-      <Header 
-        title="Government Services" 
+
+      <div className="flex items-center justify-between px-6 py-4">
+      
+        <Header 
         setShowSidebar={setShowSidebar} 
         showLanguageSelector={true}
         language="EN"
       />
-      <div className="flex items-center justify-between px-6 py-4">
-        {/* Profile Button */}
-        <button 
-          onClick={() => navigate('/profile')}
-          className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <Menu className="w-6 h-6 text-gray-600" />
-        </button>
-
-        {/* Smart Gov Title */}
-               
-        <h1 className="text-2xl font-medium text-black ">Smart Gov</h1>
-
-        {/* Language Selector */}
-        <div className="flex items-center bg-white bg-opacity-20 border border-black rounded-xl px-4 py-2">
-          <span className="text-sm font-normal text-black mr-2">English</span>
-      
-          <ChevronDown className="w-4 h-4 text-black" />
-        </div>
+    
       </div>
 
       {/* Divider Line */}

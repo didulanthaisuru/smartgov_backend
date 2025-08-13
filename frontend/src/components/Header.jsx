@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronDown } from "lucide-react";
 
 const Header = ({ title, setShowSidebar, showLanguageSelector = false, language = 'EN' }) => {
   return (
@@ -36,7 +37,8 @@ const Header = ({ title, setShowSidebar, showLanguageSelector = false, language 
       {showLanguageSelector && (
         <div className="flex items-center space-x-1 bg-white bg-opacity-20 border border-black rounded-xl px-3 py-2">
           <span className="text-sm text-black">{language}</span>
-          <div className="w-6 h-6 bg-gray-400 rounded-sm"></div>
+          {/* <div className="w-6 h-6 bg-gray-400 rounded-sm"></div> */}
+          <ChevronDown className="w-4 h-4 text-black" />
         </div>
       )}
     </div>
