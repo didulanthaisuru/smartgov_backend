@@ -13,7 +13,7 @@ from routes import chat_routes
 app = FastAPI(
     title="SmartGov",
     description="Smart Government app for managing citizen services and government operations.",
-    version="1.0.0",
+    version="1.0.0",    
 )
 
 
