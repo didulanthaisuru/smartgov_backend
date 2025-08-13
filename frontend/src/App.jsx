@@ -14,6 +14,8 @@ import AdminPage from './pages/AdminPage';
 import NewApplicationPage from './pages/NewApplicationPage';
 import AppointmentsPage from './pages/AppointmentsPage';
 import MessagesPage from './pages/MessagesPage';
+import Services from './pages/Services';
+import ServiceDetail from './pages/ServiceDetail';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -36,6 +38,8 @@ function App() {
             {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/welcome" element={<WelcomePage />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/services/:serviceId" element={<ServiceDetail />} />
             <Route 
               path="/login" 
               element={

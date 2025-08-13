@@ -1,247 +1,266 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import birthCertificateIcon from '../assets/images/figma/birth_certificate_icon.png';
-import governmentJobsIcon from '../assets/images/figma/government_jobs_icon.png';
-import businessIcon from '../assets/images/figma/business_icon.png';
+import searchIcon from '../assets/images/figma/search_icon_services.png';
+import supplyChainIcon from '../assets/images/figma/supply_chain_icon.png';
+import contactIcon from '../assets/images/figma/contact_icon.png';
+import businessIcon from '../assets/images/figma/business_building_icon.png';
+import museumIcon from '../assets/images/figma/museum_icon.png';
+import notesIcon from '../assets/images/figma/notes_icon.png';
+import servicesHeroImage from '../assets/images/figma/services_hero_image.png';
+import logoIcon from '../assets/images/figma/logo.png';
 
 const Services = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const serviceCategories = [
-    { id: 'all', name: 'All Services', count: 24 },
-    { id: 'certificates', name: 'Certificates', count: 8 },
-    { id: 'licenses', name: 'Licenses', count: 6 },
-    { id: 'permits', name: 'Permits', count: 5 },
-    { id: 'registrations', name: 'Registrations', count: 5 }
-  ];
-
-  const services = [
+  const recentServices = [
     {
       id: 1,
-      name: 'Birth Certificate',
-      description: 'Apply for birth certificate for newborns and reissue existing certificates',
-      category: 'certificates',
-      icon: birthCertificateIcon,
-      processingTime: '3-5 working days',
-      fee: 'Rs. 500',
-      status: 'Available',
-      requirements: ['Original hospital birth record', 'Parents\' ID copies', 'Marriage certificate']
+      name: 'Birth certificate new/issue',
+      icon: supplyChainIcon,
+      category: 'certificates'
     },
     {
       id: 2,
-      name: 'Government Job Applications',
-      description: 'Browse and apply for government job opportunities across all departments',
-      category: 'registrations',
-      icon: governmentJobsIcon,
-      processingTime: 'Varies by position',
-      fee: 'Free',
-      status: 'Available',
-      requirements: ['Educational certificates', 'NIC copy', 'CV/Resume']
+      name: 'NIC issue',
+      icon: contactIcon,
+      category: 'certificates'
     },
     {
       id: 3,
-      name: 'Business Registration',
-      description: 'Register your business with the government and obtain necessary permits',
-      category: 'registrations',
+      name: 'Business registration',
       icon: businessIcon,
-      processingTime: '7-10 working days',
-      fee: 'Rs. 2,500',
-      status: 'Available',
-      requirements: ['Business plan', 'Owner ID', 'Location documents']
+      category: 'registrations'
     },
     {
       id: 4,
-      name: 'Marriage Certificate',
-      description: 'Register your marriage and obtain official marriage certificate',
-      category: 'certificates',
-      icon: birthCertificateIcon,
-      processingTime: '2-3 working days',
-      fee: 'Rs. 750',
-      status: 'Available',
-      requirements: ['Both parties\' IDs', 'Witnesses', 'Marriage registration form']
+      name: 'Government Employment',
+      icon: museumIcon,
+      category: 'employment'
     },
     {
       id: 5,
-      name: 'Driving License',
-      description: 'Apply for new driving license or renew existing license',
-      category: 'licenses',
-      icon: governmentJobsIcon,
-      processingTime: '5-7 working days',
-      fee: 'Rs. 1,200',
-      status: 'Available',
-      requirements: ['Medical certificate', 'Vision test', 'Written test pass']
-    },
-    {
-      id: 6,
-      name: 'Building Permit',
-      description: 'Obtain permits for construction and building modifications',
-      category: 'permits',
-      icon: businessIcon,
-      processingTime: '14-21 working days',
-      fee: 'Rs. 5,000',
-      status: 'Available',
-      requirements: ['Architectural plans', 'Land ownership', 'Engineer approval']
+      name: 'Applications',
+      icon: notesIcon,
+      category: 'applications'
     }
   ];
 
-  const filteredServices = services.filter(service => {
-    const matchesCategory = selectedCategory === 'all' || service.category === selectedCategory;
-    const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         service.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const popularServices = [
+    {
+      id: 6,
+      name: 'Permit for felling trees',
+      icon: supplyChainIcon,
+      category: 'permits'
+    },
+    {
+      id: 7,
+      name: 'Liquor sale license (New/Renewal)',
+      icon: contactIcon,
+      category: 'licenses'
+    }
+  ];
+
+  const otherServices = [
+    {
+      id: 8,
+      name: 'Agrahara insurance',
+      icon: businessIcon,
+      category: 'insurance'
+    },
+    {
+      id: 9,
+      name: 'Disaster loan',
+      icon: museumIcon,
+      category: 'loans'
+    },
+    {
+      id: 10,
+      name: 'Grama Niladhari report',
+      icon: notesIcon,
+      category: 'reports'
+    },
+    {
+      id: 11,
+      name: 'Presidential Fund',
+      icon: supplyChainIcon,
+      category: 'funds'
+    },
+    {
+      id: 12,
+      name: 'Issue of Long Term lease',
+      icon: contactIcon,
+      category: 'licenses'
+    },
+    {
+      id: 13,
+      name: 'Issuing soil transport permits',
+      icon: businessIcon,
+      category: 'permits'
+    }
+  ];
 
   const handleServiceClick = (service) => {
-    // Navigate to service details or application form
     navigate(`/services/${service.id}`);
   };
 
+  const ServiceCard = ({ service, size = 'default' }) => (
+    <div 
+      onClick={() => handleServiceClick(service)}
+      className="bg-[#F8CA92] rounded-xl p-3 cursor-pointer hover:shadow-md transition-shadow flex flex-col items-center justify-center text-center"
+      style={{
+        width: size === 'small' ? '68px' : '68px',
+        height: size === 'small' ? '65px' : '65px'
+      }}
+    >
+      <img
+        src={service.icon}
+        alt={service.name}
+        className="w-8 h-8 object-contain mb-1"
+      />
+      <span className="text-[10px] font-normal text-black leading-tight">
+        {service.name}
+      </span>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <div className="bg-blue-600 text-white py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-4">Government Services</h1>
-          <p className="text-xl text-center text-blue-100 mb-8">
-            Access all government services in one convenient platform
-          </p>
-          
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search for services..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-6 py-4 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-              />
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4">
+        {/* Hamburger Menu */}
+        <button className="w-9 h-9">
+          <img src={logoIcon} alt="Menu" className="w-full h-full object-contain" />
+        </button>
+
+        {/* Smart Gov Title */}
+        <h1 className="text-2xl font-medium text-black">Smart Gov</h1>
+
+        {/* Language Selector */}
+        <div className="flex items-center bg-white bg-opacity-20 border border-black rounded-xl px-4 py-2">
+          <span className="text-sm font-normal text-black mr-2">English</span>
+          <img src={logoIcon} alt="Language" className="w-6 h-6" />
+        </div>
+      </div>
+
+      {/* Divider Line */}
+      <div className="w-full h-px bg-black"></div>
+
+      {/* Services Title */}
+      <div className="px-6 py-6">
+        <h2 className="text-4xl font-normal text-black">Services</h2>
+      </div>
+
+      {/* Search Bar */}
+      <div className="px-8 mb-6">
+        <div className="relative bg-[#F2963F] bg-opacity-60 rounded-xl p-3">
+          <div className="flex items-center">
+            <img src={searchIcon} alt="Search" className="w-8 h-8 mr-4" />
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-transparent text-2xl text-black text-opacity-60 placeholder-black placeholder-opacity-60 outline-none flex-1"
+            />
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Category Filter */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Service Categories</h2>
-          <div className="flex flex-wrap gap-3">
-            {serviceCategories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                  selectedCategory === category.id
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                {category.name} ({category.count})
-              </button>
-            ))}
-          </div>
+      {/* Hero Image */}
+      <div className="px-0 mb-6">
+        <img
+          src={servicesHeroImage}
+          alt="Services"
+          className="w-full h-40 object-cover"
+        />
+      </div>
+
+      {/* Categories */}
+      <div className="px-8 mb-6">
+        <h3 className="text-sm font-normal text-black mb-4">Categories</h3>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setSelectedCategory('all')}
+            className={`px-4 py-2 rounded-xl text-sm font-normal ${
+              selectedCategory === 'all' 
+                ? 'bg-[#F2622E] text-black' 
+                : 'bg-[#D0E9F2] text-black'
+            }`}
+          >
+            ALL
+          </button>
+          <button 
+            onClick={() => setSelectedCategory('popular')}
+            className={`px-4 py-2 rounded-xl text-sm font-normal ${
+              selectedCategory === 'popular' 
+                ? 'bg-[#F2622E] text-black' 
+                : 'bg-[#D0E9F2] text-black'
+            }`}
+          >
+            Popular Services
+          </button>
+          <button 
+            onClick={() => setSelectedCategory('other')}
+            className={`px-4 py-2 rounded-xl text-sm font-normal ${
+              selectedCategory === 'other' 
+                ? 'bg-[#F2622E] text-black' 
+                : 'bg-[#D0E9F2] text-black'
+            }`}
+          >
+            Other Services
+          </button>
+          <button 
+            onClick={() => setSelectedCategory('dep1')}
+            className="bg-[#F8CA92] px-4 py-2 rounded-xl text-sm font-normal text-black"
+          >
+            Dep 1
+          </button>
         </div>
+      </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredServices.map((service) => (
-            <div
-              key={service.id}
-              onClick={() => handleServiceClick(service)}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border border-gray-200"
-            >
-              <div className="p-6">
-                {/* Service Icon and Status */}
-                <div className="flex items-start justify-between mb-4">
-                  <img
-                    src={service.icon}
-                    alt={service.name}
-                    className="w-12 h-12 object-contain"
-                  />
-                  <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-                    {service.status}
-                  </span>
-                </div>
-
-                {/* Service Details */}
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{service.name}</h3>
-                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-                  {service.description}
-                </p>
-
-                {/* Service Info */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Processing Time:</span>
-                    <span className="text-sm font-medium text-gray-900">{service.processingTime}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Fee:</span>
-                    <span className="text-sm font-medium text-gray-900">{service.fee}</span>
-                  </div>
-                </div>
-
-                {/* Requirements */}
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Requirements:</h4>
-                  <ul className="text-xs text-gray-600 space-y-1">
-                    {service.requirements.slice(0, 2).map((requirement, index) => (
-                      <li key={index} className="flex items-center">
-                        <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mr-2"></div>
-                        {requirement}
-                      </li>
-                    ))}
-                    {service.requirements.length > 2 && (
-                      <li className="text-blue-600">+{service.requirements.length - 2} more</li>
-                    )}
-                  </ul>
-                </div>
-
-                {/* Apply Button */}
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
-                  Apply Now
-                </button>
-              </div>
-            </div>
+      {/* Recent Services */}
+      <div className="px-8 mb-6">
+        <h3 className="text-sm font-normal text-black mb-4">Recent Services</h3>
+        <div className="flex gap-3 flex-wrap">
+          {recentServices.map((service) => (
+            <ServiceCard key={service.id} service={service} />
           ))}
         </div>
+      </div>
 
-        {/* No Results */}
-        {filteredServices.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.137 0-4.146-.832-5.636-2.364M6.343 7.343A7.962 7.962 0 0112 5c4.418 0 8 3.582 8 8v.172a7.838 7.838 0 01-.343 2.235m-19.5 0A7.838 7.838 0 010 13.172V13c0-4.418 3.582-8 8-8 2.137 0 4.146.832 5.636 2.364" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">No services found</h3>
-            <p className="text-gray-600">Try adjusting your search criteria or browse all categories.</p>
-          </div>
-        )}
+      {/* Popular Services */}
+      <div className="px-8 mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-sm font-normal text-black">Popular Services</h3>
+          <button className="text-sm font-normal text-black">See all</button>
+        </div>
+        <div className="flex gap-3 flex-wrap">
+          {popularServices.map((service) => (
+            <ServiceCard key={service.id} service={service} />
+          ))}
+        </div>
+      </div>
 
-        {/* Help Section */}
-        <div className="mt-12 bg-blue-50 rounded-lg p-8">
-          <div className="text-center">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">Need Help?</h3>
-            <p className="text-gray-600 mb-6">
-              Can't find the service you're looking for? Our support team is here to help.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-                Contact Support
-              </button>
-              <button className="bg-white hover:bg-gray-50 text-blue-600 border border-blue-600 px-6 py-3 rounded-lg font-medium transition-colors">
-                Browse FAQ
-              </button>
-            </div>
-          </div>
+      {/* Other Services */}
+      <div className="px-8 mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-sm font-normal text-black">Other Services</h3>
+          <button className="text-sm font-normal text-black">See all</button>
+        </div>
+        <div className="grid grid-cols-4 gap-3">
+          {otherServices.map((service) => (
+            <ServiceCard key={service.id} service={service} />
+          ))}
+        </div>
+      </div>
+
+      {/* Chat with AI Button */}
+      <div className="px-8 mb-8">
+        <div className="bg-[#F8CA92] border border-black rounded-xl p-4 shadow-inner flex items-center justify-between">
+          <span className="text-sm font-normal text-black">Chat with AI</span>
+          <img src={logoIcon} alt="AI" className="w-7 h-7" />
         </div>
       </div>
     </div>
