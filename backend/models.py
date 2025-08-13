@@ -16,6 +16,12 @@ class user(BaseModel):
     passcode: str
     user_id: int
     email: str
+class services(BaseModel):
+    service_name: str
+    service_id: int
+    main_service: str
+    department_id: int
+    required_documents: List[str]  # list of document names
 
 class booking(BaseModel):
     booking_id: int
@@ -33,7 +39,8 @@ class required_documents(BaseModel):
 
 # Model for an individual sub-service
 class sub_service(BaseModel):
-    service_sub_id: str = Field(...) # The unique ID for the sub-service
+    service_sub_id: str = Field(...)
+    service_id: str
     service_name: str = Field(...)
     required_docs: List[str] = []
     payment_amount: float = Field(default=0.0) 
@@ -46,4 +53,19 @@ class main_service(BaseModel):
     icon_name: Optional[str] = None # For the UI icon
     sub_services: List[str] = []
 
+class admin(BaseModel):
+    admin_id: int
+    admin_name: str
+    service_id: str
+
+class DailyMetrics(BaseModel):
+    date: date
+    day_of_week: str
+    service_id: int
+    main_service_id: int
+    total_appointments: int
+    appointment_ids: Dict[str, Dict[str, str]]  # appointment_id -> {time_slot: "...", predicted_appointment_time: "..."}
+    no_appointment_user_count: int
+    average_processing_time: time
+    no_show_count: int
 
