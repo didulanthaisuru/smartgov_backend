@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+// lucide-react is used for icons
 import { Menu, ChevronDown, Circle } from "lucide-react";
+// Make sure to import useNavigate from react-router-dom
+import { useNavigate } from "react-router-dom";
 
-// --- Vertical Bar Chart ---
+// --- Vertical Bar Chart Component ---
 const VerticalBarChart = ({ data }) => (
   <div className="flex justify-around items-end h-20 px-2">
     {data.map((item, index) => (
@@ -17,7 +20,7 @@ const VerticalBarChart = ({ data }) => (
   </div>
 );
 
-// --- Horizontal Bar Chart ---
+// --- Horizontal Bar Chart Component ---
 const HorizontalBarChart = ({ data }) => (
   <div className="space-y-1.5">
     {data.map((item, index) => (
@@ -34,7 +37,11 @@ const HorizontalBarChart = ({ data }) => (
   </div>
 );
 
+
 const AppointmentBookingPage = () => {
+  // Call the hook here to get the navigation function
+  const navigate = useNavigate();
+
   const [selectedDate, setSelectedDate] = useState(6);
   const [selectedTime, setSelectedTime] = useState("8:30");
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -45,7 +52,7 @@ const AppointmentBookingPage = () => {
     { value: 90, color: "#F2622E" },
     { value: 45, color: "#F9B48C" },
     { value: 100, color: "#F9B48C" },
-    { value: 90, color: "#F9B48C" },
+    { value: 90, color: "#F9B48C" }
   ];
   const visitorTrafficByTime = [
     { label: "8:30-10:30", value: 80 },
@@ -68,12 +75,13 @@ const AppointmentBookingPage = () => {
       alert("Please select a payment method");
       return;
     }
-    alert(`Appointment confirmed! Payment method: ${paymentMethod}`);
+    // This will now work correctly because navigate is defined
+    navigate(paymentMethod === "now" ? `/payment` : `/confirmation`);
   };
 
   return (
     <div className="flex justify-center bg-gray-100 min-h-screen p-4">
-      <div className="bg-white w-full max-w-[428px] min-h-[926px] flex flex-col rounded-2xl shadow-2xl overflow-hidden">
+      <div className="bg-white w-full max-w-[428px] flex flex-col rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
         <header className="sticky top-0 bg-white z-10 flex items-center justify-between p-4 border-b border-gray-100">
           <button>
@@ -177,11 +185,11 @@ const AppointmentBookingPage = () => {
           {/* Summary */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-600">Service</span> 
+              <span className="text-gray-600">Service</span>
               <span className="font-semibold text-gray-800">Birth certificate</span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-600">Location</span> 
+              <span className="text-gray-600">Location</span>
               <span className="font-semibold text-gray-800">Kandy branch</span>
             </div>
             <div className="flex justify-between items-center text-sm">
@@ -191,7 +199,7 @@ const AppointmentBookingPage = () => {
               </span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-600">Expected Duration</span> 
+              <span className="text-gray-600">Expected Duration</span>
               <span className="font-semibold text-gray-800">2 hrs</span>
             </div>
           </div>
