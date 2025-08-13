@@ -17,7 +17,7 @@ async def get_completed_tasks_for_date(
 ):
     try:
 
-        completed_tasks = get_completed_tasks_by_date(query_date)
+        completed_tasks = await get_completed_tasks_by_date(query_date)
 
         if not completed_tasks:
             return {"completed_tasks": []}

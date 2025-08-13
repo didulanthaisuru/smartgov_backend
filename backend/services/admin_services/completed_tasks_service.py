@@ -2,7 +2,7 @@ from typing import List, Dict, Any
 import pymongo
 from database_config import db
 
-def get_completed_tasks_by_date(date: str) -> List[Dict[str, Any]]:
+async def get_completed_tasks_by_date(date: str) -> List[Dict[str, Any]]:
     """
     Retrieves a list of completed appointments from the database for a given date.
 
@@ -30,8 +30,9 @@ def get_completed_tasks_by_date(date: str) -> List[Dict[str, Any]]:
             "message": 1
         }
         
-        completed_tasks = list(collection.find(query, projection))
-        return completed_tasks
+        cursor = collection.find(query, projection)
+        tasks = await cursor.to_list(length=None)  # This line fixes the error
+        return tasks
 
     except pymongo.errors.PyMongoError as e:
         print(f"Database error in get_completed_tasks_by_date: {e}")
