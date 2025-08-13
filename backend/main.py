@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from routes import appointments, apointmentdetails,chat_routes
 from routes.admin import admin_view_completed
 from fastapi.middleware.cors import CORSMiddleware
-from routes.qr_scanner import router as qr_scanner_router
+# from routes.qr_scanner import router as qr_scanner_router  # Temporarily disabled
 from routes.admin import dashboard_routes,appointment_routes
 
 
@@ -24,7 +24,7 @@ app.add_middleware(
 )
 
 # Include API routes
-app.include_router(qr_scanner_router)
+# app.include_router(qr_scanner_router)  # Temporarily disabled
 app.include_router(dashboard_routes.router)
 app.include_router(appointment_routes.router)
 app.include_router(chat_routes.router)
