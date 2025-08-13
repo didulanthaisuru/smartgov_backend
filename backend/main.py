@@ -1,8 +1,38 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from routes.qr_scanner import router as qr_scanner_router
 from routes.admin import dashboard_routes,appointment_routes
 from routes import chat_routes
 
-app = FastAPI(title="Smart Gov API")
+
+
+
+
+
+
+app = FastAPI(
+    title="SmartGov",
+    description="Smart Government app for managing citizen services and government operations.",
+    version="1.0.0",
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
+# Include API routes
+app.include_router(qr_scanner_router)
+app.include_router(dashboard_routes.router)
+app.include_router(appointment_routes.router)
+app.include_router(chat_routes.router)
+
+
 
 
 
@@ -11,6 +41,5 @@ def read_root():
     return {"message": "SmartGov API is running"}
 
 
-app.include_router(dashboard_routes.router)
-app.include_router(appointment_routes.router)
-app.include_router(chat_routes.router)
+
+
