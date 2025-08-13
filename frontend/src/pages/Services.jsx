@@ -9,7 +9,7 @@ import businessIcon from '../assets/images/figma/business_building_icon.png';
 import museumIcon from '../assets/images/figma/museum_icon.png';
 import notesIcon from '../assets/images/figma/notes_icon.png';
 import servicesHeroImage from '../assets/images/figma/services_hero_image.png';
-import logoIcon from '../assets/images/logo.png';
+import logoIcon from '../assets/images/logo2.png';
 import { ChevronDown, Menu, MessageCircle  } from "lucide-react";
 
 
