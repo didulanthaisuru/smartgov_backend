@@ -18,4 +18,4 @@ def read_root():
     return {"message": "SmartGov API is running"}
 
 app.include_router(appoinment.router, prefix="/api", tags=["Appointments"])
-app.include_router(document.router, prefix="/api/documents", tags=["Documents"])
+app.include_router(document.router, prefix="/api", tags=["Documents"])

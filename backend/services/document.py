@@ -65,8 +65,8 @@ from datetime import datetime
 from uuid import uuid4
 import os
 from fastapi import HTTPException, status
-from backend.schemas.document import DocumentUpload, UploadDocumentRequest
-from backend.database_config import db, DB_NAME
+from schemas.document import DocumentUpload, UploadDocumentRequest
+from database_config import db, DB_NAME
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 

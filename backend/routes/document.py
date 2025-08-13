@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
-from backend.schemas.document import UploadDocumentRequest, DocumentUpload
-from backend.services.document import uploaded_document
+from schemas.document import UploadDocumentRequest, DocumentUpload
+from services.document import uploaded_document
 
 router = APIRouter()
 
