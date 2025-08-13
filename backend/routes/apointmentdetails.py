@@ -6,7 +6,7 @@ from services.apointmentdetails_services import (
     decline_appointment
 )
 
-router = APIRouter()
+router = APIRouter( tags=["appointments details"])
 
 @router.get("/appointmentdetails/{appointment_id}")
 async def get_appointment_detail(appointment_id: int):

@@ -1,0 +1,1 @@
+Retrieves the total count of active appointments assigned to a specific administrator. This endpoint uses the admin_id provided in the URL path to filter for appointments that are not yet marked as 'completed'. It returns a JSON object containing the final calculated count, giving a quick overview of an admin's pending workload.
