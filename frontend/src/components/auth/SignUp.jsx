@@ -1,191 +1,137 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+// SmartGovSignupPage.jsx
+
+import React from 'react';
+// You'll need to install react-icons: npm install react-icons
+import { HiOutlineDocumentCheck } from 'react-icons/hi2';
 
 const SignUp = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    nicNumber: '',
-    mobileNumber: '',
-    email: '',
-    firstName: '',
-    lastName: '',
-    password: '',
-    confirmPassword: ''
-  });
-  const [language, setLanguage] = useState('English');
+    return (
+        // Wrapper to simulate the iPhone 14 Pro Max screen (430x932)
+        // You can remove this outer div for a real-world application
+        <div
+          style={{ width: '430px', height: '932px' }}
+          className="bg-gray-50 font-sans mx-auto mt-8 border-4 border-gray-800 rounded-[50px] overflow-hidden shadow-2xl"
+        >
+            <div className="w-full h-full overflow-y-auto">
+                <div className="flex flex-col items-center justify-start pt-16 pb-8 px-8 min-h-full">
 
-  const handleChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+                    {/* Header Section */}
+                    <header className="flex flex-col items-center mb-10 text-center">
+                        <div className="p-4 bg-[#fde8c9] rounded-2xl mb-3 inline-block">
+                            <HiOutlineDocumentCheck className="w-10 h-10 text-[#8B4513]" />
+                        </div>
+                        <h2 className="text-2xl font-semibold text-gray-800">Smart Gov</h2>
+                        <h1 className="font-serif text-8xl text-black mt-4 leading-none">Sign Up</h1>
+                        <p className="text-xl text-gray-600 mt-2">Create Free Account</p>
+                    </header>
 
-  const handleSignUp = () => {
-    // Set authentication token and user data
-    const userData = {
-      id: 1,
-      name: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      nicNumber: formData.nicNumber,
-      role: 'user'
-    };
-    
-    localStorage.setItem('token', 'dummy-auth-token');
-    localStorage.setItem('user', JSON.stringify(userData));
-    
-    // Navigate to services page
-    navigate('/services');
-  };
+                    {/* Signup Form Card */}
+                    <main className="bg-white w-full rounded-3xl shadow-lg p-8">
+                        <div className="text-left mb-8">
+                            <h3 className="text-3xl font-bold text-gray-900">Personal Info</h3>
+                            <p className="text-gray-500 mt-2 text-[15px] leading-snug">
+                                Sign up to manage appointments, documents, and more.
+                            </p>
+                        </div>
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Header with Logo and Language Selector */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-orange-500 rounded"></div>
-            <span className="text-xl font-bold text-gray-800">Smart Gov</span>
-          </div>
-          
-          {/* Language Selector */}
-          <div className="flex items-center space-x-1 bg-white border border-gray-300 rounded-xl px-3 py-1">
-            <span className="text-sm text-gray-700">{language}</span>
-            <div className="w-4 h-3 bg-gray-400 rounded-sm"></div>
-          </div>
+                        <form noValidate>
+                            {/* First and Last Name */}
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label htmlFor="first-name" className="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                                    <input
+                                        type="text"
+                                        id="first-name"
+                                        placeholder="| First Name"
+                                        className="w-full px-4 py-3 bg-[#fde8c9] rounded-lg placeholder-gray-600 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#d5a97a]"
+                                    />
+                                </div>
+                                <div className="self-end">
+                                    <label htmlFor="last-name" className="block text-sm font-medium text-gray-700 mb-2 sr-only">Last Name</label>
+                                    <input
+                                        type="text"
+                                        id="last-name"
+                                        placeholder="| Last Name"
+                                        className="w-full px-4 py-3 bg-[#fde8c9] rounded-lg placeholder-gray-600 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#d5a97a]"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* NIC Number */}
+                            <div className="mb-4">
+                                <label htmlFor="nic-number" className="block text-sm font-medium text-gray-700 mb-2">NIC Number</label>
+                                <input
+                                    type="text"
+                                    id="nic-number"
+                                    placeholder="| Your NIC Number"
+                                    className="w-full px-4 py-3 bg-[#fde8c9] rounded-lg placeholder-gray-600 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#d5a97a]"
+                                />
+                            </div>
+
+                            {/* Mobile Number */}
+                            <div className="mb-4">
+                                <label htmlFor="mobile-number" className="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
+                                <input
+                                    type="tel"
+                                    id="mobile-number"
+                                    placeholder="| Your Mobile Number"
+                                    className="w-full px-4 py-3 bg-[#fde8c9] rounded-lg placeholder-gray-600 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#d5a97a]"
+                                />
+                            </div>
+
+                            {/* Email */}
+                            <div className="mb-4">
+                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    placeholder="| Your Email"
+                                    className="w-full px-4 py-3 bg-[#fde8c9] rounded-lg placeholder-gray-600 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#d5a97a]"
+                                />
+                            </div>
+
+                            {/* Password */}
+                            <div className="mb-4">
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    defaultValue="********************"
+                                    className="w-full px-4 py-3 bg-[#fde8c9] rounded-lg placeholder-gray-600 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#d5a97a]"
+                                />
+                            </div>
+
+                            {/* Confirm Password */}
+                            <div className="mb-6">
+                                <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                                <input
+                                    type="password"
+                                    id="confirm-password"
+                                    defaultValue="********************"
+                                    className="w-full px-4 py-3 bg-[#fde8c9] rounded-lg placeholder-gray-600 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#d5a97a]"
+                                />
+                            </div>
+
+                            {/* Submit Button */}
+                            <button
+                                type="submit"
+                                className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-lg font-bold text-white bg-[#8B4513] hover:bg-[#A0522D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A0522D] transition-colors"
+                            >
+                                Save & Continue
+                            </button>
+                        </form>
+
+                        {/* Back to Login Link */}
+                        <p className="mt-6 text-center text-sm">
+                            <a href="#" className="font-medium text-gray-600 hover:text-gray-800">
+                                Back to Login
+                            </a>
+                        </p>
+                    </main>
+                </div>
+            </div>
         </div>
-
-        {/* Main SignUp Card */}
-        <div className="bg-white rounded-xl p-6 shadow-md">
-          {/* Welcome Text */}
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800 mb-1">Sign Up</h1>
-            <p className="text-lg text-gray-600">Create Free Account</p>
-          </div>
-
-          {/* Tab Headers */}
-          <div className="flex mb-6 border-b">
-            <Link to="/login" className="flex-1 text-center py-2">
-              <span className="text-gray-500 text-sm">Back to Login</span>
-            </Link>
-            <div className="flex-1 text-center py-2 border-b-2 border-orange-500">
-              <span className="text-orange-500 font-medium text-sm">Personal info</span>
-            </div>
-          </div>
-
-          {/* Description */}
-          <p className="text-sm text-gray-600 text-center mb-6 leading-relaxed">
-            Sign up to manage appointments,<br />
-            documents, and more.
-          </p>
-
-          {/* Form */}
-          <div className="space-y-4">
-            {/* NIC Number Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                NIC Number
-              </label>
-              <input
-                type="text"
-                value={formData.nicNumber}
-                onChange={(e) => handleChange('nicNumber', e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:border-orange-500"
-                placeholder="| Your NIC Number"
-              />
-            </div>
-
-            {/* Mobile Number Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Mobile Number
-              </label>
-              <input
-                type="tel"
-                value={formData.mobileNumber}
-                onChange={(e) => handleChange('mobileNumber', e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:border-orange-500"
-                placeholder="| Your Mobile Number"
-              />
-            </div>
-
-            {/* Email Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:border-orange-500"
-                placeholder="| Your Email"
-              />
-            </div>
-
-            {/* Name Fields - Side by side */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Your Name
-              </label>
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) => handleChange('firstName', e.target.value)}
-                  className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:border-orange-500"
-                  placeholder="First Name"
-                />
-                <input
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => handleChange('lastName', e.target.value)}
-                  className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:border-orange-500"
-                  placeholder="Last Name"
-                />
-              </div>
-            </div>
-
-            {/* Password Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => handleChange('password', e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:border-orange-500"
-                placeholder="*********************"
-              />
-            </div>
-
-            {/* Confirm Password Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:border-orange-500"
-                placeholder="*********************"
-              />
-            </div>
-
-            {/* Sign Up Button */}
-            <button
-              onClick={handleSignUp}
-              className="w-full bg-orange-500 text-white py-3 rounded-full font-medium text-sm hover:bg-orange-600 transition-colors mt-6"
-            >
-              Save & Continue
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default SignUp;
