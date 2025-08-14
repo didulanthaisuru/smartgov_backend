@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminHeader from '../../components/AdminHeader';
 import { Send, Menu } from 'lucide-react';
 
 const AdminChatPage = () => {
+  const { user } = useAuth();
+  const [showSidebar, setShowSidebar] = useState(false);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
     {
@@ -52,86 +55,90 @@ const AdminChatPage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <AdminSidebar />
+    <div className="min-h-screen bg-white relative">
+      {/* Admin Sidebar */}
+      <AdminSidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       
-      <div className="flex-1 flex flex-col">
-        <AdminHeader />
-        
-        <div className="flex-1 flex flex-col bg-white">
-          {/* Chat Header */}
-          <div className="flex items-center justify-between p-4 border-b">
-            <div className="flex items-center gap-3">
-              <Menu size={24} className="text-black" />
-              <h1 className="text-lg font-medium text-black">Admin Support Chat</h1>
-            </div>
-            
-            {/* Language Switcher */}
-            <div className="flex items-center gap-2 px-3 py-2 border border-black rounded-xl bg-white bg-opacity-20">
-              <span className="text-sm font-normal text-black">English</span>
-              <div className="w-6 h-6 bg-gray-200 rounded"></div>
-            </div>
-          </div>
+      {/* Header */}
+      <AdminHeader 
+        title={`${user?.service_id || 'Birth Certificate'} Support Chat`}
+        setShowSidebar={setShowSidebar}
+      />
 
-          {/* Chat Messages */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-4">
-            {messages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                {msg.sender === 'bot' && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-7 h-7 bg-teal-300 rounded-md flex items-center justify-center">
-                      <div className="w-5 h-5 bg-gray-600 rounded"></div>
-                    </div>
-                    <div className="max-w-md bg-white border border-gray-200 rounded-md p-3 shadow-sm">
-                      <div className="w-1 h-full bg-blue-900 absolute left-0 top-0 rounded-l-md"></div>
-                      <p className="text-sm font-normal text-gray-700 leading-relaxed">
-                        {msg.text}
-                      </p>
-                    </div>
+      {/* Main Content */}
+      <div className="flex flex-col h-[calc(100vh-80px)] bg-white">
+        {/* Chat Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <Menu size={24} className="text-black" />
+            <h1 className="text-lg font-medium text-black">Admin Support Chat</h1>
+          </div>
+          
+          {/* Language Switcher */}
+          <div className="flex items-center gap-2 px-3 py-2 border border-black rounded-xl bg-white bg-opacity-20">
+            <span className="text-sm font-normal text-black">English</span>
+            <div className="w-6 h-6 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+
+        {/* Chat Messages */}
+        <div className="flex-1 p-4 overflow-y-auto space-y-4">
+          {messages.map((msg) => (
+            <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+              {msg.sender === 'bot' && (
+                <div className="flex items-start gap-3">
+                  <div className="w-7 h-7 bg-teal-300 rounded-md flex items-center justify-center">
+                    <div className="w-5 h-5 bg-gray-600 rounded"></div>
                   </div>
-                )}
-                
-                {msg.sender === 'user' && (
-                  <div className="flex items-start gap-3">
-                    <div className="max-w-md bg-white border border-gray-200 rounded-md p-3 shadow-sm">
-                      <div className="w-1 h-full bg-gray-900 absolute right-0 top-0 rounded-r-md"></div>
-                      <p className="text-sm font-normal text-gray-700 leading-relaxed">
-                        {msg.text}
-                      </p>
-                    </div>
-                    <div className="w-7 h-7 bg-orange-300 rounded-md flex items-center justify-center">
-                      <div className="w-5 h-5 bg-gray-600 rounded"></div>
-                    </div>
+                  <div className="max-w-md bg-white border border-gray-200 rounded-md p-3 shadow-sm relative">
+                    <div className="w-1 h-full bg-blue-900 absolute left-0 top-0 rounded-l-md"></div>
+                    <p className="text-sm font-normal text-gray-700 leading-relaxed">
+                      {msg.text}
+                    </p>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Chat Input */}
-          <div className="p-4">
-            <div className="flex items-center gap-3 bg-orange-200 rounded-xl p-3">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask anything about Your Service."
-                className="flex-1 bg-transparent outline-none text-gray-600 text-sm placeholder-gray-500"
-              />
-              <button 
-                onClick={handleSendMessage}
-                className="w-6 h-6 bg-gray-200 rounded flex items-center justify-center hover:bg-gray-300 transition-colors"
-              >
-                <Send size={16} className="text-gray-600" />
-              </button>
+                </div>
+              )}
+              
+              {msg.sender === 'user' && (
+                <div className="flex items-start gap-3">
+                  <div className="max-w-md bg-white border border-gray-200 rounded-md p-3 shadow-sm relative">
+                    <div className="w-1 h-full bg-gray-900 absolute right-0 top-0 rounded-r-md"></div>
+                    <p className="text-sm font-normal text-gray-700 leading-relaxed">
+                      {msg.text}
+                    </p>
+                  </div>
+                  <div className="w-7 h-7 bg-orange-300 rounded-md flex items-center justify-center">
+                    <div className="w-5 h-5 bg-gray-600 rounded"></div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* User Avatar */}
-          <div className="absolute bottom-20 left-4">
-            <div className="w-14 h-14 bg-gray-200 rounded-full"></div>
+        {/* Chat Input */}
+        <div className="p-4 border-t border-gray-200">
+          <div className="flex items-center gap-3 bg-orange-200 rounded-xl p-3">
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask anything about Your Service."
+              className="flex-1 bg-transparent outline-none text-gray-600 text-sm placeholder-gray-500"
+            />
+            <button 
+              onClick={handleSendMessage}
+              className="w-6 h-6 bg-gray-200 rounded flex items-center justify-center hover:bg-gray-300 transition-colors"
+            >
+              <Send size={16} className="text-gray-600" />
+            </button>
           </div>
+        </div>
+
+        {/* User Avatar */}
+        <div className="absolute bottom-20 left-4">
+          <div className="w-14 h-14 bg-gray-200 rounded-full"></div>
         </div>
       </div>
     </div>

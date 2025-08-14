@@ -11,45 +11,37 @@ from routes.insights_derect import router as insights_direct_router
 
 from routes.routes import api_router
 from config import settings
-
-
 from fastapi.middleware.cors import CORSMiddleware
+from routes.routes import api_router
 
+# Create FastAPI app
 app = FastAPI(
-    title=settings.PROJECT_NAME,
-    description=settings.PROJECT_DESCRIPTION,
-    version=settings.PROJECT_VERSION
+    title="SmartGov API",
+    description="Government Services Management System",
+    version="1.0.0"
 )
 
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # Frontend URLs
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-async def startup_event():
-    await connect_to_mongo()
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    await close_mongo_connection()
-
 @app.get("/")
 def read_root():
-    return {"message": "SmartGov API is running"}
+    return {
+        "message": "SmartGov API is running",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "redoc": "/redoc"
+    }
 
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "SmartGov Backend"}
 
-# Include all routers
-app.include_router(dashboard_router)
-app.include_router(appointment_router)
-app.include_router(document_router)
-app.include_router(insights_router)
-app.include_router(insights_direct_router)
-#pp.include_router(admin_router)
-
-# Include all routers from the centralized routes file
-app.include_router(api_router, prefix=settings.API_V1_STR)
-
+# Include API routes
+app.include_router(api_router, prefix="/api/v1")
