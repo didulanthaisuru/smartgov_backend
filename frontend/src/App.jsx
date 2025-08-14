@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ProtectedRoute, AdminRoute, UserRoute } from './components/ProtectedRoute';
 import './App.css';
 
-// Pages
+// User Pages
 import WelcomePage from './pages/WelcomePage';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -33,27 +34,78 @@ import PreviousActivitiesPage from './pages/PreviousActivitiesPage';
 import UpdateInformationPage from './pages/UpdateInformationPage';
 import AnalyticsDashboardPage from './pages/AnalyticsDashboardPage';
 
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('token');
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+// Admin Pages
+import AdminLoginPage from './pages/admin/AdminLoginPage';
+import AdminRegisterPage from './pages/admin/AdminRegisterPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminTasksPage from './pages/admin/AdminTasksPage';
+import AdminTaskDetailsPage from './pages/admin/AdminTaskDetailsPage';
+import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
+import AdminCompletedTasksPage from './pages/admin/AdminCompletedTasksPage';
+import AdminChatPage from './pages/admin/AdminChatPage';
+import AdminQRScanPage from './pages/admin/AdminQRScanPage';
+
+// Initial Route Component (handles app startup routing)
+const InitialRoute = () => {
+  const { isAuthenticated, role, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (isAuthenticated()) {
+    // Redirect based on user role
+    if (role === 'admin') {
+      return <Navigate to="/admin/dashboard" replace />;
+    } else {
+      return <Navigate to="/services" replace />;
+    }
+  }
+  
+  // Not authenticated, show landing page
+  return <LandingPage />;
 };
 
 // Public Route Component (redirect if authenticated)
 const PublicRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('token');
-  return !isAuthenticated ? children : <Navigate to="/services" replace />;
+  const { isAuthenticated, role, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (isAuthenticated()) {
+    return <Navigate to={role === 'admin' ? '/admin/dashboard' : '/services'} replace />;
+  }
+  return children;
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <div className="App">
           <Routes>
+            {/* Initial Route - handles app startup */}
+            <Route path="/" element={<InitialRoute />} />
+            
             {/* Public Routes */}
-            <Route path="/" element={<LandingPage />} />
             <Route path="/welcome" element={<WelcomePage />} />
+            <Route path="/landing" element={<LandingPage />} />
             <Route 
               path="/login" 
               element={
@@ -71,45 +123,121 @@ function App() {
               } 
             />
 
-            {/* Protected Routes - Services as main dashboard */}
+            {/* Admin Public Routes */}
+            <Route 
+              path="/admin/login" 
+              element={
+                <PublicRoute>
+                  <AdminLoginPage />
+                </PublicRoute>
+              } 
+            />
+            <Route 
+              path="/admin/register" 
+              element={
+                <PublicRoute>
+                  <AdminRegisterPage />
+                </PublicRoute>
+              } 
+            />
+
+            {/* Admin Protected Routes */}
+            <Route 
+              path="/admin/dashboard" 
+              element={
+                <AdminRoute>
+                  <AdminDashboardPage />
+                </AdminRoute>
+              } 
+            />
+            <Route 
+              path="/admin/tasks" 
+              element={
+                <AdminRoute>
+                  <AdminTasksPage />
+                </AdminRoute>
+              } 
+            />
+            <Route 
+              path="/admin/task-details/:taskId" 
+              element={
+                <AdminRoute>
+                  <AdminTaskDetailsPage />
+                </AdminRoute>
+              } 
+            />
+            <Route 
+              path="/admin/notifications" 
+              element={
+                <AdminRoute>
+                  <AdminNotificationsPage />
+                </AdminRoute>
+              } 
+            />
+            <Route 
+              path="/admin/completed-tasks" 
+              element={
+                <AdminRoute>
+                  <AdminCompletedTasksPage />
+                </AdminRoute>
+              } 
+            />
+            <Route 
+              path="/admin/chat" 
+              element={
+                <AdminRoute>
+                  <AdminChatPage />
+                </AdminRoute>
+              } 
+            />
+            <Route 
+              path="/admin/qr-scan" 
+              element={
+                <AdminRoute>
+                  <AdminQRScanPage />
+                </AdminRoute>
+              } 
+            />
+
+            {/* User Protected Routes - Services as main dashboard */}
             <Route 
               path="/services" 
               element={
-                // <ProtectedRoute>
+                <UserRoute>
                   <Services />
-                // </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <ServiceDetail />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/detail" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <ServiceDetailBooking />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/upload/:docId" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <UploadPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/payment" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <PaymentPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
@@ -281,8 +409,8 @@ function App() {
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </div>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
