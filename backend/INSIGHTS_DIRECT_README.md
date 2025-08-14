@@ -4,11 +4,7 @@ This document describes the GET endpoints available in the `insights_direct` mod
 
 ## Overview
 
-The insights_direct endpoints allow you to retrieve insights data based on various parameters including:
-- `service_id`: The main service identifier
-- `sub_service_id`: The sub-service identifier  
-- `main_service_id`: The main service category identifier
-- `date`: The date for which to retrieve insights
+The insights_direct endpoints allow you to retrieve insights data based on the MongoDB collection structure. The endpoints are designed to work with the actual insights collection format.
 
 ## Response Format
 
@@ -32,109 +28,75 @@ All endpoints return data in the following format:
 
 ## Available Endpoints
 
-### 1. Get Insights with Query Parameters
+### 1. Get Insights by Sub-Service ID and Date
 
-**Endpoint:** `GET /insights-direct/`
+**Endpoint:** `GET /insights-direct/sub-service/{sub_service_id}/date/{query_date}`
 
-**Description:** Retrieve insights data using query parameters
-
-**Query Parameters:**
-- `service_id` (optional): Service ID to filter by
-- `sub_service_id` (optional): Sub-service ID to filter by  
-- `main_service_id` (optional): Main service ID to filter by
-- `query_date` (optional): Date to filter by (YYYY-MM-DD format)
-
-**Example:**
-```
-GET /insights-direct/?sub_service_id=SUB001&main_service_id=MAIN001&query_date=2025-08-01
-```
-
-### 2. Get Insights by Sub-Service ID
-
-**Endpoint:** `GET /insights-direct/sub-service/{sub_service_id}`
-
-**Description:** Retrieve insights data for a specific sub-service
+**Description:** Retrieve insights data for a specific sub_service_id and date
 
 **Path Parameters:**
 - `sub_service_id`: The sub-service identifier
-
-**Query Parameters:**
-- `query_date` (optional): Date to filter by (YYYY-MM-DD format)
-
-**Example:**
-```
-GET /insights-direct/sub-service/SUB001?query_date=2025-08-01
-```
-
-### 3. Get Insights by Main Service ID
-
-**Endpoint:** `GET /insights-direct/main-service/{main_service_id}`
-
-**Description:** Retrieve insights data for a specific main service
-
-**Path Parameters:**
-- `main_service_id`: The main service identifier
-
-**Query Parameters:**
-- `query_date` (optional): Date to filter by (YYYY-MM-DD format)
-
-**Example:**
-```
-GET /insights-direct/main-service/MAIN001?query_date=2025-08-01
-```
-
-### 4. Get Insights by Service ID
-
-**Endpoint:** `GET /insights-direct/service/{service_id}`
-
-**Description:** Retrieve insights data for a specific service (finds all sub-services under this service)
-
-**Path Parameters:**
-- `service_id`: The service identifier
-
-**Query Parameters:**
-- `query_date` (optional): Date to filter by (YYYY-MM-DD format)
-
-**Example:**
-```
-GET /insights-direct/service/SERVICE001?query_date=2025-08-01
-```
-
-### 5. Get Insights by Sub-Service and Main Service
-
-**Endpoint:** `GET /insights-direct/sub-service/{sub_service_id}/main-service/{main_service_id}`
-
-**Description:** Retrieve insights data for a specific sub-service and main service combination
-
-**Path Parameters:**
-- `sub_service_id`: The sub-service identifier
-- `main_service_id`: The main service identifier
-
-**Query Parameters:**
-- `query_date` (optional): Date to filter by (YYYY-MM-DD format)
-
-**Example:**
-```
-GET /insights-direct/sub-service/SUB001/main-service/MAIN001?query_date=2025-08-01
-```
-
-### 6. Get Insights by Date
-
-**Endpoint:** `GET /insights-direct/date/{query_date}`
-
-**Description:** Retrieve insights data for a specific date with optional service filters
-
-**Path Parameters:**
 - `query_date`: The date to filter by (YYYY-MM-DD format)
 
-**Query Parameters:**
-- `service_id` (optional): Service ID to filter by
-- `sub_service_id` (optional): Sub-service ID to filter by
-- `main_service_id` (optional): Main service ID to filter by
+**Example:**
+```
+GET /insights-direct/sub-service/SUB001/date/2025-08-01
+```
+
+### 2. Get Insights by Main Service ID and Date
+
+**Endpoint:** `GET /insights-direct/main-service/{main_service_id}/date/{query_date}`
+
+**Description:** Retrieve insights data for a specific main_service_id and date (returns all sub-services under that main service)
+
+**Path Parameters:**
+- `main_service_id`: The main service identifier
+- `query_date`: The date to filter by (YYYY-MM-DD format)
 
 **Example:**
 ```
-GET /insights-direct/date/2025-08-01?sub_service_id=SUB001&main_service_id=MAIN001
+GET /insights-direct/main-service/MAIN001/date/2025-08-01
+```
+
+**Expected Response (with your database):**
+```json
+{
+  "insights": [
+    {
+      "date": "2025-08-01",
+      "sub_service_id": "SUB001",
+      "main_service_id": "MAIN001",
+      "average_processing_time": "00:25:00",
+      "no_show_count": 2,
+      "predicted_number_of_visitors": 6
+    },
+    {
+      "date": "2025-08-01",
+      "sub_service_id": "SUB002",
+      "main_service_id": "MAIN001",
+      "average_processing_time": "00:30:00",
+      "no_show_count": 1,
+      "predicted_number_of_visitors": 8
+    }
+  ],
+  "total_count": 2
+}
+```
+
+### 3. Get Insights by Sub-Service ID, Main Service ID and Date
+
+**Endpoint:** `GET /insights-direct/sub-service/{sub_service_id}/main-service/{main_service_id}/date/{query_date}`
+
+**Description:** Retrieve insights data for a specific sub_service_id, main_service_id and date combination
+
+**Path Parameters:**
+- `sub_service_id`: The sub-service identifier
+- `main_service_id`: The main service identifier
+- `query_date`: The date to filter by (YYYY-MM-DD format)
+
+**Example:**
+```
+GET /insights-direct/sub-service/SUB001/main-service/MAIN001/date/2025-08-01
 ```
 
 ## Error Handling
@@ -150,8 +112,8 @@ Error responses include a detail message explaining the issue.
 ## Data Processing
 
 The endpoints automatically handle:
-- Date formatting and validation
-- Processing time conversion to HH:MM:SS format
+- MongoDB date format conversion (including extended JSON format)
+- Date range queries for the entire day
 - Default values for missing fields
 - Sorting results by date (newest first)
 
@@ -165,10 +127,22 @@ python test_insights_direct.py
 
 Make sure the FastAPI server is running on `http://localhost:8000` before running the tests.
 
-## Database Collections
+## Database Collection
 
-The endpoints query the following MongoDB collections:
-- `insights`: Main insights data
-- `sub_services`: Sub-service information
-- `main_services`: Main service information
-- `appointments`: Appointment data (for reference)
+The endpoints query the `insights` MongoDB collection with the following structure:
+
+```json
+{
+  "_id": {
+    "$oid": "689df223fa4f64fd4a00200f"
+  },
+  "date": {
+    "$date": "2025-08-01T00:00:00.000Z"
+  },
+  "sub_service_id": "SUB001",
+  "main_service_id": "MAIN001",
+  "average_processing_time": "00:25:00",
+  "no_show_count": 2,
+  "predicted_number_of_visitors": 6
+}
+```

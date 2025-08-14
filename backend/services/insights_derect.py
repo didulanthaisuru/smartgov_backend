@@ -1,48 +1,29 @@
-from database_config import collection_apointment, collection_sub_services, collection_main_services, collection_insights
+from database_config import collection_insights
 from schemas.insights_derect import InsightDirectQuery, InsightDirectResponse, InsightDirectListResponse
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from typing import List, Optional
 import asyncio
 
-async def get_insights_direct(query: InsightDirectQuery) -> InsightDirectListResponse:
+async def get_insights_by_date_and_sub_service(sub_service_id: str, query_date: date) -> InsightDirectListResponse:
     """
-    Get insights data based on service_id, sub_service_id, main_service_id, and date
+    Get insights data for a specific sub_service_id and date
     """
     try:
-        # Build match conditions based on provided parameters
-        match_conditions = {}
-        
-        if query.sub_service_id:
-            match_conditions["sub_service_id"] = query.sub_service_id
-            
-        if query.main_service_id:
-            match_conditions["main_service_id"] = query.main_service_id
-            
-        if query.date:
-            # Convert date to datetime for MongoDB query
-            start_date = query.date
-            end_date = date(query.date.year, query.date.month, query.date.day + 1)
-            match_conditions["date"] = {
-                "$gte": start_date,
-                "$lt": end_date
-            }
-        
-        # If service_id is provided, we need to find related sub_services first
-        if query.service_id:
-            # Find sub_services that belong to this service_id
-            sub_services_cursor = collection_sub_services.find({"service_id": query.service_id})
-            sub_services = await sub_services_cursor.to_list(length=None)
-            
-            if sub_services:
-                sub_service_ids = [sub_service["service_sub_id"] for sub_service in sub_services]
-                match_conditions["sub_service_id"] = {"$in": sub_service_ids}
-            else:
-                # No sub_services found for this service_id
-                return InsightDirectListResponse(insights=[], total_count=0)
+        # Convert date to datetime for MongoDB query
+        start_date = datetime.combine(query_date, datetime.min.time())
+        end_date = datetime.combine(query_date, datetime.max.time())
         
         # Query insights collection
         pipeline = [
-            {"$match": match_conditions} if match_conditions else {},
+            {
+                "$match": {
+                    "sub_service_id": sub_service_id,
+                    "date": {
+                        "$gte": start_date,
+                        "$lte": end_date
+                    }
+                }
+            },
             {
                 "$project": {
                     "date": 1,
@@ -62,29 +43,19 @@ async def get_insights_direct(query: InsightDirectQuery) -> InsightDirectListRes
         # Convert to response format
         insights = []
         for data in insights_data:
-            # Format average_processing_time as HH:MM:SS
-            processing_time = data.get("average_processing_time", "00:00:00")
-            if isinstance(processing_time, (int, float)):
-                # Convert minutes to HH:MM:SS format
-                minutes = int(processing_time)
-                hours = minutes // 60
-                remaining_minutes = minutes % 60
-                processing_time = f"{hours:02d}:{remaining_minutes:02d}:00"
-            elif isinstance(processing_time, str) and ":" not in processing_time:
-                # If it's a string number, convert to HH:MM:SS
-                try:
-                    minutes = int(processing_time)
-                    hours = minutes // 60
-                    remaining_minutes = minutes % 60
-                    processing_time = f"{hours:02d}:{remaining_minutes:02d}:00"
-                except ValueError:
-                    processing_time = "00:00:00"
+            # Convert MongoDB date to Python date
+            insight_date = data.get("date")
+            if isinstance(insight_date, datetime):
+                insight_date = insight_date.date()
+            elif isinstance(insight_date, dict) and "$date" in insight_date:
+                # Handle MongoDB extended JSON format
+                insight_date = datetime.fromisoformat(insight_date["$date"].replace("Z", "+00:00")).date()
             
             insight = InsightDirectResponse(
-                date=data.get("date", date.today()),
+                date=insight_date or date.today(),
                 sub_service_id=data.get("sub_service_id", ""),
                 main_service_id=data.get("main_service_id", ""),
-                average_processing_time=processing_time,
+                average_processing_time=data.get("average_processing_time", "00:00:00"),
                 no_show_count=data.get("no_show_count", 0),
                 predicted_number_of_visitors=data.get("predicted_number_of_visitors", 0)
             )
@@ -96,50 +67,154 @@ async def get_insights_direct(query: InsightDirectQuery) -> InsightDirectListRes
         )
         
     except Exception as e:
-        raise Exception(f"Error getting insights direct: {str(e)}")
+        raise Exception(f"Error getting insights by date and sub_service: {str(e)}")
 
-async def get_insights_by_sub_service(sub_service_id: str, query_date: Optional[date] = None) -> InsightDirectListResponse:
+async def get_insights_by_date_and_main_service(main_service_id: str, query_date: date) -> InsightDirectListResponse:
     """
-    Get insights for a specific sub_service_id
+    Get insights data for a specific main_service_id and date
     """
-    query = InsightDirectQuery(sub_service_id=sub_service_id, date=query_date)
-    return await get_insights_direct(query)
+    try:
+        # Convert date to datetime for MongoDB query
+        start_date = datetime.combine(query_date, datetime.min.time())
+        end_date = datetime.combine(query_date, datetime.max.time())
+        
+        # Query insights collection
+        pipeline = [
+            {
+                "$match": {
+                    "main_service_id": main_service_id,
+                    "date": {
+                        "$gte": start_date,
+                        "$lte": end_date
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "date": 1,
+                    "sub_service_id": 1,
+                    "main_service_id": 1,
+                    "average_processing_time": 1,
+                    "no_show_count": 1,
+                    "predicted_number_of_visitors": 1
+                }
+            },
+            {"$sort": {"date": -1}}
+        ]
+        
+        cursor = collection_insights.aggregate(pipeline)
+        insights_data = await cursor.to_list(length=None)
+        
+        # Convert to response format
+        insights = []
+        for data in insights_data:
+            # Convert MongoDB date to Python date
+            insight_date = data.get("date")
+            if isinstance(insight_date, datetime):
+                insight_date = insight_date.date()
+            elif isinstance(insight_date, dict) and "$date" in insight_date:
+                # Handle MongoDB extended JSON format
+                insight_date = datetime.fromisoformat(insight_date["$date"].replace("Z", "+00:00")).date()
+            
+            insight = InsightDirectResponse(
+                date=insight_date or date.today(),
+                sub_service_id=data.get("sub_service_id", ""),
+                main_service_id=data.get("main_service_id", ""),
+                average_processing_time=data.get("average_processing_time", "00:00:00"),
+                no_show_count=data.get("no_show_count", 0),
+                predicted_number_of_visitors=data.get("predicted_number_of_visitors", 0)
+            )
+            insights.append(insight)
+        
+        return InsightDirectListResponse(
+            insights=insights,
+            total_count=len(insights)
+        )
+        
+    except Exception as e:
+        raise Exception(f"Error getting insights by date and main_service: {str(e)}")
 
-async def get_insights_by_main_service(main_service_id: str, query_date: Optional[date] = None) -> InsightDirectListResponse:
+async def get_insights_by_sub_service_main_service_date(sub_service_id: str, main_service_id: str, query_date: date) -> InsightDirectListResponse:
     """
-    Get insights for a specific main_service_id
+    Get insights data for a specific sub_service_id, main_service_id and date
     """
-    query = InsightDirectQuery(main_service_id=main_service_id, date=query_date)
-    return await get_insights_direct(query)
-
-async def get_insights_by_service(service_id: str, query_date: Optional[date] = None) -> InsightDirectListResponse:
-    """
-    Get insights for a specific service_id
-    """
-    query = InsightDirectQuery(service_id=service_id, date=query_date)
-    return await get_insights_direct(query)
+    try:
+        # Convert date to datetime for MongoDB query
+        start_date = datetime.combine(query_date, datetime.min.time())
+        end_date = datetime.combine(query_date, datetime.max.time())
+        
+        # Query insights collection
+        pipeline = [
+            {
+                "$match": {
+                    "sub_service_id": sub_service_id,
+                    "main_service_id": main_service_id,
+                    "date": {
+                        "$gte": start_date,
+                        "$lte": end_date
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "date": 1,
+                    "sub_service_id": 1,
+                    "main_service_id": 1,
+                    "average_processing_time": 1,
+                    "no_show_count": 1,
+                    "predicted_number_of_visitors": 1
+                }
+            },
+            {"$sort": {"date": -1}}
+        ]
+        
+        cursor = collection_insights.aggregate(pipeline)
+        insights_data = await cursor.to_list(length=None)
+        
+        # Convert to response format
+        insights = []
+        for data in insights_data:
+            # Convert MongoDB date to Python date
+            insight_date = data.get("date")
+            if isinstance(insight_date, datetime):
+                insight_date = insight_date.date()
+            elif isinstance(insight_date, dict) and "$date" in insight_date:
+                # Handle MongoDB extended JSON format
+                insight_date = datetime.fromisoformat(insight_date["$date"].replace("Z", "+00:00")).date()
+            
+            insight = InsightDirectResponse(
+                date=insight_date or date.today(),
+                sub_service_id=data.get("sub_service_id", ""),
+                main_service_id=data.get("main_service_id", ""),
+                average_processing_time=data.get("average_processing_time", "00:00:00"),
+                no_show_count=data.get("no_show_count", 0),
+                predicted_number_of_visitors=data.get("predicted_number_of_visitors", 0)
+            )
+            insights.append(insight)
+        
+        return InsightDirectListResponse(
+            insights=insights,
+            total_count=len(insights)
+        )
+        
+    except Exception as e:
+        raise Exception(f"Error getting insights by sub_service, main_service and date: {str(e)}")
 
 # Legacy functions for backward compatibility
-def get_insights_direct_sync(query: InsightDirectQuery):
+def get_insights_by_date_and_sub_service_sync(sub_service_id: str, query_date: date):
     """
     Synchronous wrapper for the async function
     """
-    return asyncio.run(get_insights_direct(query))
+    return asyncio.run(get_insights_by_date_and_sub_service(sub_service_id, query_date))
 
-def get_insights_by_sub_service_sync(sub_service_id: str, query_date: Optional[date] = None):
+def get_insights_by_date_and_main_service_sync(main_service_id: str, query_date: date):
     """
     Synchronous wrapper for the async function
     """
-    return asyncio.run(get_insights_by_sub_service(sub_service_id, query_date))
+    return asyncio.run(get_insights_by_date_and_main_service(main_service_id, query_date))
 
-def get_insights_by_main_service_sync(main_service_id: str, query_date: Optional[date] = None):
+def get_insights_by_sub_service_main_service_date_sync(sub_service_id: str, main_service_id: str, query_date: date):
     """
     Synchronous wrapper for the async function
     """
-    return asyncio.run(get_insights_by_main_service(main_service_id, query_date))
-
-def get_insights_by_service_sync(service_id: str, query_date: Optional[date] = None):
-    """
-    Synchronous wrapper for the async function
-    """
-    return asyncio.run(get_insights_by_service(service_id, query_date))
+    return asyncio.run(get_insights_by_sub_service_main_service_date(sub_service_id, main_service_id, query_date))

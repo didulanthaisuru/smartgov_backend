@@ -1,9 +1,8 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import date, time
+from datetime import date
 
 class InsightDirectQuery(BaseModel):
-    service_id: Optional[str] = None
     sub_service_id: Optional[str] = None
     main_service_id: Optional[str] = None
     date: Optional[date] = None
