@@ -9,13 +9,16 @@ import businessIcon from '../assets/images/figma/business_building_icon.png';
 import museumIcon from '../assets/images/figma/museum_icon.png';
 import notesIcon from '../assets/images/figma/notes_icon.png';
 import servicesHeroImage from '../assets/images/figma/services_hero_image.png';
-import logoIcon from '../assets/images/figma/logo.png';
+import logoIcon from '../assets/images/logo.png';
+import { ChevronDown, Menu, MessageCircle  } from "lucide-react";
+
 
 const Services = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showSidebar, setShowSidebar] = useState(false);
+  const [showButtons, setShowButtons] = useState(false);
 
   const recentServices = [
     {
@@ -109,9 +112,10 @@ const Services = () => {
   };
 
   const ServiceCard = ({ service, size = 'default' }) => (
+  <div className="flex flex-col items-center justify-center text-center cursor-pointer">
     <div 
       onClick={() => handleServiceClick(service)}
-      className="bg-[#F8CA92] rounded-xl p-3 cursor-pointer hover:shadow-md transition-shadow flex flex-col items-center justify-center text-center"
+      className="bg-[#F8CA92] rounded-xl p-3 hover:shadow-md transition-shadow flex items-center justify-center"
       style={{
         width: size === 'small' ? '68px' : '68px',
         height: size === 'small' ? '65px' : '65px'
@@ -120,26 +124,30 @@ const Services = () => {
       <img
         src={service.icon}
         alt={service.name}
-        className="w-8 h-8 object-contain mb-1"
+        className="w-8 h-8 object-contain"
       />
-      <span className="text-[10px] font-normal text-black leading-tight">
-        {service.name}
-      </span>
     </div>
-  );
+    <span className="text-[10px] font-normal text-black leading-tight mt-1 max-w-[80px] break-words">
+      {service.name}
+    </span>
+  </div>
+);
 
   return (
     <div className="min-h-screen bg-white relative">
       {/* Sidebar */}
       <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       
-      {/* Header */}
-      <Header 
-        title="Government Services" 
+
+      <div className="flex items-center justify-between px-6 py-4">
+      
+        <Header 
         setShowSidebar={setShowSidebar} 
         showLanguageSelector={true}
         language="EN"
       />
+    
+      </div>
 
       {/* Divider Line */}
       <div className="w-full h-px bg-black"></div>
@@ -174,48 +182,7 @@ const Services = () => {
         />
       </div>
 
-      {/* Categories */}
-      <div className="px-8 mb-6">
-        <h3 className="text-sm font-normal text-black mb-4">Categories</h3>
-        <div className="flex gap-2">
-          <button 
-            onClick={() => setSelectedCategory('all')}
-            className={`px-4 py-2 rounded-xl text-sm font-normal ${
-              selectedCategory === 'all' 
-                ? 'bg-[#F2622E] text-black' 
-                : 'bg-[#D0E9F2] text-black'
-            }`}
-          >
-            ALL
-          </button>
-          <button 
-            onClick={() => setSelectedCategory('popular')}
-            className={`px-4 py-2 rounded-xl text-sm font-normal ${
-              selectedCategory === 'popular' 
-                ? 'bg-[#F2622E] text-black' 
-                : 'bg-[#D0E9F2] text-black'
-            }`}
-          >
-            Popular Services
-          </button>
-          <button 
-            onClick={() => setSelectedCategory('other')}
-            className={`px-4 py-2 rounded-xl text-sm font-normal ${
-              selectedCategory === 'other' 
-                ? 'bg-[#F2622E] text-black' 
-                : 'bg-[#D0E9F2] text-black'
-            }`}
-          >
-            Other Services
-          </button>
-          <button 
-            onClick={() => setSelectedCategory('dep1')}
-            className="bg-[#F8CA92] px-4 py-2 rounded-xl text-sm font-normal text-black"
-          >
-            Dep 1
-          </button>
-        </div>
-      </div>
+      
 
       {/* Recent Services */}
       <div className="px-8 mb-6">
@@ -253,29 +220,40 @@ const Services = () => {
         </div>
       </div>
 
-      {/* Chat with AI Button */}
-      <div className="px-8 mb-4">
-        <button 
-          onClick={() => navigate('/chatbot')}
-          className="w-full bg-[#F8CA92] border border-black rounded-xl p-4 shadow-inner flex items-center justify-between hover:bg-[#F7C485] transition-colors"
-        >
-          <span className="text-sm font-normal text-black">Chat with AI</span>
-          <img src={logoIcon} alt="AI" className="w-7 h-7" />
-        </button>
-      </div>
+      <button 
+        onClick={() => setShowButtons(!showButtons)}
+        className="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg hover:bg-yellow-600 transition-colors z-50"
+      >
+        <MessageCircle className="w-6 h-6" />
+      </button>
 
-      {/* Contact Us Button */}
-      <div className="px-8 mb-8">
-        <button 
-          onClick={() => navigate('/contact-us')}
-          className="w-full bg-[#E8F5E8] border border-[#4CAF50] rounded-xl p-4 shadow-inner flex items-center justify-between hover:bg-[#E0F0E0] transition-colors"
-        >
-          <span className="text-sm font-normal text-[#4CAF50]">Contact Us</span>
-          <svg className="w-6 h-6 text-[#4CAF50]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26c.31.17.69.17 1-.01L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-        </button>
-      </div>
+      {/* Chat with AI Button - Fixed popup button */}
+      {showButtons && (
+        <div className="fixed bottom-20 right-6 w-48 z-40">
+          <button 
+            onClick={() => navigate('/chatbot')}
+            className="w-full bg-white border border-gray-300 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-50 transition-colors shadow-lg"
+          >
+            <MessageCircle className="w-5 h-5 text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">Chat with AI</span>
+          </button>
+        </div>
+      )}
+
+      {/* Contact Us Button - Fixed popup button */}
+      {showButtons && (
+        <div className="fixed bottom-32 right-6 w-48 z-40">
+          <button 
+            onClick={() => navigate('/contact-us')}
+            className="w-full bg-white border border-gray-300 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-50 transition-colors shadow-lg"
+          >
+            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26c.31.17.69.17 1-.01L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span className="text-sm font-medium text-gray-700">Contact Us</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
