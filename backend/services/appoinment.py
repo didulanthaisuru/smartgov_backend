@@ -45,7 +45,7 @@ async def create_appointment_service(data: AppointmentAdd):
         "sub_service_id": object_id,
         "sub_service_steps": steps_with_status,  # Store the steps array from sub_service with status/completed_by
         "created_at": data.created_at if data.created_at else datetime.now(),
-        "is_fully_complered": data.is_fully_complered if data.is_fully_complered is not None else False,
+        "is_fully_completed": data.is_fully_completed if data.is_fully_completed is not None else False,
         "appointment_date": data.appointment_date,
         "appoinment_time": data.appoinment_time,
         "predicted_duration": data.predicted_duration
