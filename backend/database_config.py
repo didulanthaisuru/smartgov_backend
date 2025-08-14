@@ -5,12 +5,21 @@ async def connect_to_mongo():
 async def close_mongo_connection():
 	pass
 import motor.motor_asyncio
+# Add async stubs for FastAPI startup/shutdown compatibility
+async def connect_to_mongo():
+	pass
+
+async def close_mongo_connection():
+	pass
+import motor.motor_asyncio
 import os
 from dotenv import load_dotenv
 
 # load environment variables from the .env file
+# load environment variables from the .env file
 load_dotenv()
 
+# MongoDB URI from .env file
 # MongoDB URI from .env file
 MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = "SmartGov" 
