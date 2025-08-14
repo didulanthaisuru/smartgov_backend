@@ -33,6 +33,10 @@ import IncompleteActivitiesPage from './pages/IncompleteActivitiesPage';
 import PreviousActivitiesPage from './pages/PreviousActivitiesPage';
 import UpdateInformationPage from './pages/UpdateInformationPage';
 import AnalyticsDashboardPage from './pages/AnalyticsDashboardPage';
+import SmartGovWelcome1 from './pages/Instructions1';
+import AdminTasks from './pages/AdminTasks';
+import AdminNotifications from './pages/AdminNotifications';
+import AdminRates from './pages/AdminRates';
 
 // Admin Pages
 import AdminLoginPage from './pages/admin/AdminLoginPage';
@@ -122,6 +126,19 @@ function App() {
                 </PublicRoute>
               } 
             />
+            <Route 
+              path="/welcome-screen-1"
+              element={<SmartGovWelcome1 />}
+            />
+
+            <Route 
+              path="/admin -notifications"
+              element={
+                // <ProtectedRoute>
+                  <AdminNotifications />
+                // </ProtectedRoute> 
+              }
+            />
 
             {/* Admin Public Routes */}
             <Route 
@@ -208,6 +225,13 @@ function App() {
                 </UserRoute>
               } 
             />
+            <Route
+              path="admin-rates"
+              element={
+                // <ProtectedRoute>
+                  <AdminRates />
+                // </ProtectedRoute>
+              }/>
             <Route 
               path="/services/:serviceId" 
               element={
@@ -232,6 +256,13 @@ function App() {
                 </UserRoute>
               } 
             />
+            <Route 
+              path="/admin-tasks"
+              element={
+                // <ProtectedRoute>
+                  <AdminTasks />
+                // </ProtectedRoute>
+              }/>
             <Route 
               path="/services/:serviceId/payment" 
               element={
