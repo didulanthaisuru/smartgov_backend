@@ -114,9 +114,9 @@ function App() {
             <Route 
               path="/login" 
               element={
-                <PublicRoute>
+                // <PublicRoute>
                   <LoginPage />
-                </PublicRoute>
+                // </PublicRoute>
               } 
             />
             <Route 
