@@ -1,11 +1,12 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from typing import List, Dict, Any, Optional
+from database_config import collection_main_services, collection_sub_services, collection_required_documents
 
 # Get all main services 
 async def get_all_main_services(db: AsyncIOMotorClient) -> List[Dict[str, Any]]:
     """Retrieves a list of all main services."""
-    services= await db["main_services"].find({}, {"_id": 1, "service_name": 1, "icon_name": 1}).to_list(1000)
+    services= await collection_main_services.find({}, {"_id": 1, "service_name": 1, "icon_name": 1}).to_list(1000)
 
     # Convert ObjectId to string
     for service in services:
@@ -23,7 +24,7 @@ async def get_sub_services_for_main_service(db: AsyncIOMotorClient, main_service
         {"$lookup": {"from": "sub_services", "localField": "sub_services", "foreignField": "_id", "as": "sub_services_full"}},
         {"$project": {"_id": 0, "sub_services": "$sub_services_full"}}
     ]
-    result = await db["main_services"].aggregate(pipeline).to_list(1)
+    result = await collection_main_services.aggregate(pipeline).to_list(1)
     
     if result:
         sub_services = result[0].get("sub_services", [])
@@ -52,7 +53,7 @@ async def get_sub_service_details(db: AsyncIOMotorClient, main_service_id: str, 
             "required_docs": "$required_docs_full"
         }}
     ]
-    result = await db["sub_services"].aggregate(pipeline).to_list(1)
+    result = await collection_sub_services.aggregate(pipeline).to_list(1)
     
     if result:
         service = result[0]

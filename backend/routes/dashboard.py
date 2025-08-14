@@ -8,8 +8,8 @@ from services import dashboard
 from database_config import db 
 
 router = APIRouter(
-    prefix="/services", # Add a prefix for all routes in this file
-    tags=["Services"]     # Group these endpoints in the API docs
+    prefix="/dashboard_services", # Add a prefix for all routes in this file
+    tags=["Dashboard Services"]     # Group these endpoints in the API docs
 )
 
 # Get all main services for the dashboard
