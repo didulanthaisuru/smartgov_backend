@@ -13,6 +13,7 @@ load_dotenv()
 
 # MongoDB URI from .env file
 MONGO_URI = os.getenv("MONGO_URI")
+DB_NAME = "SmartGov" 
 
 # create a client instance for MongoDB
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
