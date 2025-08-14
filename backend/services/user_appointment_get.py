@@ -5,7 +5,7 @@ from datetime import datetime
 
 # Collection names
 SUB_SERVICES_COLLECTION = "sub_services"
-APPOINTMENTS_COLLECTION = "AppointmentNew1"
+APPOINTMENTS_COLLECTION = "AppoinmentNew"
 # UPLOADED_DOCS_COLLECTION = "uploaded_documents"
 
 # async def get_appointment_details(db: AsyncIOMotorClient, appointment_id: str) -> Optional[Dict[str, Any]]:
@@ -23,7 +23,7 @@ APPOINTMENTS_COLLECTION = "AppointmentNew1"
 #         {"$project": {
 #             "appointment_id": {"$toString": "$_id"},
 #             "user_id": 1, "service_name": "$sub_service_info.service_name", "sub_service_states": 1,
-#             "is_fully_completed": 1, "appointment_date": 1,
+#             "is_fully_complered": 1, "appointment_date": 1,
 #             "document_checklist": {
 #                 "$map": {
 #                     "input": "$sub_service_info.required_docs", "as": "required",
@@ -74,7 +74,7 @@ async def get_user_appointments_by_status(db: AsyncIOMotorClient, user_id: str, 
             "appointment_id": {"$toString": "$_id"},
             "service_name": "$sub_service_info.service_name",
             "appointment_date": 1,
-            "is_fully_completed": 1
+            "is_fully_complered": 1
         }}
     ]
     return await db[APPOINTMENTS_COLLECTION].aggregate(pipeline).to_list(None)
@@ -83,7 +83,7 @@ async def get_previous_appointments(db: AsyncIOMotorClient, user_id: str) -> Lis
     """Gets a list of a user's PREVIOUS (fully completed) appointments."""
     pipeline = [
         # Find all appointments for the user that are fully completed
-        {"$match": {"user_id": user_id, "is_fully_completed": True}},
+        {"$match": {"user_id": user_id, "is_fully_complered": True}},
         # Join with sub_services to get the service name
         {"$lookup": {
             "from": SUB_SERVICES_COLLECTION,
@@ -95,7 +95,7 @@ async def get_previous_appointments(db: AsyncIOMotorClient, user_id: str) -> Lis
         # Project the summary shape
         {"$project": {
             "_id": 0, "appointment_id": {"$toString": "$_id"}, "service_name": "$sub_service_info.service_name",
-            "appointment_date": 1, "is_fully_completed": 1
+            "appointment_date": 1, "is_fully_complered": 1
         }}
     ]
     return await db[APPOINTMENTS_COLLECTION].aggregate(pipeline).to_list(None)
