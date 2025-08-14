@@ -74,14 +74,3 @@ async def get_previous_appointment_details(
             detail="Previous appointment not found for this user."
         )
     return appointment
-
-# @router.post("/{appointment_id}/details", response_model=AppointmentDetailResponse)
-# async def get_user_appointment(appointment_id: str, user_req: UserRequest, db: AsyncIOMotorClient = Depends(get_database)):
-#     """Retrieves the detailed state of a specific appointment for a specific user."""
-#     appointment_details = await appointment_services.get_appointment_details(db, appointment_id)
-    
-#     # Security check: Ensure the appointment belongs to the user in the request body
-#     if not appointment_details or appointment_details.get("user_id") != user_req.user_id:
-#         raise HTTPException(status_code=404, detail="Appointment not found for this user.")
-        
-#     return appointment_details
