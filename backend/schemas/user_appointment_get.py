@@ -8,7 +8,7 @@ class user_request(BaseModel):
 class appointment_summary_response(BaseModel):
     appointment_id: str
     service_name: str
-    appointment_date: Optional[date] = None
+    appointment_date: Optional[datetime] = None
     is_fully_completed: bool
 
 # New schemas for individual appointment details
