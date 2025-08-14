@@ -11,11 +11,24 @@ from datetime import date, time
 class user(BaseModel):
     first_name: str
     last_name: str
-    nic: str
+    nic: str  # Primary identifier - National Identity Card
     phone_number: str
-    passcode: str
-    user_id: int
+    passcode: str  # This will be hashed
     email: str
+    is_active: Optional[bool] = True
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+class UserInDB(BaseModel):
+    first_name: str
+    last_name: str
+    nic: str  # Primary identifier - National Identity Card
+    phone_number: str
+    hashed_password: str  # Stored hashed password
+    email: str
+    is_active: bool = True
+    created_at: datetime
+    updated_at: datetime
 class services(BaseModel):
     service_name: str
     service_id: int
@@ -57,6 +70,21 @@ class admin(BaseModel):
     admin_id: int
     admin_name: str
     service_id: str
+    email: str
+    passcode: str  # This will be hashed
+    is_active: Optional[bool] = True
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+class AdminInDB(BaseModel):
+    admin_id: int
+    admin_name: str
+    service_id: str
+    email: str
+    hashed_password: str  # Stored hashed password
+    is_active: bool = True
+    created_at: datetime
+    updated_at: datetime
 
 class DailyMetrics(BaseModel):
     date: date
