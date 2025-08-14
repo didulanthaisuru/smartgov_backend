@@ -65,6 +65,7 @@ const InitialRoute = () => {
     );
   }
   
+  // Check if user is authenticated and redirect accordingly
   if (isAuthenticated()) {
     // Redirect based on user role
     if (role === 'admin') {
@@ -93,6 +94,7 @@ const PublicRoute = ({ children }) => {
     );
   }
   
+  // If authenticated, redirect to appropriate dashboard
   if (isAuthenticated()) {
     return <Navigate to={role === 'admin' ? '/admin/dashboard' : '/services'} replace />;
   }
@@ -302,17 +304,17 @@ function App() {
             <Route 
               path="/dashboard" 
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <DashboardPage />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               } 
             />
             <Route 
               path="/activities/*" 
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <ActivitiesPage />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               } 
             />
 
@@ -326,27 +328,19 @@ function App() {
             <Route 
               path="/admin" 
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <AdminPage />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               } 
             />
             
             {/* Additional routes */}
             <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
               path="/messages" 
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <MessagesPage />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               } 
             />
             <Route 
@@ -447,7 +441,7 @@ function App() {
             />
 
             {/* Catch all route */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/landing" replace />} />
           </Routes>
         </div>
       </AuthProvider>

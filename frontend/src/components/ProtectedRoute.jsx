@@ -20,7 +20,9 @@ export const ProtectedRoute = ({ children, requiredRole = null }) => {
   }
 
   if (!isAuthenticated()) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Redirect to appropriate login page based on required role
+    const loginPath = requiredRole === 'admin' ? '/admin/login' : '/login';
+    return <Navigate to={loginPath} state={{ from: location }} replace />;
   }
 
   if (requiredRole && role !== requiredRole) {
