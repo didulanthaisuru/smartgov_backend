@@ -1,7 +1,9 @@
 from schemas.admin import (
     appointment_detail_card_request, appointment_detail_card, 
     view_detailed_appointment_request, view_detailed_appointment_response,
-    RequiredDocument
+    RequiredDocument, get_subservice_details_request, get_subservice_details_response,
+    SubServiceDocument, SubServiceStep, get_selected_appoinment_details_with_pdf_states_request,
+    get_selected_appoinment_details_with_pdf_states_response, DocumentItem
 )
 from database_config import collection_apointment, collection_users, collection_uploaded_documents, collection_required_documents, collection_sub_services
 from datetime import datetime, time
@@ -471,5 +473,268 @@ def _determine_payment_status(appointment_doc: dict) -> bool:
     # For now, return False as requested
     # This can be enhanced later with actual payment logic
     return False
+
+
+async def get_subservice_details(query: get_subservice_details_request) -> get_subservice_details_response:
+    """
+    Get detailed information about a sub-service including required documents and steps.
+    
+    This function retrieves comprehensive sub-service details including:
+    - Basic sub-service information (name, payment amount)
+    - Required documents with descriptions
+    - Service steps/process flow
+    
+    Args:
+        query: get_subservice_details_request containing subservice_id
+        
+    Returns:
+        get_subservice_details_response: Detailed sub-service information
+        
+    Raises:
+        ValueError: If subservice_id is not found or invalid
+        
+    Example:
+        >>> query = get_subservice_details_request(subservice_id="689cd830ef2618d4dfe5a594")
+        >>> result = await get_subservice_details(query)
+    """
+    try:
+        # Validate and convert subservice_id to ObjectId
+        try:
+            subservice_object_id = ObjectId(query.subservice_id)
+        except (ValueError, TypeError) as e:
+            logger.error(f"Invalid ObjectId format for subservice_id: {query.subservice_id}")
+            raise ValueError(f"Invalid subservice_id format: {query.subservice_id}")
+        
+        logger.info(f"Fetching sub-service details for ID: {query.subservice_id}")
+        
+        # Find the sub-service document
+        subservice_doc = await collection_sub_services.find_one({"_id": subservice_object_id})
+        
+        if not subservice_doc:
+            logger.error(f"Sub-service not found with id: {query.subservice_id}")
+            raise ValueError(f"Sub-service not found with id: {query.subservice_id}")
+        
+        logger.info(f"Found sub-service: {subservice_doc.get('service_name', 'Unknown')}")
+        
+        # Get required documents details
+        required_documents = await _get_required_documents_details(subservice_doc.get("required_docs", []))
+        
+        # Get steps information
+        steps = _extract_steps(subservice_doc.get("steps", []))
+        
+        # Create sub-service details response
+        try:
+            subservice_details = get_subservice_details_response(
+                subservice_id=query.subservice_id,
+                service_name=subservice_doc.get("service_name", "Unknown Service"),
+                payment_amount=float(subservice_doc.get("payment_amount", 0)),
+                required_documents=required_documents,
+                steps=steps
+            )
+        except Exception as response_error:
+            logger.error(f"Error creating response object: {response_error}")
+            raise ValueError(f"Error creating response: {str(response_error)}")
+        
+        logger.info(f"Successfully retrieved sub-service details: {query.subservice_id}")
+        return subservice_details
+        
+    except ValueError as ve:
+        logger.error(f"Validation error: {ve}")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error fetching sub-service details: {e}")
+        raise ValueError(f"Error retrieving sub-service details: {str(e)}")
+
+
+async def _get_required_documents_details(required_docs_refs: list) -> List[SubServiceDocument]:
+    """
+    Get detailed information about required documents.
+    
+    Args:
+        required_docs_refs: List of required document references from sub-service
+        
+    Returns:
+        List[SubServiceDocument]: List of required documents with details
+    """
+    try:
+        result = []
+        for doc_ref in required_docs_refs:
+            # Handle both ObjectId and string formats
+            if isinstance(doc_ref, dict) and "$oid" in doc_ref:
+                doc_id = ObjectId(doc_ref["$oid"])
+            elif isinstance(doc_ref, ObjectId):
+                doc_id = doc_ref
+            else:
+                doc_id = ObjectId(doc_ref)
+            
+            # Get the required document details from required_documents collection
+            required_doc = await collection_required_documents.find_one({"_id": doc_id})
+            
+            if required_doc:
+                doc_info = SubServiceDocument(
+                    doc_id=str(doc_id),
+                    doc_name=required_doc.get("doc_name", "Unknown Document"),
+                    description=required_doc.get("description", "")
+                )
+                result.append(doc_info)
+            else:
+                logger.warning(f"Required document not found: {doc_id}")
+        
+        logger.info(f"Found {len(result)} required documents")
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error getting required documents details: {e}")
+        return []
+
+
+def _extract_steps(steps_data: list) -> List[SubServiceStep]:
+    """
+    Extract steps information from sub-service document.
+    
+    Args:
+        steps_data: Steps data from sub-service document
+        
+    Returns:
+        List[SubServiceStep]: List of service steps
+    """
+    try:
+        result = []
+        for step in steps_data:
+            if isinstance(step, dict) and "step_id" in step and "step_name" in step:
+                step_info = SubServiceStep(
+                    step_id=int(step["step_id"]),
+                    step_name=str(step["step_name"])
+                )
+                result.append(step_info)
+        
+        logger.info(f"Found {len(result)} service steps")
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error extracting steps: {e}")
+        return []
+
+
+async def get_selected_appoinment_details_with_pdf_states(query: get_selected_appoinment_details_with_pdf_states_request) -> get_selected_appoinment_details_with_pdf_states_response:
+    """
+    Get selected appointment details with PDF states including uploaded documents.
+    
+    This function retrieves comprehensive appointment details including:
+    - Basic appointment information (ID, date, time, duration)
+    - User details (NIC, phone number)
+    - Uploaded documents with their states and required_doc_id
+    
+    Args:
+        query: get_selected_appoinment_details_with_pdf_states_request containing appointment_id
+        
+    Returns:
+        get_selected_appoinment_details_with_pdf_states_response: Detailed appointment information with PDF states
+        
+    Raises:
+        ValueError: If appointment_id is not found or invalid
+    """
+    try:
+        # Validate and convert appointment_id to ObjectId
+        try:
+            appointment_object_id = ObjectId(query.appointment_id)
+        except (ValueError, TypeError) as e:
+            logger.error(f"Invalid ObjectId format for appointment_id: {query.appointment_id}")
+            raise ValueError(f"Invalid appointment_id format: {query.appointment_id}")
+        
+        logger.info(f"Fetching appointment details with PDF states for ID: {query.appointment_id}")
+        
+        # Find the appointment document
+        appointment_doc = await collection_apointment.find_one({"_id": appointment_object_id})
+        
+        if not appointment_doc:
+            logger.error(f"Appointment not found with id: {query.appointment_id}")
+            raise ValueError(f"Appointment not found with id: {query.appointment_id}")
+        
+        logger.info(f"Found appointment: {appointment_doc.get('appointment_id', 'Unknown')}")
+        
+        # Enhanced user lookup with multiple strategies
+        user_info = await _get_user_information(appointment_doc.get("user_id"))
+        
+        # Get uploaded documents with their states
+        documents = await _get_uploaded_documents_with_states(appointment_object_id)
+        
+        # Extract and validate appointment data
+        appointment_data = _extract_appointment_data(appointment_doc)
+        
+        # Create appointment details response with PDF states
+        try:
+            appointment_details = get_selected_appoinment_details_with_pdf_states_response(
+                appointment_id=str(appointment_doc.get("appointment_id", "")),
+                appointment_user_nic=user_info.get("nic", "Unknown"),
+                appointment_user_mobile_number=user_info.get("phone_number", "Unknown"),
+                duration=appointment_data["duration"],
+                appointment_time=appointment_data["appointment_time"],
+                appointment_date=appointment_data["appointment_date"],
+                payment_status=appointment_data["payment_status"],
+                documents=documents
+            )
+        except Exception as response_error:
+            logger.error(f"Error creating response object: {response_error}")
+            raise ValueError(f"Error creating response: {str(response_error)}")
+        
+        logger.info(f"Successfully retrieved appointment details with PDF states: {query.appointment_id}")
+        return appointment_details
+        
+    except ValueError as ve:
+        logger.error(f"Validation error: {ve}")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error fetching appointment details with PDF states: {e}")
+        raise ValueError(f"Error retrieving appointment details: {str(e)}")
+
+
+async def _get_uploaded_documents_with_states(appointment_object_id: ObjectId) -> List[DocumentItem]:
+    """
+    Get uploaded documents with their states and required_doc_id.
+    
+    Args:
+        appointment_object_id: ObjectId of the appointment
+        
+    Returns:
+        List[DocumentItem]: List of uploaded documents with states
+    """
+    try:
+        result = []
+        
+        # Get uploaded documents for this appointment
+        async for uploaded_doc in collection_uploaded_documents.find({"appointment_id": appointment_object_id}):
+            try:
+                # Get the required document details
+                required_doc_id = uploaded_doc.get("required_doc_id")
+                required_doc = None
+                
+                if required_doc_id:
+                    # Try to find the required document by ID
+                    required_doc = await collection_required_documents.find_one({"_id": required_doc_id})
+                
+                # Create DocumentItem
+                doc_item = DocumentItem(
+                    document_id=str(uploaded_doc.get("_id")),
+                    required_doc_id=required_doc_id,  # Integer required_doc_id
+                    name=required_doc.get("doc_name", "Unknown Document") if required_doc else "Unknown Document",
+                    description=required_doc.get("description", "") if required_doc else "",
+                    view_link=uploaded_doc.get("file_path"),  # File path as view link
+                    accuracy=uploaded_doc.get("accuracy"),
+                    status=uploaded_doc.get("doc_status", "Unknown")
+                )
+                
+                result.append(doc_item)
+                
+            except Exception as doc_error:
+                logger.error(f"Error processing uploaded document {uploaded_doc.get('_id')}: {doc_error}")
+                continue
+        
+        logger.info(f"Found {len(result)} uploaded documents with states")
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error getting uploaded documents with states: {e}")
+        return []
 
         

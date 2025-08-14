@@ -69,10 +69,36 @@ class appointment_decline_response(BaseModel):
     reason: str
 
 
+# ===== SUB-SERVICE DETAILS ENDPOINTS =====
+
+class SubServiceStep(BaseModel):
+    step_id: int
+    step_name: str
+
+
+class SubServiceDocument(BaseModel):
+    doc_id: str                   # MongoDB ObjectId as string
+    doc_name: str                 # Document name from required_documents
+    description: Optional[str]    # Document description
+
+
+class get_subservice_details_request(BaseModel):
+    subservice_id: str            # ObjectId string for sub-service
+
+
+class get_subservice_details_response(BaseModel):
+    subservice_id: str            # ObjectId string
+    service_name: str             # Name of the sub-service
+    payment_amount: float         # Payment amount for the service
+    required_documents: List[SubServiceDocument]  # List of required documents
+    steps: List[SubServiceStep]   # List of service steps
+
+
 # ===== PDF STATES ENDPOINTS =====
 
 class DocumentItem(BaseModel):
     document_id: str              # MongoDB ObjectId as string
+    required_doc_id: Optional[int] = None  # Required document ID (integer)
     name: str                     # From required_documents
     description: Optional[str]    # From required_documents
     view_link: Optional[str]      # Uploaded document link
