@@ -251,13 +251,10 @@ function App() {
                 </UserRoute>
               } 
             />
+           
             <Route 
-              path="/services/:serviceId/detail" 
-              element={
-                <UserRoute>
-                  <ServiceDetailBooking />
-                </UserRoute>
-              } 
+            path="/services/:mainServiceId/subservices/:subServiceId" 
+            element={<ServiceDetailBooking />} 
             />
             <Route 
               path="/services/:serviceId/upload/:docId" 
