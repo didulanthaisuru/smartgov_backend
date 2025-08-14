@@ -33,6 +33,10 @@ import IncompleteActivitiesPage from './pages/IncompleteActivitiesPage';
 import PreviousActivitiesPage from './pages/PreviousActivitiesPage';
 import UpdateInformationPage from './pages/UpdateInformationPage';
 import AnalyticsDashboardPage from './pages/AnalyticsDashboardPage';
+import SmartGovWelcome1 from './pages/Instructions1';
+import AdminTasks from './pages/AdminTasks';
+import AdminNotifications from './pages/AdminNotifications';
+import AdminRates from './pages/AdminRates';
 
 // Admin Pages
 import AdminLoginPage from './pages/admin/AdminLoginPage';
@@ -44,6 +48,7 @@ import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminCompletedTasksPage from './pages/admin/AdminCompletedTasksPage';
 import AdminChatPage from './pages/admin/AdminChatPage';
 import AdminQRScanPage from './pages/admin/AdminQRScanPage';
+import SubServicesPage from './pages/SubServicesPage'; 
 
 // Initial Route Component (handles app startup routing)
 const InitialRoute = () => {
@@ -111,9 +116,9 @@ function App() {
             <Route 
               path="/login" 
               element={
-                <PublicRoute>
+                // <PublicRoute>
                   <LoginPage />
-                </PublicRoute>
+                // </PublicRoute>
               } 
             />
             <Route 
@@ -124,6 +129,20 @@ function App() {
                 </PublicRoute>
               } 
             />
+            <Route 
+              path="/welcome-screen-1"
+              element={<SmartGovWelcome1 />}
+            />
+
+            <Route 
+              path="/admin -notifications"
+              element={
+                // <ProtectedRoute>
+                  <AdminNotifications />
+                // </ProtectedRoute> 
+              }
+            />
+
 
             {/* Admin Public Routes */}
             <Route 
@@ -210,6 +229,13 @@ function App() {
                 </UserRoute>
               } 
             />
+            <Route
+              path="admin-rates"
+              element={
+                // <ProtectedRoute>
+                  <AdminRates />
+                // </ProtectedRoute>
+              }/>
             <Route 
               path="/services/:serviceId" 
               element={
@@ -235,6 +261,13 @@ function App() {
               } 
             />
             <Route 
+              path="/admin-tasks"
+              element={
+                // <ProtectedRoute>
+                  <AdminTasks />
+                // </ProtectedRoute>
+              }/>
+            <Route 
               path="/services/:serviceId/payment" 
               element={
                 <UserRoute>
@@ -245,9 +278,9 @@ function App() {
             <Route 
               path="/services/:serviceId/booking" 
               element={
-                <ProtectedRoute>
+                //<ProtectedRoute>
                   <AppointmentBookingPage />
-                </ProtectedRoute>
+                //</ProtectedRoute>
               } 
             />
             <Route 
@@ -284,6 +317,14 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+
+            <Route 
+              path="/sub-services"
+              element={
+                <SubServicesPage/>
+              }
+            />
+
             <Route 
               path="/admin" 
               element={
@@ -321,17 +362,17 @@ function App() {
             <Route 
               path="/chatbot" 
               element={
-                <ProtectedRoute>
+                //<ProtectedRoute>
                   <ChatbotPage />
-                </ProtectedRoute>
+                //</ProtectedRoute>
               } 
             />
             <Route 
               path="/contact-us" 
               element={
-                <ProtectedRoute>
+                //<ProtectedRoute>
                   <ContactUsPage />
-                </ProtectedRoute>
+                //</ProtectedRoute>
               } 
             />
             <Route 

@@ -69,6 +69,16 @@ const SignUp = () => {
       return;
     }
 
+<<<<<<< HEAD
+                        {/* Back to Login Link */}
+                        <p className="mt-6 text-center text-sm">
+                            <a href="/login" className="font-medium text-gray-600 hover:text-gray-800">
+                                Back to Login
+                            </a>
+                        </p>
+                    </main>
+                </div>
+=======
     setLoading(true);
 
     try {
@@ -132,6 +142,7 @@ const SignUp = () => {
               <span className="text-xs text-gray-600">
                 Digital Services
               </span>
+>>>>>>> frontend_avishka
             </div>
           </div>
         </div>
