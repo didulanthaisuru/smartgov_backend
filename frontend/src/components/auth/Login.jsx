@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [nicNumber, setNicNumber] = useState('');
   const [password, setPassword] = useState('');
   const [savePassword, setSavePassword] = useState(false);
@@ -18,11 +20,13 @@ const Login = () => {
       role: 'user'
     };
     
-    localStorage.setItem('token', 'dummy-auth-token');
-    localStorage.setItem('user', JSON.stringify(userData));
+    // Use auth context to login with user role
+    const userRole = login(userData, 'user', 'dummy-auth-token');
     
-    // Navigate to services page (main entry point)
-    navigate('/services');
+    // Navigate based on role
+    if (userRole === 'user') {
+      navigate('/services');
+    }
   };
 
   return (

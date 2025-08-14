@@ -52,17 +52,19 @@ const AdminDashboardPage = () => {
 
   const loadDashboardData = async () => {
     try {
-      // API call to get dashboard metrics
-      const response = await fetch('/api/admin/dashboard', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      // Mock dashboard data for demo
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
       
-      if (response.ok) {
-        const data = await response.json();
-        setMetrics(data.metrics || metrics);
-      }
+      const mockData = {
+        metrics: {
+          totalUsers: 1247,
+          onlineUsers: 89,
+          totalRequests: 342,
+          completedRequests: 298
+        }
+      };
+      
+      setMetrics(mockData.metrics);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     }

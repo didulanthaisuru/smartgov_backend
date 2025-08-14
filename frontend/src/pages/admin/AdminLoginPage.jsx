@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    adminNic: '',
+    adminEmail: '',
     password: ''
   });
   const [rememberPassword, setRememberPassword] = useState(false);
@@ -28,23 +28,31 @@ const AdminLoginPage = () => {
     setError('');
 
     try {
-      // API call for admin login
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (response.ok) {
-        const data = await response.json();
+      // Mock authentication for demo (replace with real API call later)
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
+      
+      // Simple validation - you can customize this
+      if (formData.adminEmail && formData.password) {
+        // Mock admin data
+        const mockAdminData = {
+          id: 1,
+          admin_name: 'Admin User',
+          email: formData.adminEmail,
+          service: 'Birth Certificate Admin',
+          role: 'admin'
+        };
+        
+        const mockToken = 'admin-auth-token-' + Date.now();
         
         // Use auth context to login with admin role
-        login(data.admin, 'admin', data.token);
+        const userRole = login(mockAdminData, 'admin', mockToken);
+        
+        // Navigate based on role
+        if (userRole === 'admin') {
+          navigate('/admin/dashboard');
+        }
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Login failed');
+        setError('Please enter both email and password');
       }
     } catch (error) {
       setError('Network error. Please try again.');
@@ -91,18 +99,18 @@ const AdminLoginPage = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Admin NIC Field */}
+              {/* Admin Email Field */}
               <div>
                 <label className="block text-base text-black mb-2 font-medium">
-                  Admin NIC
+                  Admin Email
                 </label>
                 <div className="relative">
                   <input
-                    type="text"
-                    name="adminNic"
-                    value={formData.adminNic}
+                    type="email"
+                    name="adminEmail"
+                    value={formData.adminEmail}
                     onChange={handleInputChange}
-                    placeholder="| Your ID Number"
+                    placeholder="| admin@example.com"
                     className="w-full h-12 bg-orange-200 bg-opacity-50 rounded-2xl px-6 text-lg text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all"
                     required
                   />
