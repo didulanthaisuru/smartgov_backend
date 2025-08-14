@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import LanguageSwitcher from '../components/languageSwitcher';
 
 // Helper Icon Components
 const ConfirmationIcon = () => (
@@ -77,10 +78,7 @@ const AppointmentConfirmationPage = () => {
                             </div>
                             <h1 className="text-xl font-semibold text-gray-800">Smart Gov</h1>
                         </div>
-                        <div className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-2">
-                            <span className="text-sm text-gray-700">English</span>
-                            <DropdownIcon />
-                        </div>
+                        <LanguageSwitcher> </LanguageSwitcher>
                     </header>
 
                     {/* Page Title */}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Menu, ChevronDown, QrCode, MessageSquare } from 'lucide-react';
 
+
 // Assume logoIcon is correctly imported from your assets
 import logoIcon from '../assets/images/logo2.png';
 
@@ -55,10 +56,7 @@ const ServiceDetailBooking = () => {
                             <h2 className="text-lg font-semibold text-gray-800">Birth Certificate new/issue</h2>
                         </div>
                         
-                        <button className="flex items-center gap-1 border border-gray-400 rounded-md px-3 py-1.5 text-sm">
-                            English
-                            <ChevronDown className="w-5 h-5" />
-                        </button>
+                        
                     </header>
 
                     <main className="px-4">

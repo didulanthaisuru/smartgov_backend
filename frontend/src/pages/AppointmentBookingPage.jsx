@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Menu, ChevronDown, Circle } from "lucide-react";
 // Make sure to import useNavigate from react-router-dom
 import { useNavigate } from "react-router-dom";
+import LanguageSwitcher from "../components/languageSwitcher";
 
 // --- Vertical Bar Chart Component ---
 const VerticalBarChart = ({ data }) => (
@@ -87,9 +88,11 @@ const AppointmentBookingPage = () => {
           <button>
             <Menu className="w-6 h-6 text-black" />
           </button>
-          <button className="flex items-center gap-1 border border-gray-300 rounded-md px-3 py-1.5 text-xs">
-            English <ChevronDown className="w-4 h-4" />
-          </button>
+          
+
+        <LanguageSwitcher></LanguageSwitcher>
+
+
         </header>
 
         {/* Scrollable Content */}
