@@ -348,9 +348,9 @@ function App() {
             <Route 
               path="/messages" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <MessagesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
@@ -436,9 +436,9 @@ function App() {
             <Route 
               path="/update-information" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <UpdateInformationPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 

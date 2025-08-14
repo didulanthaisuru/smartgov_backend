@@ -39,7 +39,7 @@ const Header = ({ title, setShowSidebar, showLanguageSelector = false, language 
             {/* Hamburger Menu */}
             <button
               onClick={() => setShowSidebar(true)}
-              className="p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200"
+              className="p-2.5 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200 flex items-center justify-center"
               aria-label="Open menu"
             >
               <Menu className="w-5 h-5 text-gray-600" />
@@ -80,13 +80,13 @@ const Header = ({ title, setShowSidebar, showLanguageSelector = false, language 
           </div>
 
           {/* Right Section - Actions */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
             {/* Language Selector */}
             {showLanguageSelector && (
               <div className="relative">
                 <button 
                   onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200"
+                  className="flex items-center space-x-2 px-3 py-2.5 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200"
                 >
                   <span className="text-sm font-medium text-gray-700">{currentLanguage.code}</span>
                   <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isLanguageDropdownOpen ? 'rotate-180' : ''}`} />
@@ -124,7 +124,7 @@ const Header = ({ title, setShowSidebar, showLanguageSelector = false, language 
             {/* Notification Bell */}
             <button 
               onClick={handleNotificationClick}
-              className="p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200 relative"
+              className="p-2.5 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200 relative flex items-center justify-center"
               aria-label="View notifications"
             >
               <Bell className="w-5 h-5 text-gray-600" />
@@ -135,7 +135,7 @@ const Header = ({ title, setShowSidebar, showLanguageSelector = false, language 
             {/* User Profile */}
             <button 
               onClick={handleProfileClick}
-              className="p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200"
+              className="p-2.5 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200 flex items-center justify-center"
               aria-label="View profile"
             >
               <User className="w-5 h-5 text-gray-600" />

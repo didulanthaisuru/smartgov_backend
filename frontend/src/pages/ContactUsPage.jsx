@@ -1,20 +1,7 @@
 import React, { useState } from 'react';
-
-// --- Helper Icon Components for a cleaner and more maintainable JSX ---
-
-// Hamburger menu icon
-const MenuIcon = () => (
-    <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-    </svg>
-);
-
-// Dropdown arrow icon
-const DropdownIcon = () => (
-    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-    </svg>
-);
+import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
 
 // User icon for the title
 const UserIcon = () => (
@@ -34,10 +21,9 @@ const SuccessTickIcon = () => (
 
 
 // Main Contact Us Page Component
-const App = () => {
-    // In a real app, you would use useNavigate from react-router-dom
-    // const navigate = useNavigate(); 
-    
+const ContactUsPage = () => {
+    const navigate = useNavigate();
+    const [showSidebar, setShowSidebar] = useState(false);
     const [language, setLanguage] = useState('English');
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
     const [formData, setFormData] = useState({
@@ -64,7 +50,7 @@ const App = () => {
     const handleCancel = () => {
         setFormData({ name: '', email: '', contactNumber: '', message: '' });
         console.log('Form cancelled and cleared.');
-        // navigate('/services'); // Example navigation
+        navigate('/services'); // Navigate back to services
     };
 
     const handleClosePopup = () => {
@@ -72,28 +58,28 @@ const App = () => {
         // Reset form after successful submission
         setFormData({ name: '', email: '', contactNumber: '', message: '' });
         console.log('Popup closed and form reset.');
-        // navigate('/services'); // Navigate to another page after success
+        navigate('/services'); // Navigate to services page after success
     };
 
     return (
         <div className="min-h-screen bg-[#F0F4F8] font-sans relative overflow-hidden">
+            {/* Header Component */}
+            <Header 
+                title="Contact Us" 
+                setShowSidebar={setShowSidebar}
+                showLanguageSelector={true}
+                language={language}
+                onLanguageChange={setLanguage}
+            />
+
+            {/* Sidebar Component */}
+            <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
             
             {/* --- Decorative Background Circles --- */}
             <div className={`absolute -left-40 top-1/4 w-96 h-96 bg-blue-200/40 rounded-full transition-all duration-500 ${showSuccessPopup ? 'filter blur-xl' : 'filter blur-lg'}`}></div>
             <div className={`absolute -right-40 bottom-1/4 w-96 h-96 bg-orange-200/30 rounded-full transition-all duration-500 ${showSuccessPopup ? 'filter blur-xl' : 'filter blur-lg'}`}></div>
 
             <div className={`relative z-10 transition-filter duration-500 ${showSuccessPopup ? 'filter blur-md' : ''}`}>
-                {/* --- Header --- */}
-                <header className="flex items-center justify-between px-4 py-3 bg-white/70 backdrop-blur-sm shadow-sm">
-                    <button className="p-2">
-                        <MenuIcon />
-                    </button>
-                    <div className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-gray-50">
-                        <span className="text-sm text-gray-800 font-medium">{language}</span>
-                        <DropdownIcon />
-                    </div>
-                </header>
-
                 {/* --- Main Content --- */}
                 <main className="px-6 py-8">
                     {/* Title Section */}
@@ -194,4 +180,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default ContactUsPage;

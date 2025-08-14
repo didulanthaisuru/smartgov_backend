@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LanguageSwitcher from '../components/languageSwitcher'; // Correct import path
-import HamburgerMenu from '../components/HamburgerMenu';
+import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
 import { CheckCircle, AlertCircle, Bell, MessageSquare } from 'lucide-react';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showSidebar, setShowSidebar] = useState(false);
   // State for selected language, now managed by the parent
   const [selectedLanguage, setSelectedLanguage] = useState('English');
 
@@ -61,6 +62,9 @@ const MessagesPage = () => {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* Sidebar */}
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+      
       {/* Background Decorative Elements with Enhanced Blur */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-blue-100 opacity-30 backdrop-blur-[15px]"></div>
@@ -68,33 +72,12 @@ const MessagesPage = () => {
         <div className="absolute top-80 -left-36 w-[600px] h-[750px] rounded-full bg-blue-100 opacity-30 backdrop-blur-[15px]"></div>
       </div>
 
-      {/* Header with Enhanced Styling */}
-      <div className="relative z-10 flex items-center justify-between px-6 py-6">
-        <button 
-          onClick={() => navigate('/profile')}
-          className="w-9 h-9 flex items-center justify-center"
-        >
-          <div className="w-9 h-9 bg-gray-300 rounded"></div>
-        </button>
-
-        <div className="flex items-center">
-          {/* Messages Icon */}
-          <div className="w-6 h-6 flex items-center justify-center mr-4 shadow-md">
-            <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-            </svg>
-          </div>
-          
-          <div className="flex items-center">
-            <div className="w-15 h-20 bg-gray-300 rounded mr-4 shadow-md"></div>
-            <h1 className="text-2xl font-medium text-black">Smart Gov</h1>
-          </div>
-        </div>
-
-        <div className="flex items-center bg-white bg-opacity-20 border border-black rounded-xl px-4 py-2 shadow-md">
-          <span className="text-sm font-normal text-black mr-2 drop-shadow-md">English</span>
-          <div className="w-6 h-6 bg-gray-300 rounded"></div>
-        </div>
+      {/* Header */}
+      <div className="relative z-10">
+        <Header 
+          title="Messages" 
+          setShowSidebar={setShowSidebar} 
+        />
       </div>
 
       {/* Title and Summary */}

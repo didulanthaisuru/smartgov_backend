@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
 
 const UpdateInformationPage = () => {
   const navigate = useNavigate();
+  const [showSidebar, setShowSidebar] = useState(false);
   const [formData, setFormData] = useState({
     username: 'kavindu',
     email: 'kavindu@gmail.com',
@@ -25,29 +28,19 @@ const UpdateInformationPage = () => {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* Header Component */}
+      <Header 
+        title="Update Information" 
+        setShowSidebar={setShowSidebar}
+        showLanguageSelector={true}
+      />
+
+      {/* Sidebar Component */}
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -left-40 w-[800px] h-[730px] rounded-full bg-blue-100 opacity-30"></div>
-      </div>
-
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-6 py-6">
-        <button 
-          onClick={() => navigate('/profile')}
-          className="w-9 h-9 flex items-center justify-center"
-        >
-          <div className="w-9 h-9 bg-gray-300 rounded"></div>
-        </button>
-
-        <div className="flex items-center">
-          <div className="w-15 h-20 bg-gray-300 rounded mr-4"></div>
-          <h1 className="text-2xl font-medium text-black">Smart Gov</h1>
-        </div>
-
-        <div className="flex items-center bg-white bg-opacity-20 border border-black rounded-xl px-4 py-2">
-          <span className="text-sm font-normal text-black mr-2">English</span>
-          <div className="w-6 h-6 bg-gray-300 rounded"></div>
-        </div>
       </div>
 
       {/* Title */}
@@ -130,31 +123,6 @@ const UpdateInformationPage = () => {
               className="flex-1 bg-[#8C322A] text-white rounded-xl py-3 px-6 text-sm font-medium hover:bg-[#7A2A22] transition-colors"
             >
               Update
-            </button>
-          </div>
-        </div>
-
-        {/* Help Section */}
-        <div className="mt-12 pt-6 border-t border-gray-200">
-          <div className="flex items-center justify-center space-x-4">
-            <button 
-              onClick={() => navigate('/chatbot')}
-              className="bg-blue-100 rounded-lg px-4 py-2 flex items-center space-x-2 hover:bg-blue-200 transition-colors"
-            >
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <span className="text-sm text-blue-600">Need Help?</span>
-            </button>
-            
-            <button 
-              onClick={() => navigate('/contact-us')}
-              className="bg-green-100 rounded-lg px-4 py-2 flex items-center space-x-2 hover:bg-green-200 transition-colors"
-            >
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26c.31.17.69.17 1-.01L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              <span className="text-sm text-green-600">Contact Us</span>
             </button>
           </div>
         </div>
