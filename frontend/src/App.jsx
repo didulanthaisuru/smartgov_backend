@@ -335,9 +335,9 @@ function App() {
             <Route 
               path="/contact-us" 
               element={
-                <ProtectedRoute>
+                //<ProtectedRoute>
                   <ContactUsPage />
-                </ProtectedRoute>
+                //</ProtectedRoute>
               } 
             />
             <Route 
