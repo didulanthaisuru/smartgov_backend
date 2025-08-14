@@ -137,12 +137,12 @@ async def get_appointment_details_by_id(db: AsyncIOMotorClient, appointment_id: 
             "as": "required_docs_info"
         }},
 
-        # Join uploaded documents by matching string(appointment _id) to uploaded_docs.appointment_id
+        # Join uploaded documents by matching string(appointment _id) to uploaded_docs.booking_id
         {"$lookup": {
             "from": UPLOADED_DOCS_COLLECTION,
             "let": {"appointmentIdStr": {"$toString": "$_id"}},
             "pipeline": [
-                {"$match": {"$expr": {"$eq": ["$appointment_id", "$$appointmentIdStr"]}}}
+                {"$match": {"$expr": {"$eq": ["$booking_id", "$$appointmentIdStr"]}}}
             ],
             "as": "uploaded_docs"
         }},
@@ -161,9 +161,9 @@ async def get_appointment_details_by_id(db: AsyncIOMotorClient, appointment_id: 
                     "as": "doc",
                     "in": {
                         "uploaded_document_id": {"$toString": "$$doc._id"},
-                        "appointment_id": "$$doc.appointment_id",
-                        "required_doc_id": "$$doc.required_doc_id",
-                        "user_id": "$$doc.user_id",
+                        "appointment_id": "$$doc.booking_id",
+                        "required_doc_id": {"$ifNull": ["$$doc.required_doc_id", None]},
+                        "user_id": {"$ifNull": ["$$doc.user_id", None]},
                         "file_name": {"$ifNull": ["$$doc.file_name", None]},
                         "file_path": {"$ifNull": ["$$doc.file_path", None]},
                         "accuracy": {"$ifNull": ["$$doc.accuracy", None]},

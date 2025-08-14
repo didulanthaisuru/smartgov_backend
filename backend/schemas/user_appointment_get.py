@@ -15,8 +15,8 @@ class appointment_summary_response(BaseModel):
 class uploaded_document_response(BaseModel):
     uploaded_document_id: str
     appointment_id: str
-    required_doc_id: int
-    user_id: str
+    required_doc_id: Optional[str] = None  # Can be null/None
+    user_id: Optional[str] = None  # Can be null/None
     file_name: Optional[str] = None
     file_path: Optional[str] = None
     accuracy: Optional[float] = None
