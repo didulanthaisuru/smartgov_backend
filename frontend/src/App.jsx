@@ -48,6 +48,7 @@ import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminCompletedTasksPage from './pages/admin/AdminCompletedTasksPage';
 import AdminChatPage from './pages/admin/AdminChatPage';
 import AdminQRScanPage from './pages/admin/AdminQRScanPage';
+import SubServicesPage from './pages/SubServicesPage'; 
 
 // Initial Route Component (handles app startup routing)
 const InitialRoute = () => {
@@ -113,9 +114,9 @@ function App() {
             <Route 
               path="/login" 
               element={
-                <PublicRoute>
+                // <PublicRoute>
                   <LoginPage />
-                </PublicRoute>
+                // </PublicRoute>
               } 
             />
             <Route 
@@ -139,6 +140,7 @@ function App() {
                 // </ProtectedRoute> 
               }
             />
+
 
             {/* Admin Public Routes */}
             <Route 
@@ -313,6 +315,14 @@ function App() {
                 // </ProtectedRoute>
               } 
             />
+
+            <Route 
+              path="/sub-services"
+              element={
+                <SubServicesPage/>
+              }
+            />
+
             <Route 
               path="/admin" 
               element={

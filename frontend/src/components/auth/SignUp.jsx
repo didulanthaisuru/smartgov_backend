@@ -123,7 +123,7 @@ const SignUp = () => {
 
                         {/* Back to Login Link */}
                         <p className="mt-6 text-center text-sm">
-                            <a href="#" className="font-medium text-gray-600 hover:text-gray-800">
+                            <a href="/login" className="font-medium text-gray-600 hover:text-gray-800">
                                 Back to Login
                             </a>
                         </p>
