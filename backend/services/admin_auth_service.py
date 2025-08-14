@@ -12,14 +12,14 @@ class AdminAuthService:
     async def register_admin_validation(self, admin_data: AdminRegister) -> AdminResponse:
         """Handle admin registration business logic"""
         # Check if admin already exists
-        if admin_service.get_admin_by_email(admin_data.email):
+        if await admin_service.get_admin_by_email(admin_data.email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Admin with this email already exists"
             )
         
         # Create new admin
-        new_admin = admin_service.create_admin(admin_data)
+        new_admin = await admin_service.create_admin(admin_data)
         if not new_admin:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -30,7 +30,7 @@ class AdminAuthService:
     
     async def admin_sign_in_validation(self, login_data: AdminLogin) -> AdminToken:
         """Handle admin login business logic"""
-        admin = admin_service.authenticate_admin(login_data.email, login_data.passcode)
+        admin = await admin_service.authenticate_admin(login_data.email, login_data.passcode)
         if not admin:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
