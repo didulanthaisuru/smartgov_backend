@@ -10,43 +10,45 @@ UPLOADED_DOCS_COLLECTION = "uploaded_documents"
 REQUIRED_DOCS_COLLECTION = "required_documents"
 
 async def get_user_appointments_by_status(db: AsyncIOMotorClient, user_id: str, is_ongoing: bool) -> List[Dict[str, Any]]:
-    """
-    Gets a list of a user's appointments, filtered by status.
-    is_ongoing = True for "Ongoing Activities" (date is set AND not fully completed)
-    is_ongoing = False for "Incomplete Activities" (date is null)
-    """
-    if is_ongoing:
-        # For ongoing: date is set AND not fully completed AND confirmed
-        match_condition = {
-            "appointment_date": {"$ne": None},
-            "is_fully_completed": False,
-            "appointment_confirmed": True
-        }
-    else:
-        # For incomplete: date is null
-        match_condition = {"appointment_date": {"$eq": None}}
+	"""
+	Gets a list of a user's appointments, filtered by status.
+	is_ongoing = True for "Ongoing Activities" (date is set AND not fully completed)
+	is_ongoing = False for "Incomplete Activities" (date is null OR appointment not confirmed)
+	"""
+	if is_ongoing:
+		# For ongoing: date is set AND not fully completed AND confirmed
+		match_condition = {
+			"appointment_date": {"$ne": None},
+			"is_fully_completed": False,
+			"appointment_confirmed": True
+		}
+	else:
+		# For incomplete: date is null OR appointment not confirmed
+		match_condition = {
+			"$or": [
+				{"appointment_date": {"$eq": None}},
+				{"appointment_confirmed": False}
+			]
+		}
 
-    pipeline = [
-        # Find all appointments for the user that match the condition
-        {"$match": {"user_id": user_id, **match_condition}},
-        # Join with sub_services to get the service name
-        {"$lookup": {
-            "from": SUB_SERVICES_COLLECTION,
-            "localField": "sub_service_id",
-            "foreignField": "_id",
-            "as": "sub_service_info"
-        }},
-        {"$unwind": "$sub_service_info"},
-        # Project the summary shape
-        {"$project": {
-            "_id": 0, # Exclude the original _id
-            "appointment_id": {"$toString": "$_id"},
-            "service_name": "$sub_service_info.service_name",
-            "appointment_date": 1,
-            "is_fully_completed": 1
-        }}
-    ]
-    return await db[APPOINTMENTS_COLLECTION].aggregate(pipeline).to_list(None)
+	pipeline = [
+		{"$match": {"user_id": user_id, **match_condition}},
+		{"$lookup": {
+			"from": SUB_SERVICES_COLLECTION,
+			"localField": "sub_service_id",
+			"foreignField": "_id",
+			"as": "sub_service_info"
+		}},
+		{"$unwind": "$sub_service_info"},
+		{"$project": {
+			"_id": 0,
+			"appointment_id": {"$toString": "$_id"},
+			"service_name": "$sub_service_info.service_name",
+			"appointment_date": 1,
+			"is_fully_completed": 1
+		}}
+	]
+	return await db[APPOINTMENTS_COLLECTION].aggregate(pipeline).to_list(None)
 
 async def get_previous_appointments(db: AsyncIOMotorClient, user_id: str) -> List[Dict[str, Any]]:
     """Gets a list of a user's PREVIOUS (fully completed) appointments."""
@@ -203,13 +205,14 @@ async def get_ongoing_appointment_details(db: AsyncIOMotorClient, appointment_id
 
 
 async def get_incomplete_appointment_details(db: AsyncIOMotorClient, appointment_id: str, user_id: str) -> Optional[Dict[str, Any]]:
-    """
-    Gets detailed information for an incomplete appointment (date is not set).
-    """
-    appointment = await get_appointment_details_by_id(db, appointment_id, user_id)
-    if appointment and not appointment.get("appointment_date"):
-        return appointment
-    return None
+	"""
+	Gets detailed information for an incomplete appointment:
+	- appointment_date is not set OR appointment is not confirmed
+	"""
+	appointment = await get_appointment_details_by_id(db, appointment_id, user_id)
+	if appointment and (not appointment.get("appointment_confirmed") or not appointment.get("appointment_date")):
+		return appointment
+	return None
 
 async def get_previous_appointment_details(db: AsyncIOMotorClient, appointment_id: str, user_id: str) -> Optional[Dict[str, Any]]:
     """
