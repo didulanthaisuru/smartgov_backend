@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from routes import appoinment
-from routes import document
+from routes.appoinment import router as appointment_create
+from routes.document import router as document_upload
 from database_config import connect_to_mongo, close_mongo_connection
 
 app = FastAPI()
@@ -17,5 +17,5 @@ async def shutdown_event():
 def read_root():
     return {"message": "SmartGov API is running"}
 
-app.include_router(appoinment.router, prefix="/api", tags=["Appointments"])
-app.include_router(document.router, prefix="/api", tags=["Documents"])
+app.include_router(appointment_create)
+app.include_router(document_upload)
