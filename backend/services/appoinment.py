@@ -48,7 +48,8 @@ async def create_appointment_service(data: AppointmentAdd):
         "is_fully_completed": data.is_fully_completed if data.is_fully_completed is not None else False,
         "appointment_date": data.appointment_date,
         "appoinment_time": data.appoinment_time,
-        "predicted_duration": data.predicted_duration
+        "predicted_duration": data.predicted_duration,
+        "payment_status": data.payment_status
     }
 
     result = await appointments_collection.insert_one(appointment_dict)

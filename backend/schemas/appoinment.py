@@ -11,5 +11,6 @@ class AppointmentAdd(BaseModel):
     appointment_date: Optional[datetime] = Field(..., description="Date and time of the appointment")
     appoinment_time: Optional[datetime] = Field(..., description="Time of the appointment")
     predicted_duration: Optional[datetime] = Field(..., description="Predicted duration of the appointment")
+    payment_status: Optional[bool] = Field(default=False, description="Payment status of the appointment")
 
 
