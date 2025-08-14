@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Helper Icon Components
 const ConfirmationIcon = () => (
@@ -22,6 +23,7 @@ const DropdownIcon = () => (
 );
 
 const AppointmentConfirmationPage = () => {
+    const navigate = useNavigate();
     // Hardcoded appointment data matching your original code
     const appointmentData = {
         service: 'Birth certificate issue/new',
@@ -44,8 +46,8 @@ const AppointmentConfirmationPage = () => {
 
         // Simulate navigation - replace with your actual navigation logic
         setTimeout(() => {
-            // navigate(`/services/qr-code`); // Uncomment when using react-router
-            alert("Navigating to QR Code page...");
+             
+         navigate('/services/:serviceId/qr-code');
         }, 300);
     };
 
