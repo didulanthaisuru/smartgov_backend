@@ -5,6 +5,7 @@ from routes.dashboard import router as dashboard_router
 from routes.appoinment import router as appointment_router
 from routes.document import router as document_router
 from routes.insights import router as insights_router
+from routes.insights_derect import router as insights_direct_router
 #rom routes.adminimport router as admin_router
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -44,4 +45,5 @@ app.include_router(dashboard_router)
 app.include_router(appointment_router)
 app.include_router(document_router)
 app.include_router(insights_router)
+app.include_router(insights_direct_router)
 #pp.include_router(admin_router)
