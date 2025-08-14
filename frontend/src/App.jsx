@@ -49,7 +49,6 @@ import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminCompletedTasksPage from './pages/admin/AdminCompletedTasksPage';
 import AdminChatPage from './pages/admin/AdminChatPage';
 import AdminQRScanPage from './pages/admin/AdminQRScanPage';
-import SubServicesPage from './pages/SubServicesPage'; 
 
 // Initial Route Component (handles app startup routing)
 const InitialRoute = () => {
@@ -255,22 +254,18 @@ function App() {
                 </UserRoute>
               } 
             />
+           
             <Route 
-              path="/services/:serviceId/detail" 
-              element={
-                <UserRoute>
-                  <ServiceDetailBooking />
-                </UserRoute>
-              } 
+            path="/services/:mainServiceId/subservices/:subServiceId" 
+            element={<ServiceDetailBooking />} 
             />
             <Route 
-              path="/services/:serviceId/upload/:docId" 
-              element={
-                <UserRoute>
-                  <UploadPage />
-                </UserRoute>
-              } 
-            />
+          path="/appointment/:appointmentId/upload/:docId" 
+          element={<UploadPage />} 
+        />
+
+
+        <Route path="/booking/:appointmentId" element={<AppointmentBookingPage />} />
             <Route 
               path="/admin-tasks"
               element={
@@ -287,13 +282,9 @@ function App() {
               } 
             />
             <Route 
-              path="/services/:serviceId/booking" 
-              element={
-                //<ProtectedRoute>
-                  <AppointmentBookingPage />
-                //</ProtectedRoute>
-              } 
-            />
+            path="/booking/:appointmentId" 
+            element={<AppointmentBookingPage />} 
+           />
             <Route 
               path="/services/:serviceId/confirmation" 
               element={
