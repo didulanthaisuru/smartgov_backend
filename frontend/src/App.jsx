@@ -60,14 +60,15 @@ const InitialRoute = () => {
     );
   }
   
-  if (isAuthenticated()) {
-    // Redirect based on user role
-    if (role === 'admin') {
-      return <Navigate to="/admin/dashboard" replace />;
-    } else {
-      return <Navigate to="/services" replace />;
-    }
-  }
+  // Commented out for development - always show landing page
+  // if (isAuthenticated()) {
+  //   // Redirect based on user role
+  //   if (role === 'admin') {
+  //     return <Navigate to="/admin/dashboard" replace />;
+  //   } else {
+  //     return <Navigate to="/services" replace />;
+  //   }
+  // }
   
   // Not authenticated, show landing page
   return <LandingPage />;
@@ -88,9 +89,10 @@ const PublicRoute = ({ children }) => {
     );
   }
   
-  if (isAuthenticated()) {
-    return <Navigate to={role === 'admin' ? '/admin/dashboard' : '/services'} replace />;
-  }
+  // Commented out for development - always show children
+  // if (isAuthenticated()) {
+  //   return <Navigate to={role === 'admin' ? '/admin/dashboard' : '/services'} replace />;
+  // }
   return children;
 };
 
@@ -141,131 +143,131 @@ function App() {
               } 
             />
 
-            {/* Admin Protected Routes */}
+            {/* Admin Protected Routes - Commented for development */}
             <Route 
               path="/admin/dashboard" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminDashboardPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
             <Route 
               path="/admin/tasks" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminTasksPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
             <Route 
               path="/admin/task-details/:taskId" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminTaskDetailsPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
             <Route 
               path="/admin/notifications" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminNotificationsPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
             <Route 
               path="/admin/completed-tasks" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminCompletedTasksPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
             <Route 
               path="/admin/chat" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminChatPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
             <Route 
               path="/admin/qr-scan" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminQRScanPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
 
-            {/* User Protected Routes - Services as main dashboard */}
+            {/* User Protected Routes - Services as main dashboard - Commented for development */}
             <Route 
               path="/services" 
               element={
-                <UserRoute>
+                // <UserRoute>
                   <Services />
-                </UserRoute>
+                // </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId" 
               element={
-                <UserRoute>
+                // <UserRoute>
                   <ServiceDetail />
-                </UserRoute>
+                // </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/detail" 
               element={
-                <UserRoute>
+                // <UserRoute>
                   <ServiceDetailBooking />
-                </UserRoute>
+                // </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/upload/:docId" 
               element={
-                <UserRoute>
+                // <UserRoute>
                   <UploadPage />
-                </UserRoute>
+                // </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/payment" 
               element={
-                <UserRoute>
+                // <UserRoute>
                   <PaymentPage />
-                </UserRoute>
+                // </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/booking" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <AppointmentBookingPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/confirmation" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <AppointmentConfirmationPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/qr-code" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <QRCodePage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
 
-            {/* Protected Routes */}
+            {/* Protected Routes - Commented for development */}
             <Route 
               path="/dashboard" 
               element={
@@ -291,13 +293,13 @@ function App() {
               } 
             />
             
-            {/* Additional routes */}
+            {/* Additional routes - Commented for development */}
             <Route 
               path="/dashboard" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <DashboardPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
@@ -311,102 +313,102 @@ function App() {
             <Route 
               path="/new-application" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <NewApplicationPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/appointments" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <AppointmentsPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/chatbot" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <ChatbotPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/contact-us" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <ContactUsPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/contact-success" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <ContactUsSuccessPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/document-upload/:serviceId" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <DocumentUploadPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/profile" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <ProfilePage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/ongoing-activities" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <OngoingActivitiesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/incomplete-activities" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <IncompleteActivitiesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/previous-activities" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <PreviousActivitiesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/update-information" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <UpdateInformationPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/analytics" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <AnalyticsDashboardPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
 
             {/* Catch all route */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/landing" replace />} />
           </Routes>
         </div>
       </AuthProvider>
