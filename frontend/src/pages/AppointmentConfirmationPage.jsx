@@ -1,163 +1,168 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import logoIcon from '../assets/images/figma/logo.png';
+import React from 'react';
+
+// Helper Icon Components
+const ConfirmationIcon = () => (
+    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
+        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+        </svg>
+    </div>
+);
+
+const MenuIcon = () => (
+    <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+    </svg>
+);
+
+const DropdownIcon = () => (
+    <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+);
 
 const AppointmentConfirmationPage = () => {
-  const { serviceId } = useParams();
-  const navigate = useNavigate();
-  
-  const [showModal, setShowModal] = useState(true);
+    // Hardcoded appointment data matching your original code
+    const appointmentData = {
+        service: 'Birth certificate issue/new',
+        location: 'Kandy branch',
+        date: '2025/08/06',
+        time: '8.30',
+        duration: '2 hrs'
+    };
 
-  const appointmentData = {
-    service: 'Birth certificate issue/new',
-    location: 'Kandy branch',
-    date: '2025/08/06',
-    time: '8.30',
-    duration: '2 hrs'
-  };
+    // Handle OK button click with animation
+    const handleOkClick = (e) => {
+        console.log("Navigating to QR code page.");
+        
+        // Add click animation
+        const button = e.target;
+        button.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            button.style.transform = 'scale(1)';
+        }, 150);
 
-  const handleOkClick = () => {
-    setShowModal(false);
-    navigate(`/services/${serviceId}/qr-code`);
-  };
+        // Simulate navigation - replace with your actual navigation logic
+        setTimeout(() => {
+            // navigate(`/services/qr-code`); // Uncomment when using react-router
+            alert("Navigating to QR Code page...");
+        }, 300);
+    };
 
-  const handleBackToServices = () => {
-    navigate('/services');
-  };
-
-  if (!showModal) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B3C2B] mx-auto mb-4"></div>
-          <p className="text-lg text-gray-700">Redirecting to QR Code...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-white relative">
-      {/* Blurred Background */}
-      <div className="absolute inset-0 bg-white filter blur-sm">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3">
-          <button 
-            onClick={handleBackToServices}
-            className="w-9 h-9 flex items-center justify-center"
-          >
-            <img src={logoIcon} alt="Back" className="w-full h-full object-contain" />
-          </button>
-
-          <div className="flex items-center">
-            <img src={logoIcon} alt="Logo" className="w-15 h-20 mr-4" />
-            <h1 className="text-2xl font-medium text-black">Smart Gov</h1>
-          </div>
-
-          <div className="flex items-center bg-white bg-opacity-20 border border-black/50 rounded-xl px-4 py-2">
-            <span className="text-sm font-normal text-black/50 mr-2">English</span>
-            <img src={logoIcon} alt="Language" className="w-6 h-6 opacity-50" />
-          </div>
-        </div>
-
-        {/* Service Title */}
-        <div className="px-4 py-4">
-          <h2 className="text-2xl font-normal text-black">Birth Certificate new/issue</h2>
-        </div>
-
-        {/* Divider */}
-        <div className="w-full h-px bg-black mx-0"></div>
-
-        {/* Background Content (blurred) */}
-        <div className="px-6 py-6">
-          <div className="mb-6 text-center">
-            <p className="text-sm text-[#8B3C2B]">Recommended date and time - 2025/08/07 10.30 time slot</p>
-          </div>
-
-          <div className="grid grid-cols-4 gap-3 mb-4">
-            {['8.30', '10.30', '12.30', '2.30'].map((time, index) => (
-              <div
-                key={time}
-                className={`py-3 px-4 rounded-xl text-sm text-center ${
-                  index === 0 ? 'bg-[#F2622E] text-white' : 'bg-[#F8CA92] text-black'
-                }`}
-              >
-                {time}
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-[#D1E9F3] bg-opacity-50 rounded-xl p-4 mb-8">
-            <div className="text-sm text-black leading-relaxed">
-              <p><span className="font-medium">Service</span> - Birth certificate issue/new</p>
-              <p><span className="font-medium">Location</span> - Kandy branch</p>
-              <p><span className="font-medium">Date & Time</span> - 2025/08/06 8.30</p>
-              <p><span className="font-medium">Expected Duration</span> - 2 hrs</p>
-            </div>
-          </div>
-
-          <div className="flex justify-center">
-            <button className="bg-[#8B3C2B] text-white px-16 py-4 rounded-xl text-2xl font-normal">
-              Confirm Appointment
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Confirmation Modal */}
-      <div className="absolute inset-0 flex items-center justify-center p-4 z-50">
-        <div className="bg-[#F8CA92] bg-opacity-90 rounded-xl p-8 max-w-md w-full shadow-2xl border-2 border-orange-200">
-          {/* Success Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-          </div>
-
-          {/* Title */}
-          <h2 className="text-2xl font-normal text-black text-center mb-6">Appointment confirmed</h2>
-
-          {/* Appointment Details Section */}
-          <div className="mb-6">
-            <h3 className="text-sm font-medium text-black mb-4 text-center">Appointment Details</h3>
-            
-            <div className="bg-[#D1E9F3] bg-opacity-50 rounded-xl p-4">
-              <div className="text-sm text-black leading-relaxed space-y-1">
-                <div className="flex justify-between">
-                  <span>Service</span>
-                  <span className="ml-8">- {appointmentData.service}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Location</span>
-                  <span className="ml-8">- {appointmentData.location}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Date & Time</span>
-                  <span className="ml-8">- {appointmentData.date} {appointmentData.time}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Expected Duration</span>
-                  <span className="ml-8">- {appointmentData.duration}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* OK Button */}
-          <div className="flex justify-center">
-            <button
-              onClick={handleOkClick}
-              className="bg-[#8B3C2B] text-white px-8 py-3 rounded-xl text-sm font-normal hover:bg-[#7A3024] transition-colors shadow-lg"
+        <div 
+            className="mx-auto bg-gray-100 min-h-screen flex items-center justify-center p-4"
+            style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
+        >
+            {/* iPhone 14 Pro Max Container */}
+            <div 
+                className="bg-white relative overflow-hidden shadow-2xl rounded-3xl"
+                style={{ width: '430px', height: '932px' }}
             >
-              OK
-            </button>
-          </div>
+                {/* Blurred Background Content */}
+                <div 
+                    className="absolute inset-0"
+                    style={{ filter: 'blur(2px)', WebkitFilter: 'blur(2px)' }}
+                >
+                    {/* Header */}
+                    <header className="flex items-center justify-between px-4 py-4 border-b border-gray-200">
+                        <button className="p-2">
+                            <MenuIcon />
+                        </button>
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 bg-orange-400 rounded-lg flex items-center justify-center">
+                                <span className="text-white font-bold text-lg">S</span>
+                            </div>
+                            <h1 className="text-xl font-semibold text-gray-800">Smart Gov</h1>
+                        </div>
+                        <div className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-2">
+                            <span className="text-sm text-gray-700">English</span>
+                            <DropdownIcon />
+                        </div>
+                    </header>
+
+                    {/* Page Title */}
+                    <div className="px-4 py-6 border-b border-gray-200">
+                        <h2 className="text-xl font-semibold text-gray-800">
+                            Birth Certificate <span className="text-gray-500 font-normal">new/issue</span>
+                        </h2>
+                    </div>
+
+                    {/* Blurred Content Area */}
+                    <div className="p-4 space-y-4">
+                        <div className="h-20 bg-gray-100 rounded-xl"></div>
+                        <div className="h-40 bg-gray-100 rounded-xl"></div>
+                        <div className="h-24 bg-gray-100 rounded-xl"></div>
+                        <div className="h-16 bg-red-200 rounded-xl"></div>
+                        <div className="h-32 bg-gray-50 rounded-xl"></div>
+                        <div className="h-20 bg-gray-100 rounded-xl"></div>
+                    </div>
+                </div>
+
+                {/* Modal Overlay */}
+                <div 
+                    className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center px-6"
+                    style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+                >
+                    {/* Modal Container */}
+                    <div 
+                        className="bg-orange-100 rounded-3xl p-8 w-full max-w-sm shadow-2xl"
+                        style={{ transform: 'translateY(-20px)' }}
+                    >
+                        {/* Modal Title */}
+                        <h2 className="text-xl font-semibold text-gray-800 mb-8 text-center">
+                            Appointment Details
+                        </h2>
+
+                        {/* Appointment Details Box */}
+                        <div className="bg-white bg-opacity-60 rounded-xl p-6 mb-8">
+                            <div 
+                                className="text-base"
+                                style={{ 
+                                    display: 'grid', 
+                                    gridTemplateColumns: 'auto 1fr', 
+                                    gap: '8px 12px',
+                                    alignItems: 'start'
+                                }}
+                            >
+                                <span className="font-medium text-gray-700">Service</span>
+                                <span className="text-gray-900">: {appointmentData.service}</span>
+                                
+                                <span className="font-medium text-gray-700">Location</span>
+                                <span className="text-gray-900">: {appointmentData.location}</span>
+                                
+                                <span className="font-medium text-gray-700">Date & Time</span>
+                                <span className="text-gray-900">: {appointmentData.date} {appointmentData.time}</span>
+                                
+                                <span className="font-medium text-gray-700 leading-tight">Expected Duration</span>
+                                <span className="text-gray-900">: {appointmentData.duration}</span>
+                            </div>
+                        </div>
+                        
+                        {/* Confirmation Status */}
+                        <div className="flex items-center justify-center gap-3 mb-8">
+                            <ConfirmationIcon />
+                            <p className="text-lg font-semibold text-gray-900">
+                                Appointment confirmed
+                            </p>
+                        </div>
+
+                        {/* OK Button */}
+                        <div className="flex justify-center">
+                            <button
+                                onClick={handleOkClick}
+                                className="bg-red-800 text-white font-medium px-12 py-3 rounded-xl hover:bg-red-900 transition-all duration-200 shadow-lg text-lg active:scale-95"
+                                onTouchStart={(e) => e.target.style.opacity = '0.8'}
+                                onTouchEnd={(e) => setTimeout(() => e.target.style.opacity = '1', 100)}
+                            >
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default AppointmentConfirmationPage;
