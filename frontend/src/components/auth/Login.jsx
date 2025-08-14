@@ -82,24 +82,34 @@ const Login = () => {
                             </div>
 
                             {/* Save Password & Forgotten Password */}
-                            <div className="flex items-center justify-between my-6">
-                                <div className="flex items-center">
-                                    <input
-                                        id="save-password"
-                                        name="save-password"
-                                        type="checkbox"
-                                        className="h-4 w-4 text-[#8B4513] focus:ring-[#A0522D] border-gray-300 rounded"
-                                    />
-                                    <label htmlFor="save-password" className="ml-2 block text-sm text-gray-800">
-                                        Save Password
-                                    </label>
-                                </div>
-                                <div className="text-sm">
-                                    <a href="#" className="font-medium text-gray-600 hover:text-gray-800">
-                                        Forgotten Password?
-                                    </a>
-                                </div>
-                            </div>
+<div className="my-6">
+  {/* First line: Save Password */}
+  <div className="flex items-center mb-3">
+    <input
+      id="save-password"
+      name="save-password"
+      type="checkbox"
+      className="h-4 w-4 text-[#8B4513] focus:ring-[#A0522D] border-gray-300 rounded"
+    />
+    <label
+      htmlFor="save-password"
+      className="ml-2 block text-sm text-gray-800"
+    >
+      Save Password
+    </label>
+  </div>
+
+  {/* Second line: Forgotten Password link */}
+  <div>
+    <a
+      href="#"
+      className="text-sm font-medium text-gray-600 hover:text-gray-800"
+    >
+      Forgotten Password?
+    </a>
+  </div>
+</div>
+
 
                             {/* Login Button */}
                             <button
@@ -112,7 +122,7 @@ const Login = () => {
 
                         {/* Create New Account Link */}
                         <p className="mt-8 text-center text-sm">
-                            <a href="#" className="font-medium text-gray-600 hover:text-gray-800">
+                            <a href="/signup" className="font-medium text-gray-600 hover:text-gray-800">
                                 Create New Account
                             </a>
                         </p>
