@@ -68,7 +68,7 @@ async def get_previous_appointments(db: AsyncIOMotorClient, user_id: str) -> Lis
     ]
     return await db[APPOINTMENTS_COLLECTION].aggregate(pipeline).to_list(None)
 
-async def get_appointment_details_by_id(db: AsyncIOMotorClient, appointment_id: str, user_id: str) -> Optional[Dict[str, Any]]:
+async def get_appointment_details_by_id(db: AsyncIOMotorClient, appointment_id: str, user_id: str, include_steps: bool = False) -> Optional[Dict[str, Any]]:
     """
     Gets detailed information for a specific appointment including required documents,
     payment amount, and uploaded documents.
@@ -140,21 +140,65 @@ async def get_appointment_details_by_id(db: AsyncIOMotorClient, appointment_id: 
                 }
             },
             "is_fully_completed": 1,
-            "appointment_date": 1
+            "appointment_date": 1,
+            "sub_service_steps": {"$ifNull": ["$sub_service_steps", []]}
         }}
     ]
     
     result = await db[APPOINTMENTS_COLLECTION].aggregate(pipeline).to_list(1)
-    return result[0] if result else None
+    if not result:
+        return None
+        
+    appointment = result[0]
+    
+    # Process sub_service_steps if requested and available
+    if include_steps and appointment.get("sub_service_steps"):
+        appointment["sub_service_steps"] = process_sub_service_steps(appointment["sub_service_steps"])
+    
+    return appointment
+
+def process_sub_service_steps(steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Process sub_service_steps to identify the currently happening step.
+    The currently happening step is the first step with status=False where all previous steps have status=True.
+    """
+    if not steps:
+        return []
+    
+    # Sort steps by step_id to ensure proper order
+    sorted_steps = sorted(steps, key=lambda x: x.get("step_id", 0))
+    
+    for i, step in enumerate(sorted_steps):
+        # Check if this step is currently happening
+        is_currently_happening = False
+        
+        if not step.get("status", True):  # If current step is not completed
+            # Check if all previous steps are completed
+            all_previous_completed = True
+            for j in range(i):
+                if not sorted_steps[j].get("status", False):
+                    all_previous_completed = False
+                    break
+            
+            if all_previous_completed:
+                is_currently_happening = True
+        
+        # Add the flag to the step
+        step["is_currently_happening"] = is_currently_happening
+    
+    return sorted_steps
+
 
 async def get_ongoing_appointment_details(db: AsyncIOMotorClient, appointment_id: str, user_id: str) -> Optional[Dict[str, Any]]:
     """
     Gets detailed information for an ongoing appointment (date is set).
+    Includes sub_service_steps with current step identification.
     """
-    appointment = await get_appointment_details_by_id(db, appointment_id, user_id)
+    appointment = await get_appointment_details_by_id(db, appointment_id, user_id, include_steps=True)
     if appointment and appointment.get("appointment_date"):
         return appointment
     return None
+
 
 async def get_incomplete_appointment_details(db: AsyncIOMotorClient, appointment_id: str, user_id: str) -> Optional[Dict[str, Any]]:
     """

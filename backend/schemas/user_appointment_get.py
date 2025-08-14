@@ -37,3 +37,21 @@ class appointment_detail_response(BaseModel):
     uploaded_documents: List[uploaded_document_response]
     is_fully_completed: bool
     appointment_date: Optional[datetime] = None
+
+class sub_service_step_response(BaseModel):
+    step_id: int
+    step_name: str
+    status: bool
+    completed_by: Optional[str] = None
+    is_currently_happening: bool = False
+
+class appointment_detail_response(BaseModel):
+    appointment_id: str
+    user_id: str
+    service_name: str
+    payment_amount: float
+    required_documents: List[required_document_response]
+    uploaded_documents: List[uploaded_document_response]
+    is_fully_completed: bool
+    appointment_date: Optional[datetime] = None
+    sub_service_steps: Optional[List[sub_service_step_response]] = None
