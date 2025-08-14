@@ -11,7 +11,7 @@ from services import user_appointment_get
 from database_config import get_database
 
 # Router for appointment-related actions
-router = APIRouter(prefix="/appointments", tags=["Appointments"])
+router = APIRouter(prefix="/appointments_view", tags=["AppointmentsView"])
 
 
 @router.post("/ongoing", response_model=List[appointment_summary_response])
