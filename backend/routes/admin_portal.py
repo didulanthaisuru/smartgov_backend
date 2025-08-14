@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from schemas.admin import (
+from schemas.admin_portal import (
     appointment_detail_card, appointment_detail_card_request, 
     view_detailed_appointment_request, view_detailed_appointment_response, 
     appointment_approval_request, appointment_approval_response, 
@@ -7,7 +7,7 @@ from schemas.admin import (
     get_subservice_details_request, get_subservice_details_response,
     get_selected_appoinment_details_with_pdf_states_request, get_selected_appoinment_details_with_pdf_states_response
 )
-from services.admin import get_all_appointments_list, get_detailed_appointment, get_subservice_details, get_selected_appoinment_details_with_pdf_states
+from services.admin_portal import get_all_appointments_list, get_detailed_appointment, get_subservice_details, get_selected_appoinment_details_with_pdf_states
 
 router = APIRouter(
     prefix="/admin", # Add a prefix for all routes in this file

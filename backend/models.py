@@ -5,6 +5,7 @@ from uuid import uuid4
 from typing import List
 from typing import Dict
 from datetime import date, time
+from enum import Enum
 
 
 
@@ -19,6 +20,19 @@ class user(BaseModel):
     passcode: str
     user_id: int  # This field should match the appointment.user_id
     email: str
+
+class UserInDB(BaseModel):
+    """User model for database operations with authentication fields"""
+    nic: str
+    first_name: str
+    last_name: str
+    phone_number: str
+    email: str
+    hashed_password: str
+    is_active: bool = True
+    created_at: datetime
+    updated_at: datetime
+    user_id: Optional[int] = None  # Optional for backward compatibility
 class services(BaseModel):
     service_name: str
     service_id: int
@@ -90,10 +104,16 @@ class main_service(BaseModel):
     icon_name: Optional[str] = None # For the UI icon
     sub_services: List[str] = []
 
-class admin(BaseModel):
+class AdminInDB(BaseModel):
+    """Admin model for database operations with authentication fields"""
     admin_id: int
     admin_name: str
     service_id: str
+    email: str
+    hashed_password: str
+    is_active: bool = True
+    created_at: datetime
+    updated_at: datetime
 
 
 # Document state model for tracking uploaded documents
@@ -156,8 +176,10 @@ class DailyMetrics(BaseModel):
     no_show_count: int
 
 # Additional models for appointment management
-class AppointmentStatus(BaseModel):
-    """Enum-like model for appointment statuses"""
+from enum import Enum
+
+class AppointmentStatus(str, Enum):
+    """Enum for appointment statuses"""
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
