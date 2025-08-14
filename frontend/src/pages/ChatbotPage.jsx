@@ -1,135 +1,160 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import React, { useState, useEffect, useRef } from 'react';
 
-const ChatbotPage = () => {
-  const navigate = useNavigate();
-  const [message, setMessage] = useState('');
-  const [language, setLanguage] = useState('English');
-  const [showSidebar, setShowSidebar] = useState(false);
+// --- Helper Icon Components for a cleaner and more maintainable JSX ---
 
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      // Handle message sending logic here
-      setMessage('');
-    }
-  };
+// Hamburger menu icon
+const MenuIcon = () => (
+    <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+    </svg>
+);
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
-    }
-  };
+// Dropdown arrow icon
+const DropdownIcon = () => (
+    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+);
 
-  return (
-    <div className="min-h-screen bg-white relative">
-      {/* Sidebar */}
-      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
-
-      {/* Header */}
-      <div className="flex justify-between items-center p-4">
-        {/* Enhanced Hamburger Menu */}
-        <button
-          onClick={() => setShowSidebar(true)}
-          className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition-colors shadow-sm border border-gray-300"
-        >
-          <svg
-            className="w-6 h-6 text-gray-700"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
-
-        {/* Logo */}
-        <div className="flex items-center space-x-2">
-          <div className="w-12 h-16 bg-orange-500 rounded"></div>
-          <span className="text-2xl font-medium text-black">Smart Gov</span>
-        </div>
-
-        {/* Language Selector */}
-        <div className="flex items-center space-x-1 bg-white bg-opacity-20 border border-black rounded-xl px-3 py-2">
-          <span className="text-sm text-black">{language}</span>
-          <div className="w-6 h-6 bg-gray-400 rounded-sm"></div>
-        </div>
-      </div>
-
-      {/* Chat Messages Container */}
-      <div className="flex-1 px-4 py-6 space-y-6 pb-32">
-        {/* Bot Avatar Icons */}
-        <div className="flex justify-between px-4">
-          <div className="w-7 h-7 bg-teal-200 rounded-lg flex items-center justify-center">
-            <div className="w-5 h-5 bg-gray-400 rounded"></div>
-          </div>
-          <div className="w-7 h-7 bg-orange-200 rounded-lg flex items-center justify-center">
-            <div className="w-5 h-5 bg-gray-400 rounded"></div>
-          </div>
-        </div>
-
-        {/* Bot Avatar and Introduction Message */}
-        <div className="flex items-start space-x-3">
-          <div className="w-7 h-7 bg-teal-300 rounded-full flex items-center justify-center">
-            <div className="w-5 h-5 bg-white rounded-full"></div>
-          </div>
-          <div className="max-w-96 bg-white border border-gray-300 rounded-lg p-3 shadow-sm relative">
-            <div className="w-1 h-16 bg-blue-900 absolute -left-1 top-0 rounded-l-lg"></div>
-            <p className="text-sm text-gray-700 leading-relaxed ml-2">
-              This AI chatbot has been developed to optimize communication and simplify work processes, ultimately leading to smoother operations.
-            </p>
-          </div>
-        </div>
-
-        {/* User Message */}
-        <div className="flex justify-end items-start space-x-3">
-          <div className="max-w-28 bg-white border border-gray-300 rounded-lg p-3 shadow-sm relative">
-            <div className="w-1 h-11 bg-black absolute -right-1 top-0 rounded-r-lg"></div>
-            <p className="text-sm text-gray-700 mr-2">Thank You :)</p>
-          </div>
-          <div className="w-7 h-7 bg-orange-300 rounded-full flex items-center justify-center">
-            <div className="w-6 h-6 bg-white rounded-full"></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Profile Avatar */}
-      <div className="fixed bottom-24 left-5">
-        <div className="w-14 h-14 bg-gray-300 rounded-full"></div>
-      </div>
-
-      {/* Chat Input */}
-      <div className="fixed bottom-0 left-0 right-0 p-9 bg-white">
-        <div className="max-w-md mx-auto relative">
-          <div className="bg-orange-200 rounded-xl p-4 shadow-sm">
-            <div className="flex items-center space-x-3">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="| Ask anything about Your Service."
-                className="flex-1 bg-transparent text-gray-600 placeholder-gray-500 outline-none text-sm"
-              />
-              <button
-                onClick={handleSendMessage}
-                className="w-7 h-7 bg-gray-400 rounded hover:bg-gray-500 transition-colors flex items-center justify-center"
-              >
-                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+// Bot avatar icon from the image
+const BotAvatar = () => (
+    <div className="w-8 h-8 bg-[#D3F2EE] rounded-lg flex items-center justify-center shadow-sm">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 8V10M15 8V10M9 14H15M4.99989 15.022C5.07747 16.0157 5.45373 16.9439 6.06929 17.691C7.30143 19.1815 9.51296 20 12 20C14.487 20 16.6986 19.1815 17.9307 17.691C18.5463 16.9439 18.9225 16.0157 19.0001 15.022M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C13.8293 3 15.5284 3.54719 16.9439 4.48157" stroke="#005D5D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
     </div>
-  );
+);
+
+// User avatar icon from the image
+const UserAvatar = () => (
+    <div className="w-8 h-8 bg-[#FFEAD9] rounded-lg flex items-center justify-center shadow-sm">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12ZM12 12C12 12 15 13.5 15 16V20H9V16C9 13.5 12 12 12 12Z" stroke="#8B4513" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    </div>
+);
+
+// Back arrow icon for the input area
+const BackArrowIcon = () => (
+    <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+    </svg>
+);
+
+// Send message icon (paper plane)
+const SendIcon = () => (
+    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+    </svg>
+);
+
+
+// Main Chatbot Page Component
+const ChatbotPage = () => {
+    // const navigate = useNavigate(); // For use with react-router-dom
+    const [messages, setMessages] = useState([
+        {
+            id: 1,
+            sender: 'bot',
+            text: 'This AI chatbot has been developed to optimize communication and simplify work processes, ultimately leading to smoother operations.'
+        },
+        {
+            id: 2,
+            sender: 'user',
+            text: 'Thank You :)'
+        }
+    ]);
+    const [newMessage, setNewMessage] = useState('');
+    const [language, setLanguage] = useState('English');
+    
+    const chatContainerRef = useRef(null);
+
+    // Automatically scroll to the bottom when new messages are added
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
+
+    const handleSendMessage = () => {
+        if (newMessage.trim()) {
+            setMessages([
+                ...messages,
+                { id: Date.now(), sender: 'user', text: newMessage.trim() }
+            ]);
+            setNewMessage('');
+            
+            // Simulate a bot response
+            setTimeout(() => {
+                setMessages(prev => [
+                    ...prev,
+                    { id: Date.now() + 1, sender: 'bot', text: 'How else can I help you today?' }
+                ]);
+            }, 1000);
+        }
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSendMessage();
+        }
+    };
+
+    return (
+        <div className="flex flex-col h-screen bg-[#F8FAFC] font-sans">
+            
+            {/* --- Header --- */}
+            <header className="flex items-center justify-between px-4 py-3 border-b bg-white shadow-sm">
+                <button className="p-2">
+                    <MenuIcon />
+                </button>
+                <div className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-gray-50">
+                    <span className="text-sm text-gray-800 font-medium">{language}</span>
+                    <DropdownIcon />
+                </div>
+            </header>
+
+            {/* --- Chat Messages Container --- */}
+            <main ref={chatContainerRef} className="flex-1 px-4 py-6 space-y-6 overflow-y-auto">
+                {messages.map((msg) => (
+                    <div key={msg.id} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        {msg.sender === 'bot' && <BotAvatar />}
+                        <div className={`max-w-md bg-white border border-gray-200 rounded-lg p-3 shadow-sm`}>
+                            <p className="text-sm text-gray-700 leading-relaxed">
+                                {msg.text}
+                            </p>
+                        </div>
+                        {msg.sender === 'user' && <UserAvatar />}
+                    </div>
+                ))}
+            </main>
+
+            {/* --- Chat Input Footer --- */}
+            <footer className="p-4 bg-white/80 backdrop-blur-sm border-t">
+                <div className="flex items-center gap-3 max-w-2xl mx-auto">
+                    <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors">
+                        <BackArrowIcon />
+                    </button>
+                    <div className="flex-1 relative">
+                         <input
+                            type="text"
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            placeholder="Ask anything about Your Service."
+                            className="w-full bg-[#FFEAD9] border border-transparent rounded-lg py-3 pl-4 pr-12 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8B4513]/50 transition-all"
+                        />
+                        <button
+                            onClick={handleSendMessage}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-[#8B4513] rounded-md hover:bg-opacity-90 active:scale-95 transition-all flex items-center justify-center shadow"
+                        >
+                            <SendIcon />
+                        </button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
 };
 
 export default ChatbotPage;
