@@ -55,7 +55,7 @@ const AdminRegisterPage = () => {
     }
 
     try {
-      const response = await fetch('/api/admin/register', {
+              const response = await fetch('/api/v1/admin/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

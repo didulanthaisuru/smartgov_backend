@@ -65,6 +65,7 @@ const InitialRoute = () => {
     );
   }
   
+  // Check if user is authenticated and redirect accordingly
   if (isAuthenticated()) {
     // Redirect based on user role
     if (role === 'admin') {
@@ -93,6 +94,7 @@ const PublicRoute = ({ children }) => {
     );
   }
   
+  // If authenticated, redirect to appropriate dashboard
   if (isAuthenticated()) {
     return <Navigate to={role === 'admin' ? '/admin/dashboard' : '/services'} replace />;
   }
@@ -114,9 +116,9 @@ function App() {
             <Route 
               path="/login" 
               element={
-                <PublicRoute>
+                // <PublicRoute>
                   <LoginPage />
-                </PublicRoute>
+                // </PublicRoute>
               } 
             />
             <Route 
@@ -140,6 +142,7 @@ function App() {
                 // </ProtectedRoute> 
               }
             />
+
 
             {/* Admin Public Routes */}
             <Route 
@@ -308,43 +311,43 @@ function App() {
             <Route 
               path="/dashboard" 
               element={
-                // <ProtectedRoute>
-                  <DashboardPage />
-                // </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/activities/*" 
-              element={
-                // <ProtectedRoute>
-                  <ActivitiesPage />
-                // </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin" 
-              element={
-                // <ProtectedRoute>
-                  <AdminPage />
-                // </ProtectedRoute>
-              } 
-            />
-            
-            {/* Additional routes */}
-            <Route 
-              path="/dashboard" 
-              element={
                 <ProtectedRoute>
                   <DashboardPage />
                 </ProtectedRoute>
               } 
             />
             <Route 
+              path="/activities/*" 
+              element={
+                <ProtectedRoute>
+                  <ActivitiesPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/sub-services"
+              element={
+                <SubServicesPage/>
+              }
+            />
+
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute>
+                  <AdminPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Additional routes */}
+            <Route 
               path="/messages" 
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <MessagesPage />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               } 
             />
             <Route 
@@ -398,33 +401,33 @@ function App() {
             <Route 
               path="/profile" 
               element={
-                <ProtectedRoute>
+                //<ProtectedRoute>
                   <ProfilePage />
-                </ProtectedRoute>
+                //</ProtectedRoute>
               } 
             />
             <Route 
               path="/ongoing-activities" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <OngoingActivitiesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/incomplete-activities" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <IncompleteActivitiesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/previous-activities" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <PreviousActivitiesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
@@ -445,7 +448,7 @@ function App() {
             />
 
             {/* Catch all route */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/landing" replace />} />
           </Routes>
         </div>
       </AuthProvider>

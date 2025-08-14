@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../Header';
 
 const ProfileDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [language, setLanguage] = useState('English');
+  const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -32,20 +34,11 @@ const ProfileDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm px-4 py-3">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-orange-500 rounded"></div>
-            <span className="text-xl font-bold text-gray-800">Smart Gov</span>
-          </div>
-          
-          {/* Language Selector */}
-          <div className="flex items-center space-x-1 bg-gray-100 border border-gray-300 rounded-xl px-3 py-1">
-            <span className="text-sm text-gray-700">{language}</span>
-            <div className="w-4 h-3 bg-gray-400 rounded-sm"></div>
-          </div>
-        </div>
-      </div>
+      <Header
+        setShowSidebar={setShowSidebar}
+        showLanguageSelector={true}
+        language={language}
+      />
 
       {/* Main Content */}
       <div className="px-4 py-6">

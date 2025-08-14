@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
     
     try {
       // Replace with actual API call
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/v1/auth/sign_in', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -72,20 +72,22 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Login failed');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Login failed');
       }
 
       const data = await response.json();
       
       // Store in localStorage
       localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('userRole', 'user');
       
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: {
           user: data.user,
-          token: data.token
+          token: data.access_token
         }
       });
 
@@ -104,7 +106,7 @@ export const AuthProvider = ({ children }) => {
     
     try {
       // Replace with actual API call
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch('/api/v1/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -113,23 +115,28 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Signup failed');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Signup failed');
       }
 
       const data = await response.json();
       
-      // Store in localStorage
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('token', data.token);
+      // For registration, we might want to redirect to login instead of auto-login
+      // But for now, we'll auto-login if the API returns a token
+      if (data.access_token) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('userRole', 'user');
+        
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: {
+            user: data.user,
+            token: data.access_token
+          }
+        });
+      }
       
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: {
-          user: data.user,
-          token: data.token
-        }
-      });
-
       return { success: true };
     } catch (error) {
       dispatch({
