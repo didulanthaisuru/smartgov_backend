@@ -1,187 +1,187 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { AuthService } from '../../services';
+import logoImage from '../../assets/images/logo3.png';
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [formData, setFormData] = useState({
-    adminEmail: '',
-    password: ''
-  });
-  const [rememberPassword, setRememberPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [savePassword, setSavePassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    setError(''); // Clear error when user types
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
+    setLoading(true);
 
     try {
-      // Mock authentication for demo (replace with real API call later)
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-      
-      // Simple validation - you can customize this
-      if (formData.adminEmail && formData.password) {
-        // Mock admin data
-        const mockAdminData = {
-          id: 1,
-          admin_name: 'Admin User',
-          email: formData.adminEmail,
-          service: 'Birth Certificate Admin',
-          role: 'admin'
-        };
+      // Use AuthService for admin login
+      const result = await AuthService.adminLogin({
+        email: email,
+        passcode: password
+      });
+
+      if (result.success) {
+        // Login successful - backend returns 'admin' not 'user'
+        const userRole = login(result.data.admin, 'admin', result.data.access_token);
         
-        const mockToken = 'admin-auth-token-' + Date.now();
-        
-        // Use auth context to login with admin role
-        const userRole = login(mockAdminData, 'admin', mockToken);
-        
-        // Navigate based on role
-        if (userRole === 'admin') {
-          navigate('/admin/dashboard');
+        // Save password if checkbox is checked
+        if (savePassword) {
+          localStorage.setItem('savedAdminPassword', password);
         }
+        
+        // Navigate to admin dashboard
+        navigate('/admin/dashboard');
       } else {
-        setError('Please enter both email and password');
+        // Login failed
+        setError(result.error || 'Login failed. Please check your credentials.');
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      console.error('Admin login error:', error);
+      setError('Network error. Please check your connection and try again.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      {/* Header with Logo */}
-      <div className="flex items-center justify-center pt-10 pb-6">
-        <div className="flex items-center space-x-3">
-          <div className="w-15 h-20 bg-orange-500 rounded shadow-lg"></div>
-          <h1 className="text-2xl font-medium text-black">Smart Gov</h1>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Header with Logo */}
+        <div className="flex justify-center items-center mb-8">
+          <div className="flex items-center space-x-3">
+            <img 
+              src={logoImage} 
+              alt="Smart Gov Logo" 
+              className="h-8 w-auto object-contain"
+            />
+            <div className="flex flex-col">
+              <span className="text-lg font-semibold text-gray-900">
+                Smart Gov
+              </span>
+              <span className="text-xs text-gray-600">
+                Administrator Portal
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center px-8">
-        <div className="w-full max-w-md">
-          {/* Title Section */}
-          <div className="text-center mb-8">
-            <h1 className="text-7xl font-normal text-black mb-4" style={{ fontFamily: 'Crimson Text' }}>
-              Admin
-            </h1>
-            <p className="text-2xl text-black" style={{ fontFamily: 'Crimson Text' }}>
-              Login
-            </p>
+        {/* Main Login Card */}
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          {/* Welcome Text */}
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-semibold text-gray-900 mb-1">Administrator Login</h1>
+            <p className="text-gray-600">Access the administration portal</p>
           </div>
 
-          {/* Login Form */}
-          <div className="bg-blue-50 bg-opacity-20 backdrop-blur-md rounded-xl shadow-2xl p-8">
-            <h2 className="text-4xl font-normal text-black mb-2">Login Account</h2>
-            <p className="text-sm text-black mb-8 leading-relaxed">
-              Access your government services securely.<br />
-              Login to manage your appointments and records.
-            </p>
-
+          <form onSubmit={handleSubmit} noValidate>
+            {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6">
-                <p className="text-red-600 text-sm">{error}</p>
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+                {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Admin Email Field */}
-              <div>
-                <label className="block text-base text-black mb-2 font-medium">
-                  Admin Email
+            {/* Email Input */}
+            <div className="mb-4">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            {/* Password Input */}
+            <div className="mb-4">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
+                minLength="6"
+              />
+            </div>
+
+            {/* Save Password & Forgotten Password */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center">
+                <input
+                  id="save-password"
+                  name="save-password"
+                  type="checkbox"
+                  checked={savePassword}
+                  onChange={(e) => setSavePassword(e.target.checked)}
+                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                />
+                <label htmlFor="save-password" className="ml-2 block text-sm text-gray-700">
+                  Remember me
                 </label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    name="adminEmail"
-                    value={formData.adminEmail}
-                    onChange={handleInputChange}
-                    placeholder="| admin@example.com"
-                    className="w-full h-12 bg-orange-200 bg-opacity-50 rounded-2xl px-6 text-lg text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all"
-                    required
-                  />
+              </div>
+              <div className="text-sm">
+                <Link to="/admin/forgot-password" className="font-medium text-green-600 hover:text-green-500">
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
+
+            {/* Login Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Signing in...
                 </div>
-              </div>
+              ) : (
+                'Sign In as Administrator'
+              )}
+            </button>
+          </form>
 
-              {/* Password Field */}
-              <div>
-                <label className="block text-base text-black mb-2 font-medium">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    placeholder="*********************"
-                    className="w-full h-12 bg-orange-200 bg-opacity-50 rounded-2xl px-6 text-lg text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all"
-                    required
-                  />
-                </div>
-              </div>
+          {/* Back to Landing */}
+          <div className="mt-6 text-center">
+            <Link 
+              to="/" 
+              className="text-sm text-gray-600 hover:text-gray-800 font-medium"
+            >
+              ← Back to Home
+            </Link>
+          </div>
+        </div>
 
-              {/* Remember Password */}
-              <div className="flex items-center space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setRememberPassword(!rememberPassword)}
-                  className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center"
-                >
-                  {rememberPassword && (
-                    <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </button>
-                <span className="text-sm text-black">Save Password</span>
-              </div>
-
-              {/* Forgot Password */}
-              <div className="text-right">
-                <button
-                  type="button"
-                  onClick={() => navigate('/admin/forgot-password')}
-                  className="text-sm text-black hover:text-gray-600 transition-colors"
-                >
-                  Forgotten Password?
-                </button>
-              </div>
-
-              {/* Login Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-red-800 hover:bg-red-900 text-white text-2xl font-medium py-3 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Logging in...' : 'Login Account'}
-              </button>
-
-              {/* Create Account Link */}
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={() => navigate('/admin/register')}
-                  className="text-sm text-black hover:text-gray-600 transition-colors"
-                >
-                  Create New Account
-                </button>
-              </div>
-            </form>
+        {/* Security Notice */}
+        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+          <div className="flex items-start">
+            <svg className="w-5 h-5 text-yellow-600 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <div className="text-sm text-yellow-800">
+              <p className="font-medium">Administrator Access Only</p>
+              <p className="mt-1">This portal is restricted to authorized government administrators only.</p>
+            </div>
           </div>
         </div>
       </div>

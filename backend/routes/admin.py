@@ -40,3 +40,16 @@ async def admin_dashboard(current_admin: AdminInDB = Depends(get_current_admin))
         "service_id": current_admin.service_id,
         "role": "admin"
     }
+
+@router.get("/verify")
+async def verify_admin_token(current_admin: AdminInDB = Depends(get_current_admin)):
+    """Verify admin token is valid"""
+    return {
+        "valid": True,
+        "admin": {
+            "admin_id": current_admin.admin_id,
+            "admin_name": current_admin.admin_name,
+            "service_id": current_admin.service_id,
+            "email": current_admin.email
+        }
+    }

@@ -30,3 +30,17 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 async def get_current_user_info(current_user: UserInDB = Depends(get_current_user)):
     """Get current authenticated user information"""
     return await auth_service.get_current_user_info(current_user)
+
+@router.get("/verify")
+async def verify_user_token(current_user: UserInDB = Depends(get_current_user)):
+    """Verify user token is valid"""
+    return {
+        "valid": True,
+        "user": {
+            "first_name": current_user.first_name,
+            "last_name": current_user.last_name,
+            "nic": current_user.nic,
+            "email": current_user.email,
+            "phone_number": current_user.phone_number
+        }
+    }

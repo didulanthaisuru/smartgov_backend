@@ -1,5 +1,6 @@
 // Role-based authentication context
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { AuthService } from '../services';
 
 const AuthContext = createContext();
 
@@ -20,18 +21,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const userRole = localStorage.getItem('userRole');
-        const userData = localStorage.getItem('userData');
+        const authData = AuthService.getAuthData();
 
-        if (token && userRole && userData) {
-          // Verify token is still valid with backend
-          const isValid = await verifyToken(token, userRole);
+        if (authData.token && authData.userRole && authData.userData) {
+          // Set the state immediately for better UX
+          setRole(authData.userRole);
+          setUser(authData.userData);
           
-          if (isValid) {
-            setRole(userRole);
-            setUser(JSON.parse(userData));
-          } else {
+          // Verify token is still valid with backend (in background)
+          const isValid = await verifyToken(authData.token, authData.userRole);
+          
+          if (!isValid) {
             // Token is invalid, clear everything
             logout();
           }
@@ -50,17 +50,13 @@ export const AuthProvider = ({ children }) => {
   // Function to verify token with backend
   const verifyToken = async (token, role) => {
     try {
-      const endpoint = role === 'admin' ? '/api/v1/admin/verify' : '/api/v1/auth/verify';
-      
-      const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      return response.ok;
+      if (role === 'admin') {
+        const result = await AuthService.verifyAdminToken();
+        return result.success;
+      } else {
+        const result = await AuthService.verifyToken();
+        return result.success;
+      }
     } catch (error) {
       console.error('Token verification failed:', error);
       return false;
@@ -68,10 +64,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = (userData, userRole, token) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('userRole', userRole);
-    localStorage.setItem('userData', JSON.stringify(userData));
+    // Store authentication data using service
+    AuthService.saveAuthData({ token, userRole, userData });
     
+    // Update state immediately
     setUser(userData);
     setRole(userRole);
     
@@ -80,17 +76,21 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('userData');
+    // Clear all authentication data using service
+    AuthService.logout();
     
+    // Update state
     setUser(null);
     setRole(null);
   };
 
   const isAdmin = () => role === 'admin';
   const isUser = () => role === 'user';
-  const isAuthenticated = () => !!user && !!role;
+  const isAuthenticated = () => {
+    // Check both state and localStorage for reliability
+    const authData = AuthService.getAuthData();
+    return !!(user && role && authData.token);
+  };
 
   const value = {
     user,
@@ -102,6 +102,7 @@ export const AuthProvider = ({ children }) => {
     isUser,
     isAuthenticated
   };
+  
 
   return (
     <AuthContext.Provider value={value}>
