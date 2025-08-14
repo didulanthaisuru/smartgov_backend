@@ -49,7 +49,6 @@ import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminCompletedTasksPage from './pages/admin/AdminCompletedTasksPage';
 import AdminChatPage from './pages/admin/AdminChatPage';
 import AdminQRScanPage from './pages/admin/AdminQRScanPage';
-import SubServicesPage from './pages/SubServicesPage'; 
 
 // Initial Route Component (handles app startup routing)
 const InitialRoute = () => {
