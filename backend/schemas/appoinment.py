@@ -25,8 +25,8 @@ class AppointmentUpdate(BaseModel):
     appointment_date: Optional[datetime] = Field(None, description="Date and time of the appointment")
     appoinment_time: Optional[datetime] = Field(None, description="Time of the appointment")
     predicted_duration: Optional[datetime] = Field(None, description="Predicted duration of the appointment")
-    payment_status: Optional[bool] = Field(None, description="Payment status of the appointment")
-    is_fully_completed: Optional[bool] = Field(None, description="Flag indicating if the appointment is fully completed")
+    payment_status: Optional[bool] = Field(default=False, description="Payment status of the appointment")
+    is_fully_completed: Optional[bool] = Field(default=False, description="Flag indicating if the appointment is fully completed")
 
 class AppointmentUpdateResponse(BaseModel):
     appointment_id: str = Field(..., description="The ObjectId of the updated appointment")
