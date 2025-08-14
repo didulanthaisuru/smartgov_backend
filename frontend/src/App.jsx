@@ -260,13 +260,9 @@ function App() {
             element={<ServiceDetailBooking />} 
             />
             <Route 
-              path="/services/:serviceId/upload/:docId" 
-              element={
-                <UserRoute>
-                  <UploadPage />
-                </UserRoute>
-              } 
-            />
+          path="/appointment/:appointmentId/upload/:docId" 
+          element={<UploadPage />} 
+        />
             <Route 
               path="/admin-tasks"
               element={

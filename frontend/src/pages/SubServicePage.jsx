@@ -5,7 +5,7 @@ import { FaBars, FaUser } from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
 
 const SubServicesPage = () => {
-  // 'serviceId' here is the ID of the main service (e.g., Birth Certificates)
+  const userId = "689b0fce51fe72cd1df58f06";
   const { serviceId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -14,8 +14,13 @@ const SubServicesPage = () => {
   const [subServices, setSubServices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isCreating, setIsCreating] = useState(null);
+  
+  // **REMOVED**: The createdAppointments state is no longer needed.
 
   useEffect(() => {
+    // **REMOVED**: The logic to check sessionStorage is gone.
+
     if (!serviceId) return;
 
     const fetchSubServices = async () => {
@@ -41,14 +46,37 @@ const SubServicesPage = () => {
     fetchSubServices();
   }, [serviceId]);
 
-  const handleSubServiceClick = (sub) => {
-    // **MODIFIED**: Navigate to the new URL structure with BOTH IDs.
-    navigate(`/services/${serviceId}/subservices/${sub.id}`, {
-      state: {
-        mainServiceName: mainServiceName,
-        subServiceName: sub.name,
-      }
-    });
+  const handleSubServiceClick = async (sub) => {
+    setIsCreating(sub.id);
+    
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/appointment_creation/empty', {
+        user_id: userId,
+        main_service_id: serviceId,
+        sub_service_id: sub.id
+      });
+
+      const { appointment_id } = response.data;
+      
+      // **REMOVED**: No longer need to save the appointment ID in this component.
+
+      // Navigate to the next page, passing all necessary info
+      navigate(`/services/${serviceId}/subservices/${sub.id}`, {
+        state: {
+          mainServiceName: mainServiceName,
+          subServiceName: sub.name,
+          appointmentId: appointment_id
+        }
+      });
+
+    } catch (err) {
+      console.error("Failed to create appointment:", err);
+      alert("Error: Could not create an appointment.");
+    } finally {
+      // We reset the loading state, but we don't navigate back,
+      // so this component will unmount. This is fine.
+      setIsCreating(null);
+    }
   };
 
   return (
@@ -73,16 +101,23 @@ const SubServicesPage = () => {
         {isLoading && <p className="text-center text-gray-500">Loading...</p>}
         {error && <p className="text-center text-red-500">{error}</p>}
         
-        {!isLoading && !error && subServices.map((sub) => (
-          <button
-            key={sub.id}
-            onClick={() => handleSubServiceClick(sub)}
-            className="flex justify-between items-center bg-orange-300 hover:bg-orange-400 transition rounded-xl px-4 py-3 shadow-md text-left"
-          >
-            <span className="font-semibold text-gray-900">{sub.name}</span>
-            <IoIosArrowForward className="text-lg text-gray-800 flex-shrink-0" />
-          </button>
-        ))}
+        {!isLoading && !error && subServices.map((sub) => {
+          return (
+            <button
+              key={sub.id}
+              onClick={() => handleSubServiceClick(sub)}
+              // **MODIFIED**: Now only disables while the API call is in progress for this specific button.
+              disabled={isCreating === sub.id}
+              className="flex justify-between items-center bg-orange-300 hover:bg-orange-400 transition rounded-xl px-4 py-3 shadow-md text-left disabled:opacity-70 disabled:cursor-wait"
+            >
+              <span className="font-semibold text-gray-900">
+                {/* **MODIFIED**: Simplified text logic. */}
+                {isCreating === sub.id ? 'Creating...' : sub.name}
+              </span>
+              <IoIosArrowForward className="text-lg text-gray-800 flex-shrink-0" />
+            </button>
+          );
+        })}
       </div>
     </div>
   );

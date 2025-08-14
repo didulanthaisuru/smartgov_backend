@@ -2,16 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Menu, QrCode, MessageSquare } from 'lucide-react';
-
-// Assume logoIcon is correctly imported from your assets
-// import logoIcon from '../assets/images/logo2.png';
+import Header from '../components/Header';
 
 const ServiceDetailBooking = () => {
-    // **MODIFIED**: Get both IDs from the URL parameters.
     const { mainServiceId, subServiceId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
     const subServiceName = location.state?.subServiceName || "Service Details";
+    // **NEW**: Get the appointmentId that was created on the previous page
+    const appointmentId = location.state?.appointmentId;
 
     const [documents, setDocuments] = useState([]);
     const [paymentAmount, setPaymentAmount] = useState(0);
@@ -24,7 +23,6 @@ const ServiceDetailBooking = () => {
         const fetchServiceDetails = async () => {
             setIsLoading(true);
             try {
-                // **MODIFIED**: Use the correct URL with both IDs.
                 const response = await axios.get(
                     `http://127.0.0.1:8000/api/v1/dashboard_services/${mainServiceId}/subservices/${subServiceId}`
                 );
@@ -51,10 +49,30 @@ const ServiceDetailBooking = () => {
         };
 
         fetchServiceDetails();
-    }, [mainServiceId, subServiceId]); // Re-run effect if either ID changes
+    }, [mainServiceId, subServiceId]);
 
-    const handleUploadClick = (docId) => navigate(`/upload/${docId}`);
-    const handleBookAppointment = () => navigate(`/booking/${subServiceId}`);
+    // **MODIFIED**: This function now navigates to the upload page with all necessary IDs
+    const handleUploadClick = (doc) => {
+        if (!appointmentId) {
+            alert("Could not find the appointment ID. Please go back and try again.");
+            return;
+        }
+        // Navigate to a dynamic route for uploading a specific document for a specific appointment
+        navigate(`/appointment/${appointmentId}/upload/${doc.id}`, {
+            state: { docName: doc.name } // Pass the document name for a better UX
+        });
+    };
+    
+    const handleBookAppointment = () => {
+        // We now have the appointmentId from the location state
+        if (!appointmentId) {
+            alert("Could not find the appointment ID.");
+            return;
+        }
+        navigate(`/booking/${appointmentId}`, {
+             state: { subServiceName: subServiceName }
+        });
+    };
 
     const getAccuracyColor = (accuracy) => {
         if (accuracy === '-') return 'text-gray-500';
@@ -67,13 +85,8 @@ const ServiceDetailBooking = () => {
         <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center p-4">
             <div className="w-full max-w-sm bg-white shadow-2xl rounded-2xl overflow-hidden relative">
                 <div className="h-[calc(100vh-2rem)] max-h-[812px] overflow-y-auto pb-28">
-                    <header className="sticky top-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-between p-4 border-b border-gray-200">
-                        <button><Menu className="w-7 h-7 text-black" /></button>
-                        <div className="text-center py-4">
-                            <div className="w-14 h-14 mx-auto bg-gray-200 rounded-full"></div>
-                            <h2 className="text-lg font-semibold text-gray-800">{subServiceName}</h2>
-                        </div>
-                    </header>
+                    <Header /> {/* Assuming Header is a self-contained component */}
+                    <h2 className="text-lg font-semibold text-gray-800 text-center">{subServiceName}</h2>
 
                     <main className="px-4">
                         <div>
@@ -97,7 +110,8 @@ const ServiceDetailBooking = () => {
                                         <div key={doc.id} className="grid grid-cols-4 items-center text-center border-b last:border-b-0 py-2 min-h-[60px] bg-white">
                                             <div className="font-semibold text-gray-800 px-1">{doc.name}</div>
                                             <div>
-                                                <button onClick={() => handleUploadClick(doc.id)} className="bg-[#F8CA92] text-black text-xs font-medium px-2 py-1.5 rounded-md flex items-center justify-center gap-1.5 mx-auto">
+                                                {/* **MODIFIED**: Pass the entire 'doc' object to the handler */}
+                                                <button onClick={() => handleUploadClick(doc)} className="bg-[#F8CA92] text-black text-xs font-medium px-2 py-1.5 rounded-md flex items-center justify-center gap-1.5 mx-auto">
                                                     <span>📄</span>
                                                     <span>Upload</span>
                                                 </button>
