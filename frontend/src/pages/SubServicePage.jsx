@@ -22,7 +22,7 @@ const SubServicesPage = () => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/services/${serviceId}/subservices`
+          `http://127.0.0.1:8000/api/v1/dashboard_services/${serviceId}/subservices`
         );
         const formattedSubServices = response.data.map(sub => ({
           id: sub._id,
