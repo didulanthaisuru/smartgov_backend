@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthService } from '../../services';
 
 const AdminRegisterPage = () => {
   const navigate = useNavigate();
@@ -55,28 +56,22 @@ const AdminRegisterPage = () => {
     }
 
     try {
-              const response = await fetch('/api/v1/admin/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          admin_name: `${formData.firstName} ${formData.lastName}`,
-          service_id: formData.service,
-          email: formData.email,
-          passcode: formData.password,
-          nic: formData.nicNumber,
-          mobile: formData.mobileNumber
-        })
+      // Use AuthService for admin registration
+      const result = await AuthService.adminRegister({
+        admin_name: `${formData.firstName} ${formData.lastName}`,
+        service_id: formData.service,
+        email: formData.email,
+        passcode: formData.password,
+        nic: formData.nicNumber,
+        mobile: formData.mobileNumber
       });
 
-      if (response.ok) {
+      if (result.success) {
         navigate('/admin/login', { 
           state: { message: 'Registration successful! Please login.' }
         });
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Registration failed');
+        setError(result.error || 'Registration failed');
       }
     } catch (error) {
       setError('Network error. Please try again.');

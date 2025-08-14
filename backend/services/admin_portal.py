@@ -1,4 +1,4 @@
-from schemas.admin import (
+from schemas.admin_portal import (
     appointment_detail_card_request, appointment_detail_card, 
     view_detailed_appointment_request, view_detailed_appointment_response,
     RequiredDocument, get_subservice_details_request, get_subservice_details_response,
