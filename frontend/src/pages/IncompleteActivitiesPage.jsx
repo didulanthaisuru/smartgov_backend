@@ -59,40 +59,52 @@ const IncompleteActivitiesPage = () => {
 
       {/* Title and Progress */}
       <div className="relative z-10 px-10 py-6">
-        <h2 className="text-4xl font-normal text-black mb-4">Incomplete Activities</h2>
-        
-        <p className="text-sm text-black mb-6">2 Documents are required for completion</p>
+        <h2 className="text-4xl font-normal text-black mb-4 text-left">Incomplete Activities</h2>
         
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-4 mb-2">
+            <div className="w-52 bg-white border border-black h-3">
+              <div className="bg-[#8C322A] h-3" style={{ width: '33%' }}></div>
+            </div>
             <span className="text-sm text-black">1 of 3 Uploaded</span>
           </div>
-          <div className="w-52 bg-white border border-black rounded-full h-3">
-            <div className="bg-[#8C322A] h-3 rounded-full" style={{ width: '33%' }}></div>
-          </div>
+          <p className="text-sm text-black text-left">2 Documents are required for completion</p>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 bg-white rounded-t-3xl shadow-[0_4px_250px_rgba(0,0,0,0.25)] mx-9 min-h-[500px] p-6">
+      <div className="relative z-10 bg-white rounded-t-3xl rounded-b-3xl shadow-[0_4px_250px_rgba(0,0,0,0.25)] mx-9 min-h-[500px] p-6">
         {/* Search and Filter Bar */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1 mr-4">
             <div className="relative bg-[#F8CB93] rounded-xl px-6 py-3 flex items-center shadow-md">
-              <span className="text-sm text-black opacity-25 mr-3">Search activities</span>
-              <svg className="w-4 h-4 text-black opacity-25" fill="currentColor" viewBox="0 0 24 24">
+              <input
+                type="text"
+                placeholder="Search activities"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 bg-transparent text-sm text-black placeholder-black placeholder-opacity-25 border-none outline-none"
+              />
+              <svg 
+                onClick={() => console.log('Search clicked:', searchTerm)}
+                className="w-6 h-6 text-black opacity-50 ml-3 hover:opacity-75 transition-opacity cursor-pointer" 
+                fill="currentColor" 
+                viewBox="0 0 24 24"
+              >
                 <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
               </svg>
             </div>
           </div>
           
-          <div className="bg-[#F8CB93] rounded-xl px-4 py-3 shadow-md flex items-center">
-            <span className="text-sm text-black opacity-25 mr-2">Order By</span>
-            <svg className="w-6 h-6 text-black opacity-25" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M7.76 9.34L12 13.63l4.24-4.29L17.66 10.9 12 16.61 6.34 10.9z"/>
-            </svg>
-          </div>
+          <button className="bg-[#F8CB93] rounded-xl px-4 py-3 shadow-md flex items-center hover:bg-[rgba(248,203,147,0.8)] transition-colors">
+            <span className="text-sm text-black opacity-75 mr-2">Order By</span>
+            <div className="w-4 h-4 flex items-center justify-center opacity-75">
+              <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M7 10l5 5 5-5z"/>
+              </svg>
+            </div>
+          </button>
         </div>
 
         {/* Incomplete Activities List */}
@@ -101,8 +113,8 @@ const IncompleteActivitiesPage = () => {
             <div key={activity.id} className="bg-[#F8CB93] rounded-xl p-6 shadow-md">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h3 className="text-sm font-bold text-black mb-1 leading-tight">
-                    Business<br/>Registration
+                  <h3 className="text-sm font-bold text-black mb-1 leading-tight text-left">
+                    Business <br />Registration
                   </h3>
                 </div>
                 <div className="text-right">
@@ -111,47 +123,22 @@ const IncompleteActivitiesPage = () => {
               </div>
 
               {/* Document List */}
-              <div className="space-y-3 ml-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-black">Grama niladari certificate</span>
-                  <span className="text-sm text-black">Pending Upload</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-black">Address proof</span>
-                  <span className="text-sm text-black">Pending Upload</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-black">Consent letter</span>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between pl-4">
+                  <span className="text-sm text-black text-left">Grama niladari certificate</span>
                   <span className="text-sm text-black">Verified</span>
+                </div>
+                <div className="flex items-center justify-between pl-4">
+                  <span className="text-sm text-black text-left">Address proof</span>
+                  <span className="text-sm text-black">Pending Upload</span>
+                </div>
+                <div className="flex items-center justify-between pl-4">
+                  <span className="text-sm text-black text-left">Consent letter</span>
+                  <span className="text-sm text-black">Pending Upload</span>
                 </div>
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Help Section */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <div className="flex items-center justify-center space-x-4">
-            <button 
-              onClick={() => navigate('/chatbot')}
-              className="bg-blue-100 rounded-lg px-4 py-2 flex items-center space-x-2 hover:bg-blue-200 transition-colors"
-            >
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <span className="text-sm text-blue-600">Need Help?</span>
-            </button>
-            
-            <button 
-              onClick={() => navigate('/contact-us')}
-              className="bg-green-100 rounded-lg px-4 py-2 flex items-center space-x-2 hover:bg-green-200 transition-colors"
-            >
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26c.31.17.69.17 1-.01L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
-              </svg>
-              <span className="text-sm text-green-600">Contact Us</span>
-            </button>
-          </div>
         </div>
       </div>
 

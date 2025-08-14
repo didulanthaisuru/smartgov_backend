@@ -56,38 +56,51 @@ const PreviousActivitiesPage = () => {
 
       {/* Title and Summary */}
       <div className="relative z-10 px-10 py-6">
-        <h2 className="text-4xl font-normal text-black mb-4">Previous Activities</h2>
-        <p className="text-sm text-black mb-6">View your previous activities here</p>
+        <h2 className="text-4xl font-normal text-black mb-4 text-left">Previous Activities</h2>
+        <p className="text-sm text-black mb-6 text-left">View your previous activities here</p>
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 bg-white rounded-t-3xl shadow-[0_4px_250px_rgba(0,0,0,0.25)] mx-9 min-h-[500px] p-6">
+      <div className="relative z-10 bg-white rounded-3xl shadow-[0_4px_250px_rgba(0,0,0,0.25)] mx-9 min-h-[500px] p-6">
         {/* Search and Filter Bar */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1 mr-4">
             <div className="relative bg-[#F8CB93] rounded-xl px-6 py-3 flex items-center shadow-md">
-              <span className="text-sm text-black opacity-25 mr-3">Search activities</span>
-              <svg className="w-4 h-4 text-black opacity-25" fill="currentColor" viewBox="0 0 24 24">
+              <input
+                type="text"
+                placeholder="Search activities"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 bg-transparent text-sm text-black placeholder-black placeholder-opacity-25 border-none outline-none"
+              />
+              <svg 
+                onClick={() => console.log('Search clicked:', searchTerm)}
+                className="w-6 h-6 text-black opacity-50 ml-3 hover:opacity-75 transition-opacity cursor-pointer" 
+                fill="currentColor" 
+                viewBox="0 0 24 24"
+              >
                 <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
               </svg>
             </div>
           </div>
           
-          <div className="bg-[#F8CB93] rounded-xl px-4 py-3 shadow-md flex items-center">
-            <span className="text-sm text-black opacity-25 mr-2">Order By</span>
-            <svg className="w-6 h-6 text-black opacity-25" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M7.76 9.34L12 13.63l4.24-4.29L17.66 10.9 12 16.61 6.34 10.9z"/>
-            </svg>
-          </div>
+          <button className="bg-[#F8CB93] rounded-xl px-4 py-3 shadow-md flex items-center hover:bg-[rgba(248,203,147,0.8)] transition-colors">
+            <span className="text-sm text-black opacity-75 mr-2">Order By</span>
+            <div className="w-4 h-4 flex items-center justify-center opacity-75">
+              <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M7 10l5 5 5-5z"/>
+              </svg>
+            </div>
+          </button>
         </div>
 
         {/* Previous Activities List */}
         <div className="space-y-6">
           {previousActivities.map((activity) => (
             <div key={activity.id} className="bg-[#F8CB93] rounded-xl p-6 shadow-md">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-sm font-normal text-black mb-1">{activity.title}</h3>
+              <div className="mb-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-normal text-black">{activity.title}</h3>
                   <p className="text-sm text-black">{activity.status}</p>
                 </div>
               </div>
@@ -106,7 +119,7 @@ const PreviousActivitiesPage = () => {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <svg
                         key={star}
-                        className="w-6 h-6 text-yellow-400 cursor-pointer"
+                        className="w-6 h-6 text-yellow-500 cursor-pointer"
                         fill="currentColor"
                         viewBox="0 0 24 24"
                       >
@@ -116,40 +129,23 @@ const PreviousActivitiesPage = () => {
                   </div>
                 </div>
                 
-                <button 
-                  onClick={() => setShowFeedback(true)}
-                  className="w-full bg-white rounded-xl py-3 px-4 shadow-md"
-                >
-                  <span className="text-sm text-gray-500">Feedback</span>
-                </button>
+                <div className="relative">
+                  <textarea 
+                    placeholder="Leave your feedback here..."
+                    className="w-full bg-white rounded-xl py-2 px-4 pr-12 shadow-md resize-none h-12 text-sm text-gray-700 border-none outline-none"
+                  />
+                  <button 
+                    onClick={() => setShowFeedback(true)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Help Section */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <div className="flex items-center justify-center space-x-4">
-            <button 
-              onClick={() => navigate('/chatbot')}
-              className="bg-blue-100 rounded-lg px-4 py-2 flex items-center space-x-2 hover:bg-blue-200 transition-colors"
-            >
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <span className="text-sm text-blue-600">Need Help?</span>
-            </button>
-            
-            <button 
-              onClick={() => navigate('/contact-us')}
-              className="bg-green-100 rounded-lg px-4 py-2 flex items-center space-x-2 hover:bg-green-200 transition-colors"
-            >
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26c.31.17.69.17 1-.01L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              <span className="text-sm text-green-600">Contact Us</span>
-            </button>
-          </div>
         </div>
       </div>
 

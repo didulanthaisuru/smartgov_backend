@@ -394,33 +394,33 @@ function App() {
             <Route 
               path="/profile" 
               element={
-                <ProtectedRoute>
+                //<ProtectedRoute>
                   <ProfilePage />
-                </ProtectedRoute>
+                //</ProtectedRoute>
               } 
             />
             <Route 
               path="/ongoing-activities" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <OngoingActivitiesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/incomplete-activities" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <IncompleteActivitiesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/previous-activities" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <PreviousActivitiesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
