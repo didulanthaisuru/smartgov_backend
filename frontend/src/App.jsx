@@ -32,6 +32,10 @@ import IncompleteActivitiesPage from './pages/IncompleteActivitiesPage';
 import PreviousActivitiesPage from './pages/PreviousActivitiesPage';
 import UpdateInformationPage from './pages/UpdateInformationPage';
 import AnalyticsDashboardPage from './pages/AnalyticsDashboardPage';
+import SmartGovWelcome1 from './pages/Instructions1';
+import AdminTasks from './pages/AdminTasks';
+import AdminNotifications from './pages/AdminNotifications';
+import AdminRates from './pages/AdminRates';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -70,6 +74,19 @@ function App() {
                 </PublicRoute>
               } 
             />
+            <Route 
+              path="/welcome-screen-1"
+              element={<SmartGovWelcome1 />}
+            />
+
+            <Route 
+              path="/admin -notifications"
+              element={
+                // <ProtectedRoute>
+                  <AdminNotifications />
+                // </ProtectedRoute> 
+              }
+            />
 
             {/* Protected Routes - Services as main dashboard */}
             <Route 
@@ -80,6 +97,13 @@ function App() {
                 // </ProtectedRoute>
               } 
             />
+            <Route
+              path="admin-rates"
+              element={
+                // <ProtectedRoute>
+                  <AdminRates />
+                // </ProtectedRoute>
+              }/>
             <Route 
               path="/services/:serviceId" 
               element={
@@ -104,6 +128,13 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/admin-tasks"
+              element={
+                // <ProtectedRoute>
+                  <AdminTasks />
+                // </ProtectedRoute>
+              }/>
             <Route 
               path="/services/:serviceId/payment" 
               element={
