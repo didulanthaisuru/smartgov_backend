@@ -139,15 +139,11 @@ const Services = () => {
       <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       
 
-      <div className="flex items-center justify-between px-6 py-4">
-      
-        <Header 
+      <Header 
         setShowSidebar={setShowSidebar} 
         showLanguageSelector={true}
         language="EN"
       />
-    
-      </div>
 
       {/* Divider Line */}
       <div className="w-full h-px bg-black"></div>

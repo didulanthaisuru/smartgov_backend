@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
   // Function to verify token with backend
   const verifyToken = async (token, role) => {
     try {
-      const endpoint = role === 'admin' ? '/api/admin/verify' : '/api/user/verify';
+      const endpoint = role === 'admin' ? '/api/v1/admin/verify' : '/api/v1/auth/verify';
       
       const response = await fetch(endpoint, {
         method: 'GET',
