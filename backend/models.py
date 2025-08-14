@@ -13,7 +13,7 @@ class user(BaseModel):
     nic: str
     phone_number: str
     passcode: str
-    user_id: int
+    user_id: int  # This field should match the appointment.user_id
     email: str
 class services(BaseModel):
     service_name: str
@@ -50,23 +50,55 @@ class admin(BaseModel):
     service_id: str
 
 
-# Placeholder for SubServiceStepState
+# Document state model for tracking uploaded documents
+class DocumentState(BaseModel):
+    doc_id: str
+    doc_name: str
+    is_uploaded: bool = False
+    uploaded_doc_id: Optional[str] = None
+    accuracy: Optional[float] = None
+    admin_status: str = "Pending"
+
+# Sub-service step model
+class SubServiceStep(BaseModel):
+    step_id: int
+    step_name: str
+
+# Sub-service state model (for older format)
 class SubServiceStepState(BaseModel):
     step_name: str
-    completed: bool = False
+    is_completed: bool = False
+    completion_date: Optional[datetime] = None
 
+# Main appointment model matching your database structure
 class Appointment(BaseModel):
-    # This model is for the AppointmentNew collection.
-    # It is now much simpler and only tracks the overall process.
-    appointment_id: str
-    user_id: str = Field(...)
-    sub_service_id: str # Links to the sub_service
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    sub_service_states: List[SubServiceStepState] = []
-    is_fully_completed: bool = Field(default=False)
-    appointment_date: Optional[date] = None
-    appointment_time: Optional[time] = None
-    predicted_duration: Optional[int] = None
+    """
+    Appointment model matching the ApointmentNew collection structure.
+    Based on the actual database documents you provided.
+    """
+    _id: Optional[str] = None  # MongoDB ObjectId
+    appointment_id: int
+    user_id: int
+    sub_service_id: str  # ObjectId string
+    created_at: datetime
+    doc_states: Optional[Dict[str, DocumentState]] = None  # For older format
+    sub_service_state: Optional[str] = None  # For older format
+    is_fully_complered: bool = False  # Note: typo in database field name
+    appointment_date: Optional[datetime] = None
+    appoinment_time: Optional[datetime] = None  # Note: typo in database field name
+    predicted_duration: Optional[datetime] = None  # Stored as date object
+    
+    # New format fields
+    sub_service_steps: Optional[List[SubServiceStep]] = None
+    is_fully_completed: Optional[bool] = None  # Correct spelling variant
+    
+    class Config:
+        # Allow extra fields to handle variations in the database
+        extra = "allow"
+        # Handle ObjectId conversion
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
 
 class DailyMetrics(BaseModel):
     matrics_id: str = Field(..., alias="matrics_id")
@@ -76,5 +108,32 @@ class DailyMetrics(BaseModel):
     main_service_id: int
     average_processing_time: time
     no_show_count: int
+
+# Additional models for appointment management
+class AppointmentStatus(BaseModel):
+    """Enum-like model for appointment statuses"""
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+class AppointmentFilter(BaseModel):
+    """Model for filtering appointments"""
+    date: Optional[date] = None
+    service_id: Optional[str] = None
+    user_id: Optional[int] = None
+    status: Optional[str] = None
+
+class AppointmentResponse(BaseModel):
+    """Response model for appointment details"""
+    appointment_id: str
+    user_id: str
+    service_id: str
+    appointment_date: Optional[datetime] = None
+    appointment_time: Optional[datetime] = None
+    status: str
+    duration: Optional[time] = None
+    documents_uploaded: int = 0
+    total_documents: int = 0
 
 

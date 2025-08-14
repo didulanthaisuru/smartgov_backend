@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from routes.insights import router as insights_router
+from routes.admin import router as admin_router
 from database_config import connect_to_mongo, close_mongo_connection
 
 app = FastAPI()
@@ -18,3 +19,4 @@ def read_root():
     return {"message": "SmartGov API is running"}
 
 app.include_router(insights_router)
+app.include_router(admin_router)

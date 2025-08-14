@@ -22,4 +22,7 @@ db = client["SmartGov"]
 
 #collections
 collection_insights = db["insights"]
-collection_apointment = db["newappointment"]
+collection_apointment = db["AppoinmentNew"]
+collection_users = db["user_with_user_id"]
+collection_uploaded_documents = db["uploaded_documents"]
+collection_required_documents = db["required_documents"]

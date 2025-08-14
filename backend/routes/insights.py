@@ -1,6 +1,12 @@
 from fastapi import APIRouter
 from schemas.insights import InsightQuery, InsightDetail
 from services.insights import get_insights_by_date_sub_service, get_insights_by_date_main_service
+# New route: filter by date and main_service_id only
+from services.insights import get_insights_by_date_main_service
+from datetime import date
+
+from schemas.insights import MainServiceQuery
+
 
 router = APIRouter()
 
@@ -11,11 +17,6 @@ def view_insights(query: InsightQuery):
 
 
 
-# New route: filter by date and main_service_id only
-from services.insights import get_insights_by_date_main_service
-from datetime import date
-
-from schemas.insights import MainServiceQuery
 
 @router.post("/view-mainservice-insights", response_model=list[InsightDetail])
 def view_mainservice_insights(query: MainServiceQuery):
