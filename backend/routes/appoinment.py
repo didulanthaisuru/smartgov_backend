@@ -1,9 +1,13 @@
 from fastapi import APIRouter
 from schemas.appoinment import (
     AppointmentAdd, EmptyAppointmentCreate, EmptyAppointmentResponse, 
-    AppointmentUpdate, AppointmentUpdateResponse, AppointmentResponse, AppointmentCreateResponse
+    AppointmentUpdate, AppointmentUpdateResponse, AppointmentResponse, AppointmentCreateResponse, AppointmentConfirmUpdate, AppointmentConfirmResponse
 )
-from services.appoinment import create_appointment_service, create_empty_appointment_service, update_appointment_service, get_appointment_service, get_appointments_by_user_service
+from services.appoinment import (
+    create_appointment_service, create_empty_appointment_service, 
+    update_appointment_service, get_appointment_service, 
+    get_appointments_by_user_service, confirm_appointment_service
+)
 from typing import List
 
 router = APIRouter(prefix="/appointment_creation", tags=["AppointmentCreation"])
@@ -32,3 +36,8 @@ async def get_appointment(appointment_id: str):
 async def update_appointment(appointment_id: str, data: AppointmentUpdate):
     """Update an existing appointment with partial data"""
     return await update_appointment_service(appointment_id, data)
+
+@router.put("/{appointment_id}/confirm", response_model=AppointmentConfirmResponse)
+async def confirm_appointment(appointment_id: str):
+    """Confirm an appointment by setting appointment_confirmed to True"""
+    return await confirm_appointment_service(appointment_id)

@@ -79,7 +79,8 @@ async def create_empty_appointment_service(data: EmptyAppointmentCreate):
         "appointment_date": None,
         "appoinment_time": None,
         "predicted_duration": None,
-        "payment_status": False
+        "payment_status": False,
+        "appointment_confirmed": False
     }
 
     result = await collection_apointment.insert_one(appointment_dict)
@@ -134,6 +135,47 @@ async def update_appointment_service(appointment_id: str, data: AppointmentUpdat
         "message": "Appointment updated successfully"
     }
 
+async def confirm_appointment_service(appointment_id: str):
+    """Confirm an appointment by setting appointment_confirmed to True"""
+    if collection_apointment is None:
+        raise HTTPException(status_code=500, detail="MongoDB collections are not initialized.")
+
+    # Convert string to ObjectId
+    try:
+        appointment_object_id = ObjectId(appointment_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid appointment_id format: {str(e)}")
+
+    # Check if appointment exists
+    existing_appointment = await collection_apointment.find_one({"_id": appointment_object_id})
+    if not existing_appointment:
+        raise HTTPException(status_code=404, detail=f"Appointment not found with id: {appointment_id}")
+
+    # Update only the appointment_confirmed field to True
+    result = await collection_apointment.update_one(
+        {"_id": appointment_object_id},
+        {"$set": {"appointment_confirmed": True}}
+    )
+
+    if result.modified_count == 0:
+        raise HTTPException(status_code=500, detail="Failed to confirm appointment")
+
+    # Prepare response details
+    sub_service_name = None
+    if existing_appointment.get("sub_service_id"):
+        sub_doc = await collection_sub_services.find_one({"_id": existing_appointment["sub_service_id"]})
+        if sub_doc:
+            sub_service_name = sub_doc.get("service_name")
+
+    return {
+        "appointment_id": appointment_id,
+        "message": "Appointment confirmed successfully",
+        "appointment_confirmed": True,
+        "sub_service_name": sub_service_name,
+        "appointment_date": existing_appointment.get("appointment_date"),
+        "predicted_duration": existing_appointment.get("predicted_duration")
+    }
+    
 async def create_appointment_service(data: AppointmentAdd):
     if collection_apointment is None or collection_sub_services is None:
         raise HTTPException(status_code=500, detail="MongoDB collections are not initialized.")
