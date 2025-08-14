@@ -243,9 +243,9 @@ function App() {
             <Route 
               path="/services/:serviceId/booking" 
               element={
-                <ProtectedRoute>
+                //<ProtectedRoute>
                   <AppointmentBookingPage />
-                </ProtectedRoute>
+                //</ProtectedRoute>
               } 
             />
             <Route 

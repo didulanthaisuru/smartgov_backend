@@ -116,7 +116,6 @@ const Login = () => {
                                 Create New Account
                             </a>
                         </p>
-                    </main>
 
                 </div>
             </div>
