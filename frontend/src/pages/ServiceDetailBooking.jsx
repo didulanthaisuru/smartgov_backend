@@ -9,7 +9,6 @@ const ServiceDetailBooking = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const subServiceName = location.state?.subServiceName || "Service Details";
-    // **NEW**: Get the appointmentId that was created on the previous page
     const appointmentId = location.state?.appointmentId;
 
     const [documents, setDocuments] = useState([]);
@@ -19,16 +18,13 @@ const ServiceDetailBooking = () => {
 
     useEffect(() => {
         if (!mainServiceId || !subServiceId) return;
-
         const fetchServiceDetails = async () => {
             setIsLoading(true);
             try {
                 const response = await axios.get(
                     `http://127.0.0.1:8000/api/v1/dashboard_services/${mainServiceId}/subservices/${subServiceId}`
                 );
-                
                 setPaymentAmount(response.data.payment_amount || 0);
-
                 const formattedDocs = response.data.required_docs.map(doc => ({
                     id: doc._id,
                     name: doc.doc_name,
@@ -39,7 +35,6 @@ const ServiceDetailBooking = () => {
                 }));
                 setDocuments(formattedDocs);
                 setError(null);
-
             } catch (err) {
                 console.error("Failed to fetch service details:", err);
                 setError("Could not load service details.");
@@ -47,30 +42,31 @@ const ServiceDetailBooking = () => {
                 setIsLoading(false);
             }
         };
-
         fetchServiceDetails();
     }, [mainServiceId, subServiceId]);
 
-    // **MODIFIED**: This function now navigates to the upload page with all necessary IDs
     const handleUploadClick = (doc) => {
-        if (!appointmentId) {
-            alert("Could not find the appointment ID. Please go back and try again.");
-            return;
-        }
-        // Navigate to a dynamic route for uploading a specific document for a specific appointment
-        navigate(`/appointment/${appointmentId}/upload/${doc.id}`, {
-            state: { docName: doc.name } // Pass the document name for a better UX
-        });
-    };
-    
-    const handleBookAppointment = () => {
-        // We now have the appointmentId from the location state
         if (!appointmentId) {
             alert("Could not find the appointment ID.");
             return;
         }
+        navigate(`/appointment/${appointmentId}/upload/${doc.id}`, {
+            state: { docName: doc.name }
+        });
+    };
+    
+        const handleBookAppointment = () => {
+        if (!appointmentId) {
+            alert("Could not find the appointment ID.");
+            return;
+        }
+        
         navigate(`/booking/${appointmentId}`, {
-             state: { subServiceName: subServiceName }
+            state: { 
+                subServiceName: subServiceName,
+                subServiceId: subServiceId,
+                paymentAmount: paymentAmount 
+            }
         });
     };
 
@@ -85,19 +81,16 @@ const ServiceDetailBooking = () => {
         <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center p-4">
             <div className="w-full max-w-sm bg-white shadow-2xl rounded-2xl overflow-hidden relative">
                 <div className="h-[calc(100vh-2rem)] max-h-[812px] overflow-y-auto pb-28">
-                    <Header /> {/* Assuming Header is a self-contained component */}
+                    <Header />
                     <h2 className="text-lg font-semibold text-gray-800 text-center">{subServiceName}</h2>
-
                     <main className="px-4">
                         <div>
                             <div className="flex justify-between items-center my-3">
                                 <h3 className="text-lg font-semibold text-black">Document checklist</h3>
                                 <QrCode className="w-6 h-6 text-gray-600" />
                             </div>
-
                             {isLoading && <p className="text-center text-gray-500 py-10">Loading details...</p>}
                             {error && <p className="text-center text-red-500 py-10">{error}</p>}
-
                             {!isLoading && !error && (
                                 <div className="w-full text-xs border rounded-lg overflow-hidden shadow-sm">
                                     <div className="grid grid-cols-4 text-gray-600 text-center font-semibold border-b bg-gray-50 py-2">
@@ -110,7 +103,6 @@ const ServiceDetailBooking = () => {
                                         <div key={doc.id} className="grid grid-cols-4 items-center text-center border-b last:border-b-0 py-2 min-h-[60px] bg-white">
                                             <div className="font-semibold text-gray-800 px-1">{doc.name}</div>
                                             <div>
-                                                {/* **MODIFIED**: Pass the entire 'doc' object to the handler */}
                                                 <button onClick={() => handleUploadClick(doc)} className="bg-[#F8CA92] text-black text-xs font-medium px-2 py-1.5 rounded-md flex items-center justify-center gap-1.5 mx-auto">
                                                     <span>📄</span>
                                                     <span>Upload</span>
@@ -125,7 +117,6 @@ const ServiceDetailBooking = () => {
                                 </div>
                             )}
                         </div>
-
                         <div className="mt-6">
                             <div className="text-center">
                                 <p className="text-xl font-bold text-black">Total Payment - Rs. {paymentAmount.toFixed(2)}</p>
@@ -139,7 +130,6 @@ const ServiceDetailBooking = () => {
                         </div>
                     </main>
                 </div>
-
                 <footer className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
                     <button onClick={handleBookAppointment} className="w-full bg-[#8B3C2B] text-white py-3 rounded-lg text-lg font-semibold hover:bg-[#7a3424] transition-colors shadow-lg">
                         Book An Appointment
@@ -149,5 +139,4 @@ const ServiceDetailBooking = () => {
         </div>
     );
 };
-
 export default ServiceDetailBooking;

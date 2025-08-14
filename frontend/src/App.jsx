@@ -263,6 +263,9 @@ function App() {
           path="/appointment/:appointmentId/upload/:docId" 
           element={<UploadPage />} 
         />
+
+
+        <Route path="/booking/:appointmentId" element={<AppointmentBookingPage />} />
             <Route 
               path="/admin-tasks"
               element={
@@ -279,13 +282,9 @@ function App() {
               } 
             />
             <Route 
-              path="/services/:serviceId/booking" 
-              element={
-                //<ProtectedRoute>
-                  <AppointmentBookingPage />
-                //</ProtectedRoute>
-              } 
-            />
+            path="/booking/:appointmentId" 
+            element={<AppointmentBookingPage />} 
+           />
             <Route 
               path="/services/:serviceId/confirmation" 
               element={
