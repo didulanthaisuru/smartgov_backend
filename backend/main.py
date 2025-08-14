@@ -7,8 +7,7 @@ app = FastAPI()
 
 
 origins = [
-    "http://localhost:5173", # The origin of your React app
-    # Add any other origins if needed
+    "http://localhost:5173", 
 ]
 
 app.add_middleware(

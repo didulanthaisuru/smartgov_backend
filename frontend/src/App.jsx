@@ -37,6 +37,7 @@ import SmartGovWelcome1 from './pages/Instructions1';
 import AdminTasks from './pages/AdminTasks';
 import AdminNotifications from './pages/AdminNotifications';
 import AdminRates from './pages/AdminRates';
+import SubServicesPage from './pages/SubServicePage';
 
 // Admin Pages
 import AdminLoginPage from './pages/admin/AdminLoginPage';
@@ -225,6 +226,16 @@ function App() {
                 //</UserRoute>
               } 
             />
+             <Route 
+              path="/services/:serviceId/detail" 
+              element={
+                //<UserRoute>
+                  <SubServicesPage />
+                //</UserRoute>
+              } 
+            />
+
+
             <Route
               path="admin-rates"
               element={
