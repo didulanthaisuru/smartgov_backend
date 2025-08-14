@@ -6,11 +6,13 @@ from services.insights import get_insights_by_date_main_service
 from datetime import date
 
 from schemas.insights import MainServiceQuery
+router = APIRouter(
+    prefix="/insights", # Add a prefix for all routes in this file
+    tags=["insights"]     # Group these endpoints in the API docs
+)
 
 
-router = APIRouter()
-
-@router.post("/view-service_insights", response_model=list[InsightDetail])
+@router.post("/view-sub_sevicnsights", response_model=list[InsightDetail])
 def view_insights(query: InsightQuery):
 	return get_insights_by_date_sub_service(query)
 

@@ -9,8 +9,10 @@ from schemas.admin import (
 )
 from services.admin import get_all_appointments_list, get_detailed_appointment, get_subservice_details, get_selected_appoinment_details_with_pdf_states
 
-router = APIRouter()
-
+router = APIRouter(
+    prefix="/admin", # Add a prefix for all routes in this file
+    tags=["admin"]     # Group these endpoints in the API docs
+)
 @router.post("/get_all_appointments_list", response_model=list[appointment_detail_card])
 async def appointments_list(query: appointment_detail_card_request):
     """
