@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminHeader from '../../components/AdminHeader';
 
 const AdminTasksPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [showSidebar, setShowSidebar] = useState(false);
   const [selectedDate] = useState('08/07/2025');
 
   const tasks = [
@@ -61,79 +64,67 @@ const AdminTasksPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <AdminSidebar />
+    <div className="min-h-screen bg-white relative">
+      {/* Admin Sidebar */}
+      <AdminSidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       
-      <div className="flex-1 ml-64">
-        <AdminHeader />
-        
-        <div className="p-6">
-          <div className="max-w-md mx-auto bg-white">
-            {/* Header */}
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-normal text-black mb-4">
-                Birth Certificate Admin
-              </h1>
-              
-              {/* Date Header */}
-              <div className="flex items-center justify-center mb-6">
-                <div className="bg-orange-200 bg-opacity-50 px-8 py-2 rounded-xl">
-                  <span className="text-2xl font-normal text-black">{selectedDate}</span>
+      {/* Header */}
+      <AdminHeader 
+        title={`${user?.service_id || 'Birth Certificate'} Tasks`}
+        setShowSidebar={setShowSidebar}
+      />
+
+      {/* Main Content */}
+      <div className="p-6 space-y-6">
+        {/* Date Header */}
+        <div className="bg-orange-200 bg-opacity-50 rounded-xl p-4 flex items-center justify-between">
+          <span className="text-2xl font-medium text-black">{selectedDate}</span>
+          <Calendar className="w-8 h-8 text-black" />
+        </div>
+
+        {/* Task List */}
+        <div className="max-w-2xl mx-auto space-y-6">
+          {tasks.map((task) => (
+            <div key={task.id} className="relative">
+              <div className="bg-blue-100 rounded-xl p-4 shadow-sm">
+                <div className="flex items-start">
+                  {/* Time */}
+                  <div className="text-2xl font-normal text-black mr-4 mt-1">
+                    {task.time}
+                  </div>
+                  
+                  {/* Vertical Line */}
+                  <div className="w-px h-16 bg-black mr-4 mt-2"></div>
+                  
+                  {/* Task Details */}
+                  <div className="flex-1">
+                    <h3 className="text-xl font-normal text-black mb-1">
+                      {task.name}
+                    </h3>
+                    <p className="text-sm text-black">
+                      Duration - {task.duration}
+                    </p>
+                  </div>
                 </div>
-                <Calendar className="w-8 h-8 text-black ml-3" />
+              </div>
+
+              {/* Status and Details */}
+              <div className="flex justify-between items-center mt-2">
+                <button
+                  onClick={() => handleTaskDetails(task.id)}
+                  className="text-sm text-black hover:text-blue-600 transition-colors"
+                >
+                  Details
+                </button>
+                
+                <div className={`${task.statusColor} px-3 py-1 rounded-xl`}>
+                  <span className={`text-sm font-normal ${getStatusTextColor(task.status)}`}>
+                    {task.status}
+                  </span>
+                </div>
               </div>
             </div>
-
-            {/* Profile Image */}
-            <div className="flex justify-end mb-8">
-              <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-            </div>
-
-            {/* Task List */}
-            <div className="space-y-6">
-              {tasks.map((task) => (
-                <div key={task.id} className="relative">
-                  <div className="bg-blue-100 rounded-xl p-4 shadow-sm">
-                    <div className="flex items-start">
-                      {/* Time */}
-                      <div className="text-2xl font-normal text-black mr-4 mt-1">
-                        {task.time}
-                      </div>
-                      
-                      {/* Vertical Line */}
-                      <div className="w-px h-16 bg-black mr-4 mt-2"></div>
-                      
-                      {/* Task Details */}
-                      <div className="flex-1">
-                        <h3 className="text-xl font-normal text-black mb-1">
-                          {task.name}
-                        </h3>
-                        <p className="text-sm text-black">
-                          Duration - {task.duration}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Status and Details */}
-                  <div className="flex justify-between items-center mt-2">
-                    <button
-                      onClick={() => handleTaskDetails(task.id)}
-                      className="text-sm text-black hover:text-blue-600 transition-colors"
-                    >
-                      Details
-                    </button>
-                    
-                    <div className={`${task.statusColor} px-3 py-1 rounded-xl`}>
-                      <span className={`text-sm font-normal ${getStatusTextColor(task.status)}`}>
-                        {task.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ from utils.auth import decode_access_token
 # Security scheme - OAuth2 for Swagger UI with NIC as username
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInDB:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInDB:
     """
     Get current authenticated user from JWT token
     """
@@ -22,7 +22,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInDB:
     if token_data is None:
         raise credentials_exception
     
-    user = user_service.get_user_by_id(token_data["nic"])
+    user = await user_service.get_user_by_id(token_data["nic"])
     
     if user is None:
         raise credentials_exception
