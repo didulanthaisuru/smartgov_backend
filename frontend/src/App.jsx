@@ -260,7 +260,6 @@ function App() {
                   <AppointmentBookingPage />
                 </ProtectedRoute>
               } 
-            />
 
             <Route 
               path="/services/:serviceId/confirmation" 
