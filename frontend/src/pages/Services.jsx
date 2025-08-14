@@ -27,6 +27,7 @@ const iconMap = {
 
 
 const Services = () => {
+
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [showSidebar, setShowSidebar] = useState(false);
@@ -82,6 +83,7 @@ const Services = () => {
             <span className="text-[10px] font-normal text-black leading-tight mt-1 max-w-[80px] break-words">
                 {service.name}
             </span>
+
         </div>
     );
 
