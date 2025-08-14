@@ -320,6 +320,7 @@ function App() {
                   <AdminPage />
                 // </ProtectedRoute>
               } 
+              
             />
             
             {/* Additional routes */}
