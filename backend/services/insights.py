@@ -1,35 +1,49 @@
 from database_config import collection_apointment, collection_sub_services, collection_main_services
-from schemas.insights import InsightQuery, MainServiceQuery, SubServiceInsightResponse, MainServiceInsightResponse
-from datetime import date
+from schemas.insights import InsightQuery, MainServiceQuery, InsightDetail
+from datetime import date, datetime
 from typing import List
 import asyncio
+from bson import ObjectId
 
-async def get_insights_by_date_sub_service(query: InsightQuery) -> SubServiceInsightResponse:
+async def get_insights_by_date_sub_service(query: InsightQuery) -> List[InsightDetail]:
     """
-    Get appointment count and IDs for a specific sub_service and date
+    Get appointment details for a specific sub_service and date
     """
     try:
         # Convert date to datetime for MongoDB query
-        start_date = query.date
-        end_date = date(query.date.year, query.date.month, query.date.day + 1)
+        start_date = datetime.combine(query.date, datetime.min.time())
+        end_date = datetime.combine(query.date, datetime.max.time())
+        
+        # Convert string sub_service_id to ObjectId
+        try:
+            sub_service_object_id = ObjectId(query.sub_service_id)
+        except Exception:
+            raise ValueError(f"Invalid sub_service_id format: {query.sub_service_id}")
         
         # Query appointments for the specific sub_service and date
         pipeline = [
             {
                 "$match": {
-                    "sub_service_id": query.sub_service_id,
+                    "sub_service_id": sub_service_object_id,
                     "appointment_date": {
                         "$gte": start_date,
-                        "$lt": end_date
+                        "$lte": end_date
                     }
                 }
             },
             {
                 "$project": {
+                    "_id": 1,
                     "appointment_id": 1,
                     "user_id": 1,
                     "sub_service_id": 1,
-                    "appointment_date": 1
+                    "sub_service_steps": 1,
+                    "created_at": 1,
+                    "is_fully_completed": 1,
+                    "appointment_date": 1,
+                    "appoinment_time": 1,
+                    "predicted_duration": 1,
+                    "payment_status": 1
                 }
             }
         ]
@@ -37,25 +51,70 @@ async def get_insights_by_date_sub_service(query: InsightQuery) -> SubServiceIns
         cursor = collection_apointment.aggregate(pipeline)
         appointments = await cursor.to_list(length=None)
         
-        # Extract appointment IDs
-        appointment_ids = [appointment["appointment_id"] for appointment in appointments]
-        total_count = len(appointment_ids)
+        # Convert to InsightDetail objects
+        insight_details = []
+        for appointment in appointments:
+            # Convert MongoDB date to Python date
+            appointment_date = appointment.get("appointment_date")
+            if isinstance(appointment_date, datetime):
+                appointment_date = appointment_date.date()
+            elif isinstance(appointment_date, dict) and "$date" in appointment_date:
+                # Handle MongoDB extended JSON format
+                appointment_date = datetime.fromisoformat(appointment_date["$date"].replace("Z", "+00:00")).date()
+            
+            # Convert ObjectId to string if needed
+            sub_service_id = appointment.get("sub_service_id", "")
+            if isinstance(sub_service_id, ObjectId):
+                sub_service_id = str(sub_service_id)
+            
+            # Convert _id to string if needed
+            appointment_id_str = str(appointment.get("_id", "")) if appointment.get("_id") else None
+            
+            # Handle datetime fields
+            created_at = appointment.get("created_at")
+            if isinstance(created_at, dict) and "$date" in created_at:
+                created_at = datetime.fromisoformat(created_at["$date"].replace("Z", "+00:00"))
+            
+            appoinment_time = appointment.get("appoinment_time")
+            if isinstance(appoinment_time, dict) and "$date" in appoinment_time:
+                appoinment_time = datetime.fromisoformat(appoinment_time["$date"].replace("Z", "+00:00"))
+            
+            predicted_duration = appointment.get("predicted_duration")
+            if isinstance(predicted_duration, dict) and "$date" in predicted_duration:
+                predicted_duration = datetime.fromisoformat(predicted_duration["$date"].replace("Z", "+00:00"))
+            
+            insight_detail = InsightDetail(
+                _id=appointment_id_str,
+                appointment_id=appointment.get("appointment_id", ""),
+                user_id=appointment.get("user_id", ""),
+                sub_service_id=sub_service_id,
+                sub_service_steps=appointment.get("sub_service_steps", []),
+                created_at=created_at,
+                is_fully_completed=appointment.get("is_fully_completed", False),
+                appointment_date=appointment_date or query.date,
+                appoinment_time=appoinment_time,
+                predicted_duration=predicted_duration,
+                payment_status=appointment.get("payment_status", False),
+                status="completed"  # Default status
+            )
+            insight_details.append(insight_detail)
         
-        return SubServiceInsightResponse(
-            sub_service_id=query.sub_service_id,
-            date=query.date,
-            total_appointments=total_count,
-            appointment_ids=appointment_ids
-        )
+        return insight_details
         
     except Exception as e:
         raise Exception(f"Error getting insights by sub_service and date: {str(e)}")
 
-async def get_insights_by_date_main_service(query: MainServiceQuery) -> MainServiceInsightResponse:
+async def get_insights_by_date_main_service(query: MainServiceQuery) -> List[InsightDetail]:
     """
-    Get appointment count and IDs for a specific sub_service, main_service and date
+    Get appointment details for a specific sub_service, main_service and date
     """
     try:
+        # Convert string sub_service_id to ObjectId
+        try:
+            sub_service_object_id = ObjectId(query.sub_service_id)
+        except Exception:
+            raise ValueError(f"Invalid sub_service_id format: {query.sub_service_id}")
+        
         # First, get the main_service_id from sub_services collection
         sub_service = await collection_sub_services.find_one({"service_sub_id": query.sub_service_id})
         if not sub_service:
@@ -66,26 +125,33 @@ async def get_insights_by_date_main_service(query: MainServiceQuery) -> MainServ
             raise ValueError(f"Sub-service {query.sub_service_id} does not belong to main-service {query.main_service_id}")
         
         # Convert date to datetime for MongoDB query
-        start_date = query.date
-        end_date = date(query.date.year, query.date.month, query.date.day + 1)
+        start_date = datetime.combine(query.date, datetime.min.time())
+        end_date = datetime.combine(query.date, datetime.max.time())
         
         # Query appointments for the specific sub_service and date
         pipeline = [
             {
                 "$match": {
-                    "sub_service_id": query.sub_service_id,
+                    "sub_service_id": sub_service_object_id,
                     "appointment_date": {
                         "$gte": start_date,
-                        "$lt": end_date
+                        "$lte": end_date
                     }
                 }
             },
             {
                 "$project": {
+                    "_id": 1,
                     "appointment_id": 1,
                     "user_id": 1,
                     "sub_service_id": 1,
-                    "appointment_date": 1
+                    "sub_service_steps": 1,
+                    "created_at": 1,
+                    "is_fully_completed": 1,
+                    "appointment_date": 1,
+                    "appoinment_time": 1,
+                    "predicted_duration": 1,
+                    "payment_status": 1
                 }
             }
         ]
@@ -93,17 +159,55 @@ async def get_insights_by_date_main_service(query: MainServiceQuery) -> MainServ
         cursor = collection_apointment.aggregate(pipeline)
         appointments = await cursor.to_list(length=None)
         
-        # Extract appointment IDs
-        appointment_ids = [appointment["appointment_id"] for appointment in appointments]
-        total_count = len(appointment_ids)
+        # Convert to InsightDetail objects
+        insight_details = []
+        for appointment in appointments:
+            # Convert MongoDB date to Python date
+            appointment_date = appointment.get("appointment_date")
+            if isinstance(appointment_date, datetime):
+                appointment_date = appointment_date.date()
+            elif isinstance(appointment_date, dict) and "$date" in appointment_date:
+                # Handle MongoDB extended JSON format
+                appointment_date = datetime.fromisoformat(appointment_date["$date"].replace("Z", "+00:00")).date()
+            
+            # Convert ObjectId to string if needed
+            sub_service_id = appointment.get("sub_service_id", "")
+            if isinstance(sub_service_id, ObjectId):
+                sub_service_id = str(sub_service_id)
+            
+            # Convert _id to string if needed
+            appointment_id_str = str(appointment.get("_id", "")) if appointment.get("_id") else None
+            
+            # Handle datetime fields
+            created_at = appointment.get("created_at")
+            if isinstance(created_at, dict) and "$date" in created_at:
+                created_at = datetime.fromisoformat(created_at["$date"].replace("Z", "+00:00"))
+            
+            appoinment_time = appointment.get("appoinment_time")
+            if isinstance(appoinment_time, dict) and "$date" in appoinment_time:
+                appoinment_time = datetime.fromisoformat(appoinment_time["$date"].replace("Z", "+00:00"))
+            
+            predicted_duration = appointment.get("predicted_duration")
+            if isinstance(predicted_duration, dict) and "$date" in predicted_duration:
+                predicted_duration = datetime.fromisoformat(predicted_duration["$date"].replace("Z", "+00:00"))
+            
+            insight_detail = InsightDetail(
+                _id=appointment_id_str,
+                appointment_id=appointment.get("appointment_id", ""),
+                user_id=appointment.get("user_id", ""),
+                sub_service_id=sub_service_id,
+                sub_service_steps=appointment.get("sub_service_steps", []),
+                created_at=created_at,
+                is_fully_completed=appointment.get("is_fully_completed", False),
+                appointment_date=appointment_date or query.date,
+                appoinment_time=appoinment_time,
+                predicted_duration=predicted_duration,
+                payment_status=appointment.get("payment_status", False),
+                status="completed"  # Default status
+            )
+            insight_details.append(insight_detail)
         
-        return MainServiceInsightResponse(
-            sub_service_id=query.sub_service_id,
-            main_service_id=query.main_service_id,
-            date=query.date,
-            total_appointments=total_count,
-            appointment_ids=appointment_ids
-        )
+        return insight_details
         
     except Exception as e:
         raise Exception(f"Error getting insights by main_service and date: {str(e)}")
