@@ -44,7 +44,7 @@ class main_service(BaseModel):
     icon_name: Optional[str] = None # For the UI icon
     sub_services: List[str] = []
 
-class uploaded_document(BaseModel):
+class uploaded_documents(BaseModel):
     uploaded_document_id: str = Field(...)
     appointment_id: str = Field(...)
     required_doc_id: int = Field(...) # Links to the doc_id in the sub-service
