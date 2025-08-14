@@ -1,39 +1,58 @@
-// SmartGovLogin.jsx
-
-import React from 'react';
-// You'll need to install react-icons: npm install react-icons
-import { HiOutlineDocumentCheck } from 'react-icons/hi2';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Login = () => {
-    return (
-        // Wrapper to simulate the iPhone 14 Pro Max screen (430x932)
-        // You can remove the outer div and its styles for a real-world application
-        <div 
-          style={{ width: '430px', height: '932px' }} 
-          className="bg-gray-50 font-sans mx-auto mt-8 border-4 border-gray-800 rounded-[50px] overflow-hidden shadow-2xl"
-        >
-            <div className="w-full h-full overflow-y-auto">
-                <div className="flex flex-col items-center justify-start pt-16 pb-8 px-8 min-h-full">
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [nicNumber, setNicNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [savePassword, setSavePassword] = useState(false);
+  const [language, setLanguage] = useState('English');
 
-                    {/* Header Section */}
-                    <header className="flex flex-col items-center mb-10 text-center">
-                        <div className="p-4 bg-[#fde8c9] rounded-2xl mb-3 inline-block">
-                            {/* Icon matching the logo style */}
-                            <HiOutlineDocumentCheck className="w-10 h-10 text-[#8B4513]" />
-                        </div>
-                        <h2 className="text-2xl font-semibold text-gray-800">Smart Gov</h2>
-                        <h1 className="font-serif text-7xl text-black mt-4 leading-none">Hello</h1>
-                        <p className="text-xl text-gray-600 mt-2">Welcome back.</p>
-                    </header>
+  const handleLogin = () => {
+    // Set authentication token and user data
+    const userData = {
+      id: 1,
+      name: 'Imasha Jayarathne',
+      email: 'imasha@example.com',
+      nicNumber: nicNumber,
+      role: 'user'
+    };
+    
+    // Use auth context to login with user role
+    const userRole = login(userData, 'user', 'dummy-auth-token');
+    
+    // Navigate based on role
+    if (userRole === 'user') {
+      navigate('/services');
+    }
+  };
 
-                    {/* Login Form Card */}
-                    <main className="bg-white w-full rounded-3xl shadow-lg p-8">
-                        <div className="text-left mb-8">
-                            <h3 className="text-3xl font-bold text-gray-900">Login Account</h3>
-                            <p className="text-gray-500 mt-2 text-[15px] leading-snug">
-                                Access your government services securely. Login to manage your appointments and records.
-                            </p>
-                        </div>
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Header with Logo and Language Selector */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-orange-500 rounded"></div>
+            <span className="text-xl font-bold text-gray-800">Smart Gov</span>
+          </div>
+          
+          {/* Language Selector */}
+          <div className="flex items-center space-x-1 bg-white border border-gray-300 rounded-xl px-3 py-1">
+            <span className="text-sm text-gray-700">{language}</span>
+            <div className="w-4 h-3 bg-gray-400 rounded-sm"></div>
+          </div>
+        </div>
+
+        {/* Main Login Card */}
+        <div className="bg-white rounded-xl p-6 shadow-md">
+          {/* Welcome Text */}
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-800 mb-1">Hello</h1>
+            <p className="text-lg text-gray-600">Welcome back!</p>
+          </div>
 
                         <form noValidate>
                             {/*  NIC Input */}
