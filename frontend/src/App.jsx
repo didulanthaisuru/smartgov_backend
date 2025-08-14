@@ -228,18 +228,22 @@ function App() {
                 </UserRoute>
               } 
             />
-           
             <Route 
-            path="/services/:mainServiceId/subservices/:subServiceId" 
-            element={<ServiceDetailBooking />} 
+              path="/services/:serviceId/detail" 
+              element={
+                <UserRoute>
+                  <ServiceDetailBooking />
+                </UserRoute>
+              } 
             />
             <Route 
-          path="/appointment/:appointmentId/upload/:docId" 
-          element={<UploadPage />} 
-        />
-
-
-        <Route path="/booking/:appointmentId" element={<AppointmentBookingPage />} />
+              path="/services/:serviceId/upload/:docId" 
+              element={
+                <UserRoute>
+                  <UploadPage />
+                </UserRoute>
+              } 
+            />
             <Route 
               path="/services/:serviceId/payment" 
               element={
@@ -249,18 +253,13 @@ function App() {
               } 
             />
             <Route 
-
-            path="/booking/:appointmentId" 
-            element={<AppointmentBookingPage />} 
-           />
-
               path="/services/:serviceId/booking" 
               element={
                 <ProtectedRoute>
                   <AppointmentBookingPage />
                 </ProtectedRoute>
               } 
-
+            />
             <Route 
               path="/services/:serviceId/confirmation" 
               element={
