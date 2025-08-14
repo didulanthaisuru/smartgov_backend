@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute, AdminRoute, UserRoute } from './components/ProtectedRoute';
 import './App.css';
 
-// Pages
+// User Pages
 import WelcomePage from './pages/WelcomePage';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -33,16 +34,18 @@ import PreviousActivitiesPage from './pages/PreviousActivitiesPage';
 import UpdateInformationPage from './pages/UpdateInformationPage';
 import AnalyticsDashboardPage from './pages/AnalyticsDashboardPage';
 
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('token');
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-};
+// Admin Pages
+import AdminLoginPage from './pages/admin/AdminLoginPage';
+import AdminRegisterPage from './pages/admin/AdminRegisterPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 
 // Public Route Component (redirect if authenticated)
 const PublicRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('token');
-  return !isAuthenticated ? children : <Navigate to="/services" replace />;
+  const userRole = localStorage.getItem('userRole');
+  if (userRole) {
+    return <Navigate to={userRole === 'admin' ? '/admin/dashboard' : '/services'} replace />;
+  }
+  return children;
 };
 
 function App() {
@@ -71,45 +74,73 @@ function App() {
               } 
             />
 
-            {/* Protected Routes - Services as main dashboard */}
+            {/* Admin Public Routes */}
+            <Route 
+              path="/admin/login" 
+              element={
+                <PublicRoute>
+                  <AdminLoginPage />
+                </PublicRoute>
+              } 
+            />
+            <Route 
+              path="/admin/register" 
+              element={
+                <PublicRoute>
+                  <AdminRegisterPage />
+                </PublicRoute>
+              } 
+            />
+
+            {/* Admin Protected Routes */}
+            <Route 
+              path="/admin/dashboard" 
+              element={
+                <AdminRoute>
+                  <AdminDashboardPage />
+                </AdminRoute>
+              } 
+            />
+
+            {/* User Protected Routes - Services as main dashboard */}
             <Route 
               path="/services" 
               element={
-                // <ProtectedRoute>
+                <UserRoute>
                   <Services />
-                // </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <ServiceDetail />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/detail" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <ServiceDetailBooking />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/upload/:docId" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <UploadPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/payment" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <PaymentPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
