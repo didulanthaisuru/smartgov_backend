@@ -49,6 +49,12 @@ const ServiceDetailBooking = () => {
                         <button>
                             <Menu className="w-7 h-7 text-black" />
                         </button>
+                         {/* Page Title */}
+                        <div className="text-center py-4">
+                            <img src={logoIcon} alt="Service Logo" className="w-14 h-14 mx-auto" />
+                            <h2 className="text-lg font-semibold text-gray-800">Birth Certificate new/issue</h2>
+                        </div>
+                        
                         <button className="flex items-center gap-1 border border-gray-400 rounded-md px-3 py-1.5 text-sm">
                             English
                             <ChevronDown className="w-5 h-5" />
@@ -56,11 +62,7 @@ const ServiceDetailBooking = () => {
                     </header>
 
                     <main className="px-4">
-                        {/* Page Title */}
-                        <div className="text-center py-4">
-                            <img src={logoIcon} alt="Service Logo" className="w-14 h-14 mx-auto" />
-                            <h2 className="text-black text-2xl font-semibold mt-2">Birth Certificate new/issue</h2>
-                        </div>
+                       
 
                         {/* Document Checklist Section */}
                         <div>
