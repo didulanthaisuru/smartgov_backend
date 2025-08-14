@@ -1,16 +1,10 @@
 from fastapi import FastAPI
 from database_config import connect_to_mongo, close_mongo_connection
 from routes.dashboard import router as dashboard_router
+from routes.appoinment import router as appointment_router
+from routes.document import router as document_router
 
 app = FastAPI()
-
-@app.on_event("startup")
-async def startup_event():
-    await connect_to_mongo()
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    await close_mongo_connection()
 
 @app.on_event("startup")
 async def startup_event():
@@ -24,8 +18,10 @@ async def shutdown_event():
 def read_root():
     return {"message": "SmartGov API is running"}
 
-# Include routers
+# Include all routers
 app.include_router(dashboard_router)
+app.include_router(appointment_router)
+app.include_router(document_router)
 
 # Note: Uncomment these when you have the actual routers implemented
 # app.include_router(insights_router)

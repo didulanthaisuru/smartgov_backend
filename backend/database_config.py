@@ -22,11 +22,15 @@ client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
 db = client["SmartGov"] 
 
 #collections
-collection_insights = db["insights"]
 collection_apointment = db["AppoinmentNew"]
-collection_users = db["user_with_user_id"]
-collection_uploaded_documents = db["uploaded_documents"]
-collection_required_documents = db["required_documents"]
-collection_sub_services = db["sub_services"] 
+collection_admin = db["admin"]
+collection_insights = db["insights"]
 collection_main_services = db["main_services"]
+collection_messages = db["messages"]
+collection_required_documents = db["required_documents"]
+collection_users = db["users"]
+collection_uploaded_documents = db["uploaded_documents"]
+collection_sub_services = db["sub_services"] 
+
  # Sub-services are stored in sub_services collection
+

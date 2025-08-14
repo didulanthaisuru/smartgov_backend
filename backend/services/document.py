@@ -4,13 +4,12 @@ import os
 import aiofiles
 from fastapi import HTTPException, status, UploadFile
 from schemas.document import DocumentUpload, UploadDocumentRequest
-from database_config import db, DB_NAME
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from database_config import collection_uploaded_documents
 
 
 async def uploaded_document(request: UploadDocumentRequest, file: UploadFile) -> DocumentUpload:
     try:
-        if not db.client:
+        if collection_uploaded_documents is None:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="Database connection is not initialized."
@@ -34,9 +33,6 @@ async def uploaded_document(request: UploadDocumentRequest, file: UploadFile) ->
 
         # Reset file pointer after reading
         await file.seek(0)
-
-        # Access the database
-        database: AsyncIOMotorDatabase = db.client[DB_NAME]
 
         # Generate unique doc_id
         doc_id = str(uuid4().int)[:8]
@@ -77,7 +73,7 @@ async def uploaded_document(request: UploadDocumentRequest, file: UploadFile) ->
         }
 
         # Insert into MongoDB
-        result = await database["uploaded_documents"].insert_one(document_data)
+        result = await collection_uploaded_documents.insert_one(document_data)
 
         if not result.inserted_id:
             # If DB insert fails, clean up the saved file
