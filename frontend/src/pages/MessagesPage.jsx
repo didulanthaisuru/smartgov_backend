@@ -1,9 +1,16 @@
+// MessagesPage.js (Updated)
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LanguageSwitcher from '../components/languageSwitcher'; // Correct import path
+import HamburgerMenu from '../components/HamburgerMenu';
+import { CheckCircle, AlertCircle, Bell, MessageSquare } from 'lucide-react';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  // State for selected language, now managed by the parent
+  const [selectedLanguage, setSelectedLanguage] = useState('English');
 
   const messages = [
     {
@@ -15,7 +22,7 @@ const MessagesPage = () => {
     },
     {
       id: 2,
-      from: 'NIC Admin', 
+      from: 'NIC Admin',
       date: '2025-07-10',
       content: 'Hi Imasha Jayarathne, we are happy to inform you that your grama niladari approval got verified and now have gone to the permit processing stage.',
       type: 'success'
@@ -23,7 +30,7 @@ const MessagesPage = () => {
     {
       id: 3,
       from: 'License Admin',
-      date: '2025-07-09', 
+      date: '2025-07-09',
       content: 'Hi Imasha Jayarathne, we are happy to inform you that your business registration is at the final stage and it will be send to the final signature on 13th monday. you can borrow it on 2.00 pm',
       type: 'info'
     }
@@ -32,92 +39,79 @@ const MessagesPage = () => {
   const getMessageIcon = (type) => {
     switch (type) {
       case 'success': return CheckCircle;
-      case 'warning': return AlertCircle;
+      case 'error': return AlertCircle;
       case 'info': return Bell;
       default: return MessageSquare;
     }
   };
 
-  const getMessageColor = (type) => {
-    switch (type) {
-      case 'success': return 'text-green-600';
-      case 'warning': return 'text-orange-600';
-      case 'info': return 'text-blue-600';
-      default: return 'text-gray-600';
-    }
-  };
 
   const filteredMessages = messages.filter(message =>
     message.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
     message.from.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Handler for language change from the child component
+  const handleLanguageChange = (lang) => {
+    setSelectedLanguage(lang);
+    console.log(`Language changed to: ${lang}`);
+    // You can add more logic here to handle the language change,
+    // like updating the app's state for translations
+  };
+
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Background Decorative Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-48 -left-48 w-[720px] h-[620px] rounded-full bg-blue-100 opacity-30"></div>
-        <div className="absolute bottom-[-500px] -left-48 w-[720px] h-[620px] rounded-full bg-blue-100 opacity-30"></div>
-      </div>
 
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-6 py-6">
-        <button 
-          onClick={() => navigate('/profile')}
-          className="w-9 h-9 flex items-center justify-center"
-        >
-          <div className="w-9 h-9 bg-gray-300 rounded"></div>
-        </button>
 
+     <header className="relative z-10 bg-white shadow-md">
+      <div className="flex items-center justify-between px-4 py-3">
+        {/* Left Section: Hamburger Menu */}
         <div className="flex items-center">
-          {/* Messages Icon */}
-          <div className="w-8 h-8 flex items-center justify-center mr-4 bg-white shadow-md rounded-lg">
-            <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-            </svg>
-          </div>
-          
-          <div className="flex items-center">
-            <div className="w-15 h-20 bg-gray-300 rounded mr-4"></div>
-            <h1 className="text-2xl font-medium text-black">Smart Gov</h1>
-          </div>
+          <HamburgerMenu />
         </div>
 
-        <div className="flex items-center bg-white bg-opacity-20 border border-black rounded-xl px-4 py-2">
-          <span className="text-sm font-normal text-black mr-2">English</span>
-          <div className="w-6 h-6 bg-gray-300 rounded"></div>
+        {/* Center Section: Logo/Title */}
+        <div className="flex items-center space-x-3">
+          <div className="w-[45px] h-[45px] bg-gray-300 rounded-full flex-shrink-0"></div>
+          <h1 className="text-xl font-semibold text-gray-800">Smart Gov</h1>
+        </div>
+
+        {/* Right Section: Language Switcher */}
+        <div className="flex items-center">
+          <LanguageSwitcher onLanguageChange={handleLanguageChange} />
         </div>
       </div>
+    </header>
 
       {/* Title and Summary */}
-      <div className="relative z-10 px-10 py-6">
+      <div className="relative z-10 px-6 py-6">
         <h2 className="text-4xl font-normal text-black mb-4">Messages</h2>
         <p className="text-sm text-black mb-6">You have 3 unread Messages</p>
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 bg-white rounded-t-3xl shadow-[0_4px_250px_rgba(0,0,0,0.25)] mx-9 min-h-[500px] p-6">
+      <div className="relative z-10 bg-white rounded-t-3xl shadow-[0_4px_250px_rgba(0,0,0,0.25)] mx-6 min-h-[500px] p-6">
         {/* Search and Filter Bar */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1 mr-4">
             <div className="relative bg-[#F8CB93] rounded-xl px-6 py-3 flex items-center shadow-md">
               <span className="text-sm text-black opacity-25 mr-3">Search Messages</span>
               <svg className="w-4 h-4 text-black opacity-25" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
               </svg>
             </div>
           </div>
-          
+
           <div className="bg-[#F8CB93] rounded-xl px-4 py-3 shadow-md flex items-center">
             <span className="text-sm text-black opacity-25 mr-2">Order By</span>
             <svg className="w-6 h-6 text-black opacity-25" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M7.76 9.34L12 13.63l4.24-4.29L17.66 10.9 12 16.61 6.34 10.9z"/>
+              <path d="M7.76 9.34L12 13.63l4.24-4.29L17.66 10.9 12 16.61 6.34 10.9z" />
             </svg>
           </div>
         </div>
 
         {/* Messages List */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredMessages.map((message) => (
             <div key={message.id} className="bg-[#F8CB93] rounded-xl p-6 shadow-md">
               <div className="flex items-start justify-between mb-4">
@@ -128,7 +122,7 @@ const MessagesPage = () => {
                   {message.date}
                 </div>
               </div>
-              
+
               <p className="text-sm text-black leading-relaxed">
                 {message.content}
               </p>
@@ -139,7 +133,7 @@ const MessagesPage = () => {
         {/* Help Section */}
         <div className="mt-8 pt-6 border-t border-gray-200">
           <div className="flex items-center justify-center space-x-4">
-            <button 
+            <button
               onClick={() => navigate('/chatbot')}
               className="bg-blue-100 rounded-lg px-4 py-2 flex items-center space-x-2 hover:bg-blue-200 transition-colors"
             >
@@ -148,8 +142,8 @@ const MessagesPage = () => {
               </svg>
               <span className="text-sm text-blue-600">Need Help?</span>
             </button>
-            
-            <button 
+
+            <button
               onClick={() => navigate('/contact-us')}
               className="bg-green-100 rounded-lg px-4 py-2 flex items-center space-x-2 hover:bg-green-200 transition-colors"
             >
@@ -160,10 +154,10 @@ const MessagesPage = () => {
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Padding */}
-      <div className="h-8"></div>
+        {/* Bottom Padding */}
+        <div className="h-8"></div>
+      </div>
     </div>
   );
 };

@@ -75,9 +75,9 @@ function App() {
             <Route 
               path="/services" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <Services />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
@@ -141,17 +141,17 @@ function App() {
             <Route 
               path="/dashboard" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <DashboardPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/activities/*" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <ActivitiesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
@@ -175,9 +175,9 @@ function App() {
             <Route 
               path="/messages" 
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <MessagesPage />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
