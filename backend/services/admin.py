@@ -1,5 +1,9 @@
-from schemas.admin import appointment_detail_card_request,appointment_detail_card, view_detailed_appointment_request, view_detailed_appointment_response
-from database_config import collection_apointment, collection_users, collection_uploaded_documents, collection_required_documents
+from schemas.admin import (
+    appointment_detail_card_request, appointment_detail_card, 
+    view_detailed_appointment_request, view_detailed_appointment_response,
+    RequiredDocument
+)
+from database_config import collection_apointment, collection_users, collection_uploaded_documents, collection_required_documents, collection_sub_services
 from datetime import datetime, time
 from typing import List
 from bson import ObjectId
@@ -180,6 +184,22 @@ async def get_detailed_appointment(query: view_detailed_appointment_request) -> 
         # Get uploaded documents count and status
         document_info = await _get_document_information(appointment_object_id)
         
+        # Get required documents with upload status
+        required_documents = await _get_required_documents_with_status(
+            appointment_doc.get("sub_service_id"), 
+            appointment_object_id
+        )
+        
+        # Get sub-service name
+        sub_service_name = None
+        if appointment_doc.get("sub_service_id"):
+            sub_service_doc = await collection_sub_services.find_one({"_id": appointment_doc.get("sub_service_id")})
+            if sub_service_doc:
+                sub_service_name = sub_service_doc.get("service_name")
+        
+        # Determine overall appointment status
+        appointment_status = _determine_appointment_status(appointment_doc)
+        
         # Extract and validate appointment data
         appointment_data = _extract_appointment_data(appointment_doc)
         
@@ -192,7 +212,10 @@ async def get_detailed_appointment(query: view_detailed_appointment_request) -> 
                 duration=appointment_data["duration"],
                 appointment_time=appointment_data["appointment_time"],
                 appointment_date=appointment_data["appointment_date"],
-                payment_status=appointment_data["payment_status"]
+                payment_status=appointment_data["payment_status"],
+                required_documents=required_documents,
+                sub_service_name=sub_service_name,
+                appointment_status=appointment_status
             )
         except Exception as response_error:
             logger.error(f"Error creating response object: {response_error}")
@@ -358,6 +381,82 @@ def _extract_appointment_data(appointment_doc: dict) -> dict:
             "appointment_date": None,
             "payment_status": False
         }
+
+async def _get_required_documents_with_status(sub_service_id, appointment_object_id: ObjectId) -> list:
+    """
+    Get required documents for the sub-service with their upload status.
+    
+    Args:
+        sub_service_id: ObjectId of the sub-service
+        appointment_object_id: ObjectId of the appointment
+        
+    Returns:
+        list: List of required documents with upload status
+    """
+    try:
+        # Get the sub-service document to find required documents
+        sub_service_doc = await collection_sub_services.find_one({"_id": sub_service_id})
+        
+        if not sub_service_doc:
+            logger.warning(f"Sub-service not found: {sub_service_id}")
+            return []
+        
+        required_docs = sub_service_doc.get("required_docs", [])
+        logger.info(f"Found {len(required_docs)} required documents for sub-service: {sub_service_doc.get('service_name', 'Unknown')}")
+        
+        # Get uploaded documents for this appointment
+        uploaded_docs = []
+        async for doc in collection_uploaded_documents.find({"appointment_id": appointment_object_id}):
+            uploaded_docs.append(doc)
+        
+        # Create a map of uploaded documents by required_doc_id
+        uploaded_docs_map = {}
+        for doc in uploaded_docs:
+            required_doc_id = doc.get("required_doc_id")
+            if required_doc_id:
+                uploaded_docs_map[str(required_doc_id)] = doc
+        
+        # Build the result list
+        result = []
+        for required_doc_ref in required_docs:
+            # Handle both ObjectId and string formats
+            if isinstance(required_doc_ref, dict) and "$oid" in required_doc_ref:
+                required_doc_id = ObjectId(required_doc_ref["$oid"])
+            elif isinstance(required_doc_ref, ObjectId):
+                required_doc_id = required_doc_ref
+            else:
+                required_doc_id = ObjectId(required_doc_ref)
+            
+            # Get the required document details from required_documents collection
+            required_doc = await collection_required_documents.find_one({"_id": required_doc_id})
+            
+            if required_doc:
+                # Create RequiredDocument object
+                doc_info = RequiredDocument(
+                    doc_id=str(required_doc_id),
+                    doc_name=required_doc.get("doc_name", "Unknown Document"),
+                    description=required_doc.get("description", ""),
+                    is_uploaded=str(required_doc_id) in uploaded_docs_map,
+                    upload_status="Uploaded" if str(required_doc_id) in uploaded_docs_map else "Not Uploaded"
+                )
+                
+                # Add upload details if document is uploaded
+                if str(required_doc_id) in uploaded_docs_map:
+                    uploaded_doc = uploaded_docs_map[str(required_doc_id)]
+                    doc_info.uploaded_doc_id = str(uploaded_doc.get("_id"))
+                    doc_info.admin_status = uploaded_doc.get("doc_status", "Pending")
+                    doc_info.accuracy = uploaded_doc.get("accuracy")
+                
+                result.append(doc_info)
+            else:
+                logger.warning(f"Required document not found: {required_doc_id}")
+        
+        logger.info(f"Returning {len(result)} required documents with status")
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error getting required documents with status: {e}")
+        return []
 
 def _determine_payment_status(appointment_doc: dict) -> bool:
     """

@@ -26,3 +26,4 @@ collection_apointment = db["AppoinmentNew"]
 collection_users = db["user_with_user_id"]
 collection_uploaded_documents = db["uploaded_documents"]
 collection_required_documents = db["required_documents"]
+collection_sub_services = db["required_documents"]  # Sub-services are stored in required_documents collection
