@@ -1,9 +1,8 @@
 from fastapi import FastAPI
-from routes.dashboard import router as service_router
 from database_config import connect_to_mongo, close_mongo_connection
+from routes.dashboard import router as dashboard_router
 
 app = FastAPI()
-
 
 @app.on_event("startup")
 async def startup_event():
@@ -17,4 +16,9 @@ async def shutdown_event():
 def read_root():
     return {"message": "SmartGov API is running"}
 
-app.include_router(service_router)
+# Include routers
+app.include_router(dashboard_router)
+
+# Note: Uncomment these when you have the actual routers implemented
+# app.include_router(insights_router)
+# app.include_router(admin_router)

@@ -31,7 +31,8 @@ async def get_sub_services_for_main_service(db: AsyncIOMotorClient, main_service
         for sub_service in sub_services:
             if "_id" in sub_service:
                 sub_service["_id"] = str(sub_service["_id"])
-            if "required_docs" in sub_service:
+            # Only convert required_docs if it exists and is a list
+            if "required_docs" in sub_service and isinstance(sub_service["required_docs"], list):
                 sub_service["required_docs"] = [str(doc_id) for doc_id in sub_service["required_docs"]]
         return sub_services
     return None
