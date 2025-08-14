@@ -16,10 +16,11 @@ async def get_user_appointments_by_status(db: AsyncIOMotorClient, user_id: str, 
     is_ongoing = False for "Incomplete Activities" (date is null)
     """
     if is_ongoing:
-        # For ongoing: date is set AND not fully completed
+        # For ongoing: date is set AND not fully completed AND confirmed
         match_condition = {
             "appointment_date": {"$ne": None},
-            "is_fully_completed": False
+            "is_fully_completed": False,
+            "appointment_confirmed": True
         }
     else:
         # For incomplete: date is null
@@ -141,6 +142,7 @@ async def get_appointment_details_by_id(db: AsyncIOMotorClient, appointment_id: 
             },
             "is_fully_completed": 1,
             "appointment_date": 1,
+            "appointment_confirmed": 1,
             "sub_service_steps": {"$ifNull": ["$sub_service_steps", []]}
         }}
     ]
@@ -195,7 +197,7 @@ async def get_ongoing_appointment_details(db: AsyncIOMotorClient, appointment_id
     Includes sub_service_steps with current step identification.
     """
     appointment = await get_appointment_details_by_id(db, appointment_id, user_id, include_steps=True)
-    if appointment and appointment.get("appointment_date"):
+    if appointment and appointment.get("appointment_date") and appointment.get("appointment_confirmed") and not appointment.get("is_fully_completed"):
         return appointment
     return None
 
