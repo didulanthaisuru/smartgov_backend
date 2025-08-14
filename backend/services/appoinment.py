@@ -29,15 +29,21 @@ async def create_appointment_service(data: AppointmentAdd):
     if not sub_service:
         raise HTTPException(status_code=404, detail=f"Sub-service not found with id: {data.sub_service_id}")
 
-    # Get steps from sub_service
+    # Get steps from sub_service and add status/completed_by
     steps = sub_service.get("steps", [])
+    steps_with_status = []
+    for step in steps:
+        step_copy = dict(step)  # Make a copy to avoid mutating the original
+        step_copy["status"] = False
+        step_copy["completed_by"] = None
+        steps_with_status.append(step_copy)
 
     # Create appointment document
     appointment_dict = {
         "appointment_id": data.appointment_id,
         "user_id": data.user_id,
         "sub_service_id": object_id,
-        "sub_service_steps": steps,  # Store the steps array from sub_service
+        "sub_service_steps": steps_with_status,  # Store the steps array from sub_service with status/completed_by
         "created_at": data.created_at if data.created_at else datetime.now(),
         "is_fully_complered": data.is_fully_complered if data.is_fully_complered is not None else False,
         "appointment_date": data.appointment_date,
