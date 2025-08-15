@@ -248,20 +248,19 @@ class ProfileService {
       {
         id: 1,
         title: 'Ongoing Activities',
-        description: appointments.ongoingProgress > 0 
-          ? `${appointments.ongoingProgress}%`
+        description: appointments.ongoing.length > 0 
+          ? `${appointments.ongoing.length} ongoing activities`
           : 'No ongoing activities',
         iconType: 'ongoing',
-        showProgress: true,
-        progressValue: appointments.ongoingProgress,
+        showProgress: false, // Remove progress bar
         route: '/ongoing-activities',
         count: appointments.ongoing.length
       },
       {
         id: 2,
         title: 'Incomplete Activities',
-        description: appointments.requiredDocumentsCount > 0 
-          ? `${appointments.requiredDocumentsCount} Documents are required for completion`
+        description: appointments.incomplete.length > 0 
+          ? `${appointments.incomplete.length} incomplete activities`
           : 'No incomplete activities',
         iconType: 'incomplete',
         route: '/incomplete-activities',
@@ -271,7 +270,7 @@ class ProfileService {
         id: 3,
         title: 'Messages',
         description: messages.unreadCount > 0 
-          ? `You have ${messages.unreadCount} Unread Messages`
+          ? `You have ${messages.unreadCount} unread messages`
           : 'No unread messages',
         iconType: 'messages',
         route: '/messages',
@@ -290,7 +289,7 @@ class ProfileService {
       {
         id: 6,
         title: 'Update Information',
-        description: '',
+        description: 'Update your personal information',
         iconType: 'update',
         route: '/update-information'
       }

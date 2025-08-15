@@ -204,16 +204,6 @@ const ProfilePage = () => {
               {item.description && (
                 <p className="text-sm text-white drop-shadow-md">{item.description}</p>
               )}
-              {item.showProgress && (
-                <div className="mt-3">
-                  <div className="w-full bg-white bg-opacity-30 rounded-full h-2">
-                    <div 
-                      className="bg-[#F8CA92] h-2 rounded-full transition-all duration-300" 
-                      style={{ width: `${item.progressValue}%` }}
-                    ></div>
-                  </div>
-                </div>
-              )}
             </div>
           </button>
         ))}
