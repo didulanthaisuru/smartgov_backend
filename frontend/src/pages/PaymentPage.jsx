@@ -12,7 +12,7 @@ import {
 import axios from "axios";
 import { Menu, ChevronDown, Check, X } from "lucide-react";
 
-const stripePromise = loadStripe("pk_test_51RwId9Agvx5HIouQWVYHeLSJO5e5wCdnlrINloASxF0JgfaMBBF4Jc4mV1XP1S7SK5kbf6Aude9N3aao2kRDJLC100ysekAN53");
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 // --- Reusable UI Components & Styling ---
 const MastercardIcon = () => ( <svg width="32" height="24" viewBox="0 0 32 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="12" r="9" fill="#EB001B"/><circle cx="23" cy="12" r="9" fill="#F79E1B" fillOpacity="0.8"/></svg> );
