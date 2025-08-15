@@ -230,16 +230,29 @@ function App() {
             />
            
             <Route 
-            path="/services/:mainServiceId/subservices/:subServiceId" 
-            element={<ServiceDetailBooking />} 
+              path="/services/:mainServiceId/subservices/:subServiceId" 
+              element={
+                <UserRoute>
+                  <ServiceDetailBooking />
+                </UserRoute>
+              } 
             />
             <Route 
-          path="/appointment/:appointmentId/upload/:docId" 
-          element={<UploadPage />} 
-        />
-
-
-        <Route path="/booking/:appointmentId" element={<AppointmentBookingPage />} />
+              path="/appointment/:appointmentId/upload/:docId" 
+              element={
+                <UserRoute>
+                  <UploadPage />
+                </UserRoute>
+              } 
+            />
+            <Route 
+              path="/booking/:appointmentId" 
+              element={
+                <UserRoute>
+                  <AppointmentBookingPage />
+                </UserRoute>
+              } 
+            />
             <Route 
               path="/services/:serviceId/payment" 
               element={
@@ -249,165 +262,160 @@ function App() {
               } 
             />
             <Route 
-
-            path="/booking/:appointmentId" 
-            element={<AppointmentBookingPage />} 
-           />
-
               path="/services/:serviceId/booking" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <AppointmentBookingPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
 
             <Route 
               path="/services/:serviceId/confirmation" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <AppointmentConfirmationPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/qr-code" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <QRCodePage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
 
-            {/* Protected Routes */}
+            {/* User Protected Routes */}
             <Route 
               path="/dashboard" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <DashboardPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/activities/*" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <ActivitiesPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/admin" 
               element={
-                <ProtectedRoute>
+                <AdminRoute>
                   <AdminPage />
-                </ProtectedRoute>
+                </AdminRoute>
               } 
             />
             
-            {/* Additional routes */}
+            {/* Additional User Routes */}
             <Route 
               path="/messages" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <MessagesPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/new-application" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <NewApplicationPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/appointments" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <AppointmentsPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/chatbot" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <ChatbotPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/contact-us" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <ContactUsPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/contact-success" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <ContactUsSuccessPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/document-upload/:serviceId" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <DocumentUploadPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/profile" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <ProfilePage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/ongoing-activities" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <OngoingActivitiesPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/incomplete-activities" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <IncompleteActivitiesPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/previous-activities" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <PreviousActivitiesPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/update-information" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <UpdateInformationPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/analytics" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <AnalyticsDashboardPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
 
