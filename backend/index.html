@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+</head>
+<body>
+    <h1>WebSocket Chat</h1>
+    <div>
+        <label>Your ID: <input type="text" id="myId" autocomplete="off" value="user_101"/></label>
+        <button onclick="connect()">Connect</button>
+    </div>
+    <hr>
+    <h2>Messages</h2>
+    <pre id="messages" style="background-color:#f4f4f4; padding: 10px;"></pre>
+    <hr>
+    <form onsubmit="sendMessage(event)">
+        <label>Service ID: <input type="text" id="serviceId" autocomplete="off" value="SERVICE_ABC"/></label>
+        <br>
+        <label>Appointment ID: <input type="text" id="appointmentId" autocomplete="off" value="APPOINTMENT_123"/></label>
+        <br>
+        <label>Recipient ID: <input type="text" id="recipientId" autocomplete="off" value="admin_1"/></label>
+        <br>
+        <label>Message: <input type="text" id="messageText" autocomplete="off" style="width: 300px;"/></label>
+        <button>Send</button>
+    </form>
+    <script>
+        var ws;
+
+        function connect() {
+            var myId = document.getElementById("myId").value;
+            if (!myId) { alert("Please enter Your ID"); return; }
+            ws = new WebSocket(`ws://localhost:8000/ws/${myId}`);
+            ws.onopen = () => log("Status: Connected");
+            ws.onmessage = (event) => log(`Received: ${event.data}`);
+            ws.onclose = () => log("Status: Disconnected");
+        }
+
+        function sendMessage(event) {
+            event.preventDefault();
+            var serviceId = document.getElementById("serviceId").value; // Get service_id
+            var appointmentId = document.getElementById("appointmentId").value;
+            var recipient = document.getElementById("recipientId").value;
+            var message = document.getElementById("messageText").value;
+            
+            // Add service_id to the JSON payload
+            var payload = { 
+                receiver_id: recipient,
+                service_id: serviceId,
+                appointment_id: appointmentId,
+                message_text: message 
+            };
+            
+            ws.send(JSON.stringify(payload));
+            log(`You to ${recipient} (Appt: ${appointmentId}): ${message}`);
+            document.getElementById("messageText").value = "";
+        }
+
+        function log(text) {
+             document.getElementById('messages').append(text + '\n');
+        }
+    </script>
+</body>
+</html>
