@@ -40,7 +40,7 @@ const Services = () => {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/services/');
+                const response = await axios.get('http://127.0.0.1:8000/api/v1/dashboard_services/');
                 console.log("Backend Response Data:", response.data);
 
                 if (Array.isArray(response.data)) {

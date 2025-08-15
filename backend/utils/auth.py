@@ -4,13 +4,11 @@ from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from dotenv import load_dotenv
+from database_config import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES,ALGORITHM
 
 load_dotenv()
 
-# JWT Configuration
-SECRET_KEY = os.getenv("JWT_SECRET", "your-secret-key-change-this-in-production")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -44,13 +42,28 @@ def verify_token(token: str) -> Optional[dict]:
         return None
 
 def decode_access_token(token: str):
-    """Decode access token and return user data"""
+    """Decode access token and return user/admin data"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        nic: str = payload.get("nic")
-        email: str = payload.get("email")
-        if nic is None or email is None:
-            return None
-        return {"nic": nic, "email": email}
+        
+        # Check if it's an admin token (has admin_id and role)
+        if "admin_id" in payload and "role" in payload:
+            admin_id = payload.get("admin_id")
+            email = payload.get("email")
+            role = payload.get("role")
+            service_id = payload.get("service_id")
+            if admin_id is None or email is None or role != "admin":
+                return None
+            return {"admin_id": admin_id, "email": email, "role": role, "service_id": service_id}
+        
+        # Check if it's a user token (has nic and email)
+        elif "nic" in payload and "email" in payload:
+            nic = payload.get("nic")
+            email = payload.get("email")
+            if nic is None or email is None:
+                return None
+            return {"nic": nic, "email": email}
+        
+        return None
     except JWTError:
         return None

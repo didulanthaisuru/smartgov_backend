@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import datetime
-from pymongo.collection import Collection
+from motor.motor_asyncio import AsyncIOMotorCollection
 from pymongo.errors import DuplicateKeyError
 from database_config import db
 from models import admin, AdminInDB
@@ -9,26 +9,26 @@ from utils.auth import get_password_hash, verify_password
 
 class AdminService:
     def __init__(self):
-        self.collection: Collection = db["admins"]
+        self.collection: AsyncIOMotorCollection = db["admins"]
         # Create unique indexes
         self.collection.create_index("email", unique=True)
         self.collection.create_index("admin_id", unique=True)
     
-    def get_next_admin_id(self) -> int:
+    async def get_next_admin_id(self) -> int:
         """Generate next admin ID"""
-        last_admin = self.collection.find_one({}, sort=[("admin_id", -1)])
+        last_admin = await self.collection.find_one({}, sort=[("admin_id", -1)])
         return 1000 if not last_admin else last_admin["admin_id"] + 1
     
-    def create_admin(self, admin_data: AdminRegister) -> Optional[AdminResponse]:
+    async def create_admin(self, admin_data: AdminRegister) -> Optional[AdminResponse]:
         """Create a new admin"""
         try:
             # Check if admin already exists
-            if self.get_admin_by_email(admin_data.email):
+            if await self.get_admin_by_email(admin_data.email):
                 return None
             
             # Hash password and create admin
             hashed_password = get_password_hash(admin_data.passcode)
-            admin_id = self.get_next_admin_id()
+            admin_id = await self.get_next_admin_id()
             
             admin_doc = {
                 "admin_id": admin_id,
@@ -41,7 +41,7 @@ class AdminService:
                 "updated_at": datetime.utcnow()
             }
             
-            result = self.collection.insert_one(admin_doc)
+            result = await self.collection.insert_one(admin_doc)
             
             if result.inserted_id:
                 return AdminResponse(
@@ -59,23 +59,23 @@ class AdminService:
             print(f"Error creating admin: {e}")
             return None
     
-    def get_admin_by_email(self, email: str) -> Optional[AdminInDB]:
+    async def get_admin_by_email(self, email: str) -> Optional[AdminInDB]:
         """Get admin by email"""
-        admin_doc = self.collection.find_one({"email": email})
+        admin_doc = await self.collection.find_one({"email": email})
         if admin_doc:
             return AdminInDB(**admin_doc)
         return None
     
-    def get_admin_by_id(self, admin_id: int) -> Optional[AdminInDB]:
+    async def get_admin_by_id(self, admin_id: int) -> Optional[AdminInDB]:
         """Get admin by ID"""
-        admin_doc = self.collection.find_one({"admin_id": admin_id})
+        admin_doc = await self.collection.find_one({"admin_id": admin_id})
         if admin_doc:
             return AdminInDB(**admin_doc)
         return None
     
-    def authenticate_admin(self, email: str, password: str) -> Optional[AdminInDB]:
+    async def authenticate_admin(self, email: str, password: str) -> Optional[AdminInDB]:
         """Authenticate admin with email and password"""
-        admin = self.get_admin_by_email(email)
+        admin = await self.get_admin_by_email(email)
         if not admin or not admin.is_active:
             return None
             
