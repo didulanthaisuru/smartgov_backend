@@ -95,7 +95,7 @@ const ProfilePage = () => {
 
       {/* Profile Section */}
       <div className="relative z-10 px-10 py-6">
-        <div className="flex items-center space-x-3 mb-2">
+        {/* <div className="flex items-center space-x-3 mb-2">
           <p className="text-sm text-black">Good Morning,</p>
           <button 
             onClick={() => navigate('/profile/edit')}
@@ -105,7 +105,7 @@ const ProfilePage = () => {
               <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
             </svg>
           </button>
-        </div>
+        </div> */}
         <h2 className="text-4xl font-normal text-black mb-2">Imasha Jayarathne</h2>
         <div className="flex items-center space-x-3 mb-6">
           <p className="text-sm text-black">2002******68</p>
