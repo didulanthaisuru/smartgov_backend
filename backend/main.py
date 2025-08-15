@@ -1,7 +1,11 @@
+
 from fastapi import FastAPI, HTTPException
+
+
+from fastapi.middleware.cors import CORSMiddleware
+
 from database_config import connect_to_mongo, close_mongo_connection
 from routes.routes import api_router
-from fastapi.middleware.cors import CORSMiddleware
 
 import stripe
 from pydantic import BaseModel
@@ -22,6 +26,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 @app.get("/")

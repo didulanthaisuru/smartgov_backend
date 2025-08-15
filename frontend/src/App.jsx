@@ -135,14 +135,13 @@ function App() {
             />
 
             <Route 
-              path="/admin -notifications"
+              path="/admin-notifications"
               element={
                 // <ProtectedRoute>
                   <AdminNotifications />
                 // </ProtectedRoute> 
               }
             />
-
 
             {/* Admin Public Routes */}
             <Route 
@@ -229,7 +228,7 @@ function App() {
                 //</UserRoute>
               } 
             />
-             <Route 
+            <Route 
               path="/services/:serviceId/detail" 
               element={
                 //<UserRoute>
@@ -238,26 +237,21 @@ function App() {
               } 
             />
 
+            <Route 
+              path="/payment/:appointmentId" 
+              element={<PaymentPage />} 
+            />
 
+            {/* **NEW**: Route for the final confirmation page */}
+            <Route 
+              path="/confirmation/:appointmentId" 
+              element={<AppointmentConfirmationPage />} 
+            />
 
-              <Route 
-          path="/payment/:appointmentId" 
-          element={<PaymentPage />} 
-        />
-
-        {/* **NEW**: Route for the final confirmation page */}
-        <Route 
-          path="/confirmation/:appointmentId" 
-          element={<AppointmentConfirmationPage />} 
-        />
-
-              <Route 
-          path="/qr-code/:appointmentId" 
-          element={<QRCodePage />} 
-        />
-
-
-
+            <Route 
+              path="/qr-code/:appointmentId" 
+              element={<QRCodePage />} 
+            />
 
             <Route
               path="admin-rates"
@@ -276,16 +270,29 @@ function App() {
             />
            
             <Route 
-            path="/services/:mainServiceId/subservices/:subServiceId" 
-            element={<ServiceDetailBooking />} 
+              path="/services/:mainServiceId/subservices/:subServiceId" 
+              element={
+                <UserRoute>
+                  <ServiceDetailBooking />
+                </UserRoute>
+              } 
             />
             <Route 
-          path="/appointment/:appointmentId/upload/:docId" 
-          element={<UploadPage />} 
-        />
-
-
-        <Route path="/booking/:appointmentId" element={<AppointmentBookingPage />} />
+              path="/appointment/:appointmentId/upload/:docId" 
+              element={
+                <UserRoute>
+                  <UploadPage />
+                </UserRoute>
+              } 
+            />
+            <Route 
+              path="/booking/:appointmentId" 
+              element={
+                <UserRoute>
+                  <AppointmentBookingPage />
+                </UserRoute>
+              } 
+            />
             <Route 
               path="/admin-tasks"
               element={
@@ -302,41 +309,45 @@ function App() {
               } 
             />
             <Route 
-            path="/booking/:appointmentId" 
-            element={<AppointmentBookingPage />} 
-           />
+              path="/services/:serviceId/booking" 
+              element={
+                <UserRoute>
+                  <AppointmentBookingPage />
+                </UserRoute>
+              } 
+            />
             <Route 
               path="/services/:serviceId/confirmation" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <AppointmentConfirmationPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/qr-code" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <QRCodePage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
 
-            {/* Protected Routes */}
+            {/* User Protected Routes */}
             <Route 
               path="/dashboard" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <DashboardPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/activities/*" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <ActivitiesPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
 
@@ -350,35 +361,35 @@ function App() {
             <Route 
               path="/admin" 
               element={
-                <ProtectedRoute>
+                <AdminRoute>
                   <AdminPage />
-                </ProtectedRoute>
+                </AdminRoute>
               } 
             />
             
-            {/* Additional routes */}
+            {/* Additional User Routes */}
             <Route 
               path="/messages" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <MessagesPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/new-application" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <NewApplicationPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/appointments" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <AppointmentsPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
@@ -400,17 +411,17 @@ function App() {
             <Route 
               path="/contact-success" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <ContactUsSuccessPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/document-upload/:serviceId" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <DocumentUploadPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
@@ -448,17 +459,17 @@ function App() {
             <Route 
               path="/update-information" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <UpdateInformationPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/analytics" 
               element={
-                <ProtectedRoute>
+                <UserRoute>
                   <AnalyticsDashboardPage />
-                </ProtectedRoute>
+                </UserRoute>
               } 
             />
 
