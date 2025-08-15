@@ -5,8 +5,33 @@ import AuthService from './authService.js';
 // Profile service for handling all profile-related data aggregation
 class ProfileService {
   /**
+   * Extract user ID from user data object
+   * @param {Object} userData - User data object
+   * @returns {string|null} User ID or null if not found
+   */
+  static extractUserId(userData) {
+    if (!userData) return null;
+    
+    // Try different possible field names for user ID (prioritize actual ObjectId)
+    const possibleIdFields = ['id', 'user_id', '_id', 'userId', 'userID'];
+    
+    for (const field of possibleIdFields) {
+      if (userData[field]) {
+        console.log(`Found user ID in field '${field}':`, userData[field]);
+        return userData[field];
+      }
+    }
+    
+    // If no ID found, log the user data structure for debugging
+    console.log('User data structure:', userData);
+    console.log('Available fields:', Object.keys(userData));
+    
+    return null;
+  }
+
+  /**
    * Get comprehensive profile data including appointments and messages
-   * @param {string} userId - User ID
+   * @param {string} userId - User ID (MongoDB ObjectId)
    * @returns {Promise<Object>} Complete profile data
    */
   static async getProfileData(userId) {
@@ -64,6 +89,70 @@ class ProfileService {
         }
       };
     }
+  }
+
+  /**
+   * Get profile data with automatic user ID extraction
+   * @returns {Promise<Object>} Complete profile data
+   */
+  static async getProfileDataWithAutoUserId() {
+    try {
+      // Get user data from auth service
+      const authData = AuthService.getAuthData();
+      console.log('Auth data retrieved:', authData);
+      
+      if (!authData.userData) {
+        return {
+          success: false,
+          error: 'User data not found. Please login again.',
+          data: this.getDefaultProfileData()
+        };
+      }
+
+      // Extract user ID using the helper function
+      const userId = this.extractUserId(authData.userData);
+      if (!userId) {
+        return {
+          success: false,
+          error: 'User ID not found in user data. Please login again.',
+          data: this.getDefaultProfileData()
+        };
+      }
+
+      console.log('Using user ID:', userId);
+      return await this.getProfileData(userId);
+      
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: this.getDefaultProfileData()
+      };
+    }
+  }
+
+  /**
+   * Get default profile data structure
+   * @returns {Object} Default profile data
+   */
+  static getDefaultProfileData() {
+    return {
+      user: {},
+      appointments: {
+        ongoing: [],
+        incomplete: [],
+        previous: [],
+        ongoingProgress: 0,
+        requiredDocumentsCount: 0,
+        totalAppointments: 0
+      },
+      messages: {
+        unreadCount: 0,
+        totalCount: 0,
+        hasUnread: false,
+        hasMessages: false
+      }
+    };
   }
 
   /**

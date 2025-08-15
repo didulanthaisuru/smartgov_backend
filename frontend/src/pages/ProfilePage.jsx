@@ -80,22 +80,11 @@ const ProfilePage = () => {
         setLoading(true);
         setError(null);
 
-        // Get user data from localStorage or API
-        const authData = AuthService.getAuthData();
-        if (!authData.userData) {
-          throw new Error('User data not found. Please login again.');
-        }
-
-        const userId = authData.userData.user_id || authData.userData.id;
-        if (!userId) {
-          throw new Error('User ID not found. Please login again.');
-        }
-
-        // Fetch comprehensive profile data using the new service
-        const result = await ProfileService.getProfileData(userId);
+        // Use the new method that handles user ID extraction automatically
+        const result = await ProfileService.getProfileDataWithAutoUserId();
         
         if (!result.success) {
-          throw new Error(`Failed to fetch profile data: ${result.error}`);
+          throw new Error(result.error);
         }
 
         setProfileData(result.data);

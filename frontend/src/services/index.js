@@ -1,3 +1,11 @@
+// Import all services
+import ApiService from './api.js';
+import AuthService from './authService.js';
+import AppointmentService from './appointmentService.js';
+import MessageService from './messageService.js';
+import ProfileService from './profileService.js';
+import UserService from './userService.js';
+
 // Export all services for easy importing
 export { default as ApiService } from './api.js';
 export { default as AuthService } from './authService.js';

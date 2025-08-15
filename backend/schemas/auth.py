@@ -15,6 +15,7 @@ class UserRegister(BaseModel):
     passcode: str = Field(..., min_length=6, description="User password")
 
 class UserResponse(BaseModel):
+    id: Optional[str] = None  # MongoDB ObjectId as string
     nic: str
     first_name: str
     last_name: str
