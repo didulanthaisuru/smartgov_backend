@@ -244,6 +244,7 @@ function App() {
                 </UserRoute>
               } 
             />
+            <Route
               path="/appointment/:appointmentId/upload/:docId" 
               element={
                 <UserRoute>
