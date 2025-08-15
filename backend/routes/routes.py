@@ -14,6 +14,7 @@ from .qr_scanner import router as qr_scanner_router
 from .user_appointment_get import router as user_appointment_get_router
 from .admin_appointment_updates import router as admin_appointment_updates_router
 from .admin_dashboard import router as admin_dashboard_router
+from .rating import router as rating_router
 
 # Create main API router
 api_router = APIRouter()
@@ -32,6 +33,7 @@ api_router.include_router(qr_scanner_router)
 api_router.include_router(user_appointment_get_router)
 api_router.include_router(admin_appointment_updates_router)
 api_router.include_router(admin_dashboard_router)
+api_router.include_router(rating_router)
 
 
 

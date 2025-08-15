@@ -1,4 +1,4 @@
-from database_config import collection_admin, collection_apointment, collection_sub_services, collection_required_documents, collection_uploaded_documents
+from database_config import collection_admin, collection_apointment, collection_sub_services, collection_required_documents, collection_uploaded_documents, collection_users
 from typing import Optional, List
 from bson import ObjectId
 
@@ -37,12 +37,13 @@ async def get_admin_service_info(admin_id: str):
 async def get_appointments_by_sub_service(sub_service_id: str):
     """
     Retrieves full appointment details for a specific sub_service_id from MongoDB where appointment_confirmed is true.
+    Includes user names by joining with the users collection.
     
     Args:
         sub_service_id (str): The sub service ID to search for (MongoDB ObjectId as string)
         
     Returns:
-        list: List of appointment documents, or empty list if no appointments found
+        list: List of appointment documents with user names, or empty list if no appointments found
     """
     try:
         # Convert string to ObjectId and search by sub_service_id and appointment_confirmed = true
@@ -57,6 +58,23 @@ async def get_appointments_by_sub_service(sub_service_id: str):
             appointment["_id"] = str(appointment["_id"])
             if "sub_service_id" in appointment:
                 appointment["sub_service_id"] = str(appointment["sub_service_id"])
+            
+            # Get user details from users collection using user_id (which references user's _id)
+            user_name = "Unknown User"
+            if "user_id" in appointment:
+                try:
+                    # user_id in appointment references the user's _id (ObjectId)
+                    user_doc = await collection_users.find_one({"_id": ObjectId(appointment["user_id"])})
+                    if user_doc:
+                        first_name = user_doc.get("first_name", "")
+                        last_name = user_doc.get("last_name", "")
+                        user_name = f"{first_name} {last_name}".strip()
+                except Exception as e:
+                    print(f"Error fetching user details for user_id {appointment['user_id']}: {e}")
+                    user_name = "Unknown User"
+            
+            # Add user_name to appointment data
+            appointment["user_name"] = user_name
             appointments.append(appointment)
         
         return appointments
