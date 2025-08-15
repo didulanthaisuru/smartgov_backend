@@ -5,7 +5,8 @@ from fastapi import HTTPException, status
 from services.admin_service import admin_service
 from schemas.admin import AdminRegister, AdminResponse, AdminLogin, AdminToken
 from models import AdminInDB
-from utils.auth import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
+from database_config import  ACCESS_TOKEN_EXPIRE_MINUTES
+from utils.auth import create_access_token
 
 class AdminAuthService:
     

@@ -5,7 +5,8 @@ from fastapi import HTTPException, status
 from services.user_service import user_service
 from schemas.auth import UserRegister, UserResponse, UserLogin, Token
 from models import UserInDB
-from utils.auth import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
+from database_config import  ACCESS_TOKEN_EXPIRE_MINUTES
+from utils.auth import create_access_token
 
 class AuthService:
     
