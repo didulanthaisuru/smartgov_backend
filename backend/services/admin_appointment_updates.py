@@ -126,6 +126,6 @@ async def update_appointment_completion(
             "is_fully_completed": update_request.is_fully_completed,
             "updated_at": datetime.utcnow()
         }
-        
+    # Handle errors
     except Exception as e:
         raise Exception(f"Error updating appointment completion: {str(e)}")
