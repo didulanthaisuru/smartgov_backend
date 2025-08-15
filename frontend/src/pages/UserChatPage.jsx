@@ -174,84 +174,92 @@ const UserChatPage = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-gray-50 max-w-md mx-auto">
+        <div className="flex flex-col h-screen max-w-md mx-auto bg-white font-inter">
             {/* Header */}
-            <div className="bg-white shadow-sm px-4 py-3 flex items-center justify-between">
-                <button 
+            <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100">
+                <button
                     onClick={handleBack}
-                    className="p-2 rounded-full hover:bg-gray-100"
+                    className="p-2 rounded-full hover:bg-gray-100 active:scale-95 transition"
+                    aria-label="Back"
                 >
-                    <ArrowLeftIcon className="w-6 h-6 text-gray-600" />
+                    <ArrowLeftIcon className="w-6 h-6 text-gray-700" />
                 </button>
-                
-                <div className="flex items-center">
-                    <Bars3Icon className="w-6 h-6 text-gray-600 mr-4" />
-                    <select 
-                        value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
-                        className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="English">English</option>
-                        <option value="Sinhala">Sinhala</option>
-                        <option value="Tamil">Tamil</option>
-                    </select>
+
+                <div className="flex items-center gap-3">
+                    <Bars3Icon className="w-6 h-6 text-gray-700" />
+                    <div className="relative">
+                        <select
+                            value={language}
+                            onChange={(e) => setLanguage(e.target.value)}
+                            className="appearance-none pl-3 pr-8 py-1.5 rounded-full border border-gray-300 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#73A2BF]"
+                        >
+                            <option value="English">English</option>
+                            <option value="Sinhala">Sinhala</option>
+                            <option value="Tamil">Tamil</option>
+                        </select>
+                        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-500">▾</span>
+                    </div>
                 </div>
             </div>
 
-            {/* Messages Container */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-                {messages.map((msg, index) => (
-                    <div key={msg.id || index} className={`flex ${msg.sender_id === canonicalUserId ? 'justify-end' : 'justify-start'}`}>
-                        {msg.sender_id !== canonicalUserId && (
-                            <div className="flex-shrink-0 mr-3">
-                                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                                    <span className="text-white text-sm font-medium">AI</span>
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-[#FAFAFA]">
+                {messages.map((msg, index) => {
+                    const isMe = msg.sender_id === canonicalUserId;
+                    return (
+                        <div key={msg.id || index} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                            {!isMe && (
+                                <div className="flex-shrink-0 mr-2 mt-1">
+                                    <div className="w-8 h-8 rounded-full bg-[#73A2BF] flex items-center justify-center shadow-sm">
+                                        <span className="text-white text-xs font-semibold">AI</span>
+                                    </div>
                                 </div>
+                            )}
+
+                            <div
+                                className={`max-w-[78%] rounded-2xl px-4 py-2 ${
+                                    isMe
+                                        ? 'bg-white text-gray-900 shadow-sm border border-gray-200 rounded-br-sm'
+                                        : 'bg-[#D0E9F2] text-gray-800 rounded-bl-sm border border-[#73A2BF]/10'
+                                }`}
+                            >
+                                <p className="text-[13px] leading-relaxed font-roboto">{msg.content}</p>
+                                {isMe && (
+                                    <div className="text-[10px] text-gray-400 mt-1 text-right">
+                                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                )}
                             </div>
-                        )}
-                        
-                        <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                            msg.sender_id === canonicalUserId 
-                                ? 'bg-blue-500 text-white rounded-br-sm' 
-                                : 'bg-white text-gray-800 shadow-sm rounded-bl-sm'
-                        }`}>
-                            <p className="text-sm leading-relaxed">{msg.content}</p>
-                            {msg.sender_id === canonicalUserId && (
-                                <div className="text-xs text-blue-100 mt-1 text-right">
-                                    {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+
+                            {isMe && (
+                                <div className="flex-shrink-0 ml-2 mt-1">
+                                    <div className="w-8 h-8 rounded-full bg-[#F2622E] flex items-center justify-center shadow-sm">
+                                        <span className="text-white text-xs font-semibold">{user?.first_name?.[0] || 'U'}</span>
+                                    </div>
                                 </div>
                             )}
                         </div>
-
-                        {msg.sender_id === canonicalUserId && (
-                            <div className="flex-shrink-0 ml-3">
-                                <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
-                                    <span className="text-white text-sm font-medium">
-                                        {user?.first_name?.[0] || 'U'}
-                                    </span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                ))}
+                    );
+                })}
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Area */}
-            <div className="bg-white px-4 py-4 border-t border-gray-200">
-                <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
+            {/* Composer */}
+            <div className="px-4 py-4 border-t border-gray-100 bg-white">
+                <form onSubmit={handleSendMessage} className="flex items-center gap-2">
                     <div className="flex-1 relative">
                         <input
                             type="text"
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
-                            placeholder="Ask anything about Your Service..."
-                            className="w-full px-4 py-3 pr-12 bg-orange-100 border border-orange-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm placeholder-gray-600"
+                            placeholder="Ask anything about Your Service."
+                            className="w-full px-4 py-3 pr-12 rounded-full bg-[#F29727]/15 border border-[#F29727]/30 text-sm placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-[#F29727]"
                         />
-                        <button 
+                        <button
                             type="submit"
                             disabled={!newMessage.trim()}
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-orange-400 hover:bg-orange-500 disabled:bg-gray-300 rounded-full transition-colors"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-[#F29727] hover:bg-[#E1841F] disabled:bg-gray-300 transition"
+                            aria-label="Send"
                         >
                             <PaperAirplaneIcon className="w-4 h-4 text-white" />
                         </button>
