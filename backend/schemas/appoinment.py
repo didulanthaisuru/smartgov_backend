@@ -13,6 +13,7 @@ class AppointmentAdd(BaseModel):
     predicted_duration: Optional[datetime] = Field(..., description="Predicted duration of the appointment")
     payment_status: Optional[bool] = Field(default=False, description="Payment status of the appointment")
 
+
 class EmptyAppointmentCreate(BaseModel):
     user_id: str = Field(..., description="ID of the user making the appointment")
     sub_service_id: str = Field(..., description="ID of the sub-service being booked")
