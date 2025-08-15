@@ -5,7 +5,16 @@ dsvenv
 sakkavenv
 dsvenv
 venv/
-.venv/
+
+./venv/
+../venv
+
+
+./venv/
+
+
+
+
 */venv/
 */.venv/
 devvenv

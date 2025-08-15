@@ -9,6 +9,7 @@ from .appoinment import router as appointment_router
 from .document import router as document_router
 from .insights import router as insights_router
 from .insights_derect import router as insights_direct_router
+from .qr_scanner import router as qr_scanner_router
 
 # Create main API router
 api_router = APIRouter()
@@ -22,6 +23,7 @@ api_router.include_router(appointment_router)
 api_router.include_router(document_router)
 api_router.include_router(insights_router)
 api_router.include_router(insights_direct_router)
+api_router.include_router(qr_scanner_router)
 
 # api_router.include_router(health_router, tags=["Health Check"])
 # api_router.include_router(utility_router, tags=["Utilities"])
