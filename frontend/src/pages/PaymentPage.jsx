@@ -13,8 +13,6 @@ import axios from "axios";
 import { Menu, ChevronDown, Check, X } from "lucide-react";
 
 
-
-
 const stripePromise = loadStripe("pk_test_51RwId9Agvx5HIouQWVYHeLSJO5e5wCdnlrINloASxF0JgfaMBBF4Jc4mV1XP1S7SK5kbf6Aude9N3aao2kRDJLC100ysekAN53");
 
 // --- Reusable UI Components & Styling ---
@@ -50,7 +48,7 @@ const CheckoutForm = () => {
 
     try {
       const { data } = await axios.post("http://localhost:8000/create-payment-intent", {
-        amount: Math.round(paymentAmount * 100) // UPDATED: Use dynamic amount
+        amount: Math.round((paymentAmount/300) * 100) // UPDATED: Use dynamic amount
       });
       const clientSecret = data.clientSecret;
       const cardNumberElement = elements.getElement(CardNumberElement);
