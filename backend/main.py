@@ -1,30 +1,39 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from database_config import connect_to_mongo, close_mongo_connection
+from routes.routes import api_router
 from routes.user_profile import router as user_profile_router
 
-
-app = FastAPI()
-
+# Create FastAPI app
 app = FastAPI(
-    title="SmartGov",
-    description="Smart Government app for managing citizen services and government operations.",
-    version="1.0.0",
+    title="SmartGov API",
+    description="Government Services Management System",
+    version="1.0.0"
 )
 
-
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Frontend URLs
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
 )
 
-app.include_router(user_profile_router, prefix="/api", tags=["user_profile"])
+@app.get("/")
+def read_root():
+    return {
+        "message": "SmartGov API is running",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "redoc": "/redoc"
+    }
 
-
-# Simple health endpoint
 @app.get("/health")
-async def health():
-    return {"status": "ok"}
+def health_check():
+    return {"status": "healthy", "service": "SmartGov Backend"}
+
+# Include API routes
+app.include_router(api_router, prefix="/api/v1")
+app.include_router(user_profile_router, prefix="/api", tags=["user_profile"])
