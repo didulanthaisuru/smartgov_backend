@@ -3,7 +3,8 @@ __pycache__/
 venv
 dsvenv
 sakkavenv
-dsvenv
+sakkavenv
+devvenv
 venv/
 
 ./venv/
