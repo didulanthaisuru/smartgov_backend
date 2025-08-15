@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
+import HelpSection from '../components/HelpSection';
 
 const PreviousActivitiesPage = () => {
   const navigate = useNavigate();
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [language, setLanguage] = useState('English');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFeedback, setShowFeedback] = useState(false);
 
@@ -19,39 +24,21 @@ const PreviousActivitiesPage = () => {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* Header Component */}
+      <Header 
+        title="Previous Activities" 
+        setShowSidebar={setShowSidebar}
+        showLanguageSelector={true}
+        language={language}
+        onLanguageChange={setLanguage}
+      />
+
+      {/* Sidebar Component */}
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -left-40 w-[800px] h-[730px] rounded-full bg-blue-100 opacity-30"></div>
-      </div>
-
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-6 py-6">
-        <button 
-          onClick={() => navigate('/profile')}
-          className="w-9 h-9 flex items-center justify-center"
-        >
-          <div className="w-9 h-9 bg-gray-300 rounded"></div>
-        </button>
-
-        <div className="flex items-center">
-          {/* History Icon */}
-          <div className="w-8 h-8 flex items-center justify-center mr-4 bg-white shadow-md rounded-lg">
-            <svg className="w-6 h-6 text-black" stroke="currentColor" fill="none" viewBox="0 0 24 24" strokeWidth="2.5">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12,6 12,12 16,14"/>
-            </svg>
-          </div>
-          
-          <div className="flex items-center">
-            <div className="w-15 h-20 bg-gray-300 rounded mr-4"></div>
-            <h1 className="text-2xl font-medium text-black">Smart Gov</h1>
-          </div>
-        </div>
-
-        <div className="flex items-center bg-white bg-opacity-20 border border-black rounded-xl px-4 py-2">
-          <span className="text-sm font-normal text-black mr-2">English</span>
-          <div className="w-6 h-6 bg-gray-300 rounded"></div>
-        </div>
       </div>
 
       {/* Title and Summary */}
@@ -147,6 +134,9 @@ const PreviousActivitiesPage = () => {
             </div>
           ))}
         </div>
+
+        {/* Help Section */}
+        <HelpSection />
       </div>
 
       {/* Feedback Modal */}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
+import HelpSection from '../components/HelpSection';
 
 const IncompleteActivitiesPage = () => {
   const navigate = useNavigate();
@@ -124,6 +125,9 @@ const IncompleteActivitiesPage = () => {
             </div>
           ))}
         </div>
+
+        {/* Help Section */}
+        <HelpSection />
       </div>
 
       {/* Bottom Padding */}

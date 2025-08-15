@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
+import HelpSection from '../components/HelpSection';
 
 const UpdateInformationPage = () => {
   const navigate = useNavigate();
@@ -126,6 +127,9 @@ const UpdateInformationPage = () => {
             </button>
           </div>
         </div>
+
+        {/* Help Section */}
+        <HelpSection />
       </div>
 
       {/* Success Modal */}

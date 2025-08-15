@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
+import HelpSection from '../components/HelpSection';
 
 const OngoingActivitiesPage = () => {
   const navigate = useNavigate();
@@ -189,6 +190,9 @@ const OngoingActivitiesPage = () => {
             </div>
           ))}
         </div>
+
+        {/* Help Section */}
+        <HelpSection />
       </div>
 
       {/* Bottom Padding */}

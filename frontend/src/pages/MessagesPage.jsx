@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
+import HelpSection from '../components/HelpSection';
 import { CheckCircle, AlertCircle, Bell, MessageSquare } from 'lucide-react';
 
 const MessagesPage = () => {
@@ -139,6 +140,9 @@ const MessagesPage = () => {
             </div>
           ))}
         </div>
+
+        {/* Help Section */}
+        <HelpSection />
       </div>
 
       {/* Bottom Padding */}
