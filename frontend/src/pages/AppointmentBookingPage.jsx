@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Menu, ChevronDown, Circle } from "lucide-react";
 import Header from '../components/Header';
+import AuthService from '../services/authService';
 
 // Chart Components
 const VerticalBarChart = ({ data }) => ( <div className="flex justify-around items-end h-20 px-2">{data.map((item, index) => (<div key={index} className="w-8 rounded-t-sm" style={{ height: `${item.value}%`, backgroundColor: item.color }}></div>))}</div> );
@@ -16,7 +17,8 @@ const AppointmentBookingPage = () => {
   const subServiceName = location.state?.subServiceName || "Book Appointment";
   const subServiceId = location.state?.subServiceId;
   const paymentAmount = location.state?.paymentAmount || 0;
-  const userId = "689b0fce51fe72cd1df58f06"; 
+  const userData = AuthService.getAuthData().userData || {};
+  const userId = userData._id || userData.nic || ""; 
 
   const [currentDate, setCurrentDate] = useState(new Date(2025, 0, 1)); 
   const [selectedDate, setSelectedDate] = useState(new Date(2025, 0, 7));

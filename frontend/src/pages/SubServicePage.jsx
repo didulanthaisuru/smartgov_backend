@@ -6,7 +6,9 @@ import { IoIosArrowForward } from "react-icons/io";
 import Header from '../components/Header';
 
 const SubServicesPage = () => {
-  const userId = "689b0fce51fe72cd1df58f06";
+  //const userId = "689b0fce51fe72cd1df58f06";
+  const userData = AuthService.getAuthData().userData || {};
+  const userId = userData._id || userData.nic || ""; 
   const { serviceId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
