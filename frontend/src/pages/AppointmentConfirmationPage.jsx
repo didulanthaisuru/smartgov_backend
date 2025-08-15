@@ -23,7 +23,9 @@ const AppointmentConfirmationPage = () => {
         : appointmentData.date;
 
     const handleOkClick = () => {
-        navigate(`/qr-code/${appointmentId}`);
+        navigate(`/qr-code/${appointmentId}`, { 
+        state: { appointmentDetails: appointmentData } 
+    });
     };
 
     return (
