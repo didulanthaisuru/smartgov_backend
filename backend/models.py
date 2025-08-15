@@ -7,6 +7,11 @@ from typing import Dict
 from datetime import date, time
 from enum import Enum
 
+
+
+
+
+ 
 class user(BaseModel):
     first_name: str
     last_name: str
@@ -18,7 +23,6 @@ class user(BaseModel):
 
 class UserInDB(BaseModel):
     """User model for database operations with authentication fields"""
-    id: Optional[str] = Field(default=None, alias="_id")  # MongoDB ObjectId as string
     nic: str
     first_name: str
     last_name: str
@@ -29,11 +33,6 @@ class UserInDB(BaseModel):
     created_at: datetime
     updated_at: datetime
     user_id: Optional[int] = None  # Optional for backward compatibility
-
-    class Config:
-        validate_by_name = True
-        arbitrary_types_allowed = True
-
 class services(BaseModel):
     service_name: str
     service_id: int

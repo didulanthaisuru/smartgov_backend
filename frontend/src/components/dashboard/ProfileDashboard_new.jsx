@@ -40,10 +40,10 @@ const ProfileDashboard = () => {
           </div>
           
           {/* Language Selector */}
-          {/* <div className="flex items-center space-x-1 bg-gray-100 border border-gray-300 rounded-xl px-3 py-1">
+          <div className="flex items-center space-x-1 bg-gray-100 border border-gray-300 rounded-xl px-3 py-1">
             <span className="text-sm text-gray-700">{language}</span>
             <div className="w-4 h-3 bg-gray-400 rounded-sm"></div>
-          </div> */}
+          </div>
         </div>
       </div>
 

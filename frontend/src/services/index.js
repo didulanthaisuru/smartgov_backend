@@ -1,17 +1,13 @@
-// Import all services
+// Service layer exports
+// This file provides a centralized way to import all services
+
 import ApiService from './api.js';
 import AuthService from './authService.js';
-import AppointmentService from './appointmentService.js';
-import MessageService from './messageService.js';
-import ProfileService from './profileService.js';
 import UserService from './userService.js';
 
-// Export all services for easy importing
+// Export the main services
 export { default as ApiService } from './api.js';
 export { default as AuthService } from './authService.js';
-export { default as AppointmentService } from './appointmentService.js';
-export { default as MessageService } from './messageService.js';
-export { default as ProfileService } from './profileService.js';
 export { default as UserService } from './userService.js';
 
 // Re-export commonly used methods for convenience
