@@ -214,9 +214,9 @@ function App() {
             <Route 
               path="/admin/qr-scan" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminQRScanPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
 
