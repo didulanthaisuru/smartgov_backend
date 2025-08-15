@@ -1,6 +1,10 @@
 aiofiles==24.1.0
+aiohappyeyeballs==2.6.1
+aiohttp==3.12.15
+aiosignal==1.4.0
 annotated-types==0.7.0
 anyio==4.10.0
+attrs==25.3.0
 bcrypt==4.3.0
 bidict==0.23.1
 cachetools==5.5.2
@@ -14,6 +18,7 @@ dnspython==2.7.0
 dotenv==0.9.9
 ecdsa==0.19.1
 fastapi==0.116.1
+frozenlist==1.7.0
 google-api-core==2.25.1
 google-api-python-client==2.179.0
 google-auth==2.40.3
@@ -25,8 +30,10 @@ h11==0.16.0
 httplib2==0.22.0
 idna==3.10
 motor==3.7.1
+multidict==6.6.4
 oauthlib==3.3.1
 passlib==1.7.4
+propcache==0.3.2
 proto-plus==1.26.1
 protobuf==6.31.1
 pyasn1==0.6.1
@@ -55,4 +62,6 @@ typing_extensions==4.14.1
 uritemplate==4.2.0
 urllib3==2.5.0
 uvicorn==0.35.0
+websocket-client==1.8.0
 wsproto==1.2.0
+yarl==1.20.1
