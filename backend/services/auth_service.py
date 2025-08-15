@@ -52,8 +52,9 @@ class AuthService:
             expires_delta=access_token_expires
         )
         
-        # Prepare user response
+        # Prepare user response with ObjectId
         user_response = UserResponse(
+            id=str(user.id) if user.id else None,  # Convert ObjectId to string
             nic=user.nic,
             first_name=user.first_name,
             last_name=user.last_name,
@@ -72,6 +73,7 @@ class AuthService:
     async def get_current_user_info(self, current_user: UserInDB) -> UserResponse:
         """Get current user information"""
         return UserResponse(
+            id=str(current_user.id) if current_user.id else None,  # Convert ObjectId to string
             nic=current_user.nic,
             first_name=current_user.first_name,
             last_name=current_user.last_name,

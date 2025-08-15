@@ -150,13 +150,24 @@ async def get_insights_by_date_main_service(query: MainServiceQuery) -> List[Ins
         except Exception:
             raise ValueError(f"Invalid sub_service_id format: {query.sub_service_id}")
         
-        # First, get the main_service_id from sub_services collection
-        sub_service = await collection_sub_services.find_one({"service_sub_id": query.sub_service_id})
+        # First, get the sub_service from sub_services collection using _id
+        sub_service = await collection_sub_services.find_one({"_id": sub_service_object_id})
         if not sub_service:
             raise ValueError(f"Sub-service with ID {query.sub_service_id} not found")
         
+        # Get the main service to verify the relationship
+        try:
+            main_service_object_id = ObjectId(query.main_service_id)
+        except Exception:
+            raise ValueError(f"Invalid main_service_id format: {query.main_service_id}")
+        
+        main_service = await collection_main_services.find_one({"_id": main_service_object_id})
+        if not main_service:
+            raise ValueError(f"Main-service with ID {query.main_service_id} not found")
+        
         # Verify that the sub_service belongs to the specified main_service
-        if sub_service.get("service_id") != query.main_service_id:
+        # Check if the sub_service_id exists in the main_service's sub_services array
+        if sub_service_object_id not in [ObjectId(sub_id) for sub_id in main_service.get("sub_services", [])]:
             raise ValueError(f"Sub-service {query.sub_service_id} does not belong to main-service {query.main_service_id}")
         
         # Convert date to datetime for MongoDB query
@@ -443,13 +454,24 @@ async def get_weekly_insights_by_main_service(query: WeeklyMainServiceQuery) -> 
         except Exception:
             raise ValueError(f"Invalid sub_service_id format: {query.sub_service_id}")
         
-        # First, get the main_service_id from sub_services collection
-        sub_service = await collection_sub_services.find_one({"service_sub_id": query.sub_service_id})
+        # First, get the sub_service from sub_services collection using _id
+        sub_service = await collection_sub_services.find_one({"_id": sub_service_object_id})
         if not sub_service:
             raise ValueError(f"Sub-service with ID {query.sub_service_id} not found")
         
+        # Get the main service to verify the relationship
+        try:
+            main_service_object_id = ObjectId(query.main_service_id)
+        except Exception:
+            raise ValueError(f"Invalid main_service_id format: {query.main_service_id}")
+        
+        main_service = await collection_main_services.find_one({"_id": main_service_object_id})
+        if not main_service:
+            raise ValueError(f"Main-service with ID {query.main_service_id} not found")
+        
         # Verify that the sub_service belongs to the specified main_service
-        if sub_service.get("service_id") != query.main_service_id:
+        # Check if the sub_service_id exists in the main_service's sub_services array
+        if sub_service_object_id not in [ObjectId(sub_id) for sub_id in main_service.get("sub_services", [])]:
             raise ValueError(f"Sub-service {query.sub_service_id} does not belong to main-service {query.main_service_id}")
         
         # Query appointments for the specific sub_service and week
@@ -687,13 +709,24 @@ async def get_weekly_appointment_counts_main_service(query: WeeklyMainServiceCou
         except Exception:
             raise ValueError(f"Invalid sub_service_id format: {query.sub_service_id}")
         
-        # First, get the main_service_id from sub_services collection
-        sub_service = await collection_sub_services.find_one({"service_sub_id": query.sub_service_id})
+        # First, get the sub_service from sub_services collection using _id
+        sub_service = await collection_sub_services.find_one({"_id": sub_service_object_id})
         if not sub_service:
             raise ValueError(f"Sub-service with ID {query.sub_service_id} not found")
         
+        # Get the main service to verify the relationship
+        try:
+            main_service_object_id = ObjectId(query.main_service_id)
+        except Exception:
+            raise ValueError(f"Invalid main_service_id format: {query.main_service_id}")
+        
+        main_service = await collection_main_services.find_one({"_id": main_service_object_id})
+        if not main_service:
+            raise ValueError(f"Main-service with ID {query.main_service_id} not found")
+        
         # Verify that the sub_service belongs to the specified main_service
-        if sub_service.get("service_id") != query.main_service_id:
+        # Check if the sub_service_id exists in the main_service's sub_services array
+        if sub_service_object_id not in [ObjectId(sub_id) for sub_id in main_service.get("sub_services", [])]:
             raise ValueError(f"Sub-service {query.sub_service_id} does not belong to main-service {query.main_service_id}")
         
         # Query appointments for the specific sub_service and week

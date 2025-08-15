@@ -40,6 +40,7 @@ class UserService:
             
             if result.inserted_id:
                 return UserResponse(
+                    id=str(result.inserted_id),  # Include the ObjectId
                     nic=user_data.nic,
                     first_name=user_data.first_name,
                     last_name=user_data.last_name,
@@ -59,6 +60,9 @@ class UserService:
         """Get user by email"""
         user_doc = await self.collection.find_one({"email": email})
         if user_doc:
+            # Convert ObjectId to string
+            if "_id" in user_doc:
+                user_doc["_id"] = str(user_doc["_id"])
             return UserInDB(**user_doc)
         return None
     
@@ -66,6 +70,9 @@ class UserService:
         """Get user by NIC"""
         user_doc = await self.collection.find_one({"nic": nic})
         if user_doc:
+            # Convert ObjectId to string
+            if "_id" in user_doc:
+                user_doc["_id"] = str(user_doc["_id"])
             return UserInDB(**user_doc)
         return None
     
