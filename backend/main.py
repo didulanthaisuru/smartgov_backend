@@ -1,18 +1,8 @@
 from fastapi import FastAPI
 from database_config import connect_to_mongo, close_mongo_connection
-
-from routes.dashboard import router as dashboard_router
-
-from routes.appoinment import router as appointment_router
-from routes.document import router as document_router
-from routes.insights import router as insights_router
-from routes.insights_derect import router as insights_direct_router
-
-
 from routes.routes import api_router
 from config import settings
 from fastapi.middleware.cors import CORSMiddleware
-from routes.routes import api_router
 
 # Create FastAPI app
 app = FastAPI(

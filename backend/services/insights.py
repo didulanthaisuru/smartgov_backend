@@ -1,5 +1,8 @@
 from database_config import collection_apointment, collection_sub_services, collection_main_services
-from schemas.insights import InsightQuery, MainServiceQuery, WeeklyInsightQuery, WeeklyMainServiceQuery, InsightDetail
+from schemas.insights import (
+    InsightQuery, MainServiceQuery, WeeklyInsightQuery, WeeklyMainServiceQuery, 
+    WeeklyCountQuery, WeeklyMainServiceCountQuery, WeeklyCountResponse, DayCount, InsightDetail
+)
 from datetime import date, datetime, timedelta
 from typing import List
 import asyncio
@@ -98,6 +101,7 @@ async def get_insights_by_date_sub_service(query: InsightQuery) -> List[InsightD
                 is_fully_completed=appointment.get("is_fully_completed", False),
                 appointment_date=appointment_date or query.date,
                 day_of_week=day_of_week,
+                actual_date=appointment_date.strftime("%Y-%m-%d") if appointment_date else query.date.strftime("%Y-%m-%d"),
                 appoinment_time=appoinment_time,
                 predicted_duration=predicted_duration,
                 payment_status=appointment.get("payment_status", False),
@@ -122,6 +126,7 @@ async def get_insights_by_date_sub_service(query: InsightQuery) -> List[InsightD
                     is_fully_completed=False,
                     appointment_date=query.date,
                     day_of_week=day,
+                    actual_date=query.date.strftime("%Y-%m-%d"),
                     appoinment_time=None,
                     predicted_duration=None,
                     payment_status=False,
@@ -236,6 +241,7 @@ async def get_insights_by_date_main_service(query: MainServiceQuery) -> List[Ins
                 is_fully_completed=appointment.get("is_fully_completed", False),
                 appointment_date=appointment_date or query.date,
                 day_of_week=day_of_week,
+                actual_date=appointment_date.strftime("%Y-%m-%d") if appointment_date else query.date.strftime("%Y-%m-%d"),
                 appoinment_time=appoinment_time,
                 predicted_duration=predicted_duration,
                 payment_status=appointment.get("payment_status", False),
@@ -260,6 +266,7 @@ async def get_insights_by_date_main_service(query: MainServiceQuery) -> List[Ins
                     is_fully_completed=False,
                     appointment_date=query.date,
                     day_of_week=day,
+                    actual_date=query.date.strftime("%Y-%m-%d"),
                     appoinment_time=None,
                     predicted_duration=None,
                     payment_status=False,
@@ -374,6 +381,7 @@ async def get_weekly_insights_by_sub_service(query: WeeklyInsightQuery) -> List[
                 is_fully_completed=appointment.get("is_fully_completed", False),
                 appointment_date=appointment_date or query.date,
                 day_of_week=day_of_week,
+                actual_date=appointment_date.strftime("%Y-%m-%d") if appointment_date else query.date.strftime("%Y-%m-%d"),
                 appoinment_time=appoinment_time,
                 predicted_duration=predicted_duration,
                 payment_status=appointment.get("payment_status", False),
@@ -398,6 +406,7 @@ async def get_weekly_insights_by_sub_service(query: WeeklyInsightQuery) -> List[
                     is_fully_completed=False,
                     appointment_date=query.date,
                     day_of_week=day,
+                    actual_date=query.date.strftime("%Y-%m-%d"),
                     appoinment_time=None,
                     predicted_duration=None,
                     payment_status=False,
@@ -521,6 +530,7 @@ async def get_weekly_insights_by_main_service(query: WeeklyMainServiceQuery) -> 
                 is_fully_completed=appointment.get("is_fully_completed", False),
                 appointment_date=appointment_date or query.date,
                 day_of_week=day_of_week,
+                actual_date=appointment_date.strftime("%Y-%m-%d") if appointment_date else query.date.strftime("%Y-%m-%d"),
                 appoinment_time=appoinment_time,
                 predicted_duration=predicted_duration,
                 payment_status=appointment.get("payment_status", False),
@@ -545,6 +555,7 @@ async def get_weekly_insights_by_main_service(query: WeeklyMainServiceQuery) -> 
                     is_fully_completed=False,
                     appointment_date=query.date,
                     day_of_week=day,
+                    actual_date=query.date.strftime("%Y-%m-%d"),
                     appoinment_time=None,
                     predicted_duration=None,
                     payment_status=False,
@@ -569,3 +580,184 @@ def get_insights_by_date_main_service_sync(query: MainServiceQuery):
     Synchronous wrapper for the async function
     """
     return asyncio.run(get_insights_by_date_main_service(query))
+
+async def get_weekly_appointment_counts(query: WeeklyCountQuery) -> WeeklyCountResponse:
+    """
+    Get appointment counts for each day of the week for a specific sub_service
+    """
+    try:
+        # Calculate the start and end of the week (Monday to Sunday)
+        day_of_week = query.date.weekday()
+        monday = query.date - timedelta(days=day_of_week)
+        sunday = monday + timedelta(days=6)
+        
+        # Convert dates to datetime for MongoDB query
+        start_date = datetime.combine(monday, datetime.min.time())
+        end_date = datetime.combine(sunday, datetime.max.time())
+        
+        # Convert string sub_service_id to ObjectId
+        try:
+            sub_service_object_id = ObjectId(query.sub_service_id)
+        except Exception:
+            raise ValueError(f"Invalid sub_service_id format: {query.sub_service_id}")
+        
+        # Query appointments for the specific sub_service and week
+        pipeline = [
+            {
+                "$match": {
+                    "sub_service_id": sub_service_object_id,
+                    "appointment_date": {
+                        "$gte": start_date,
+                        "$lte": end_date
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "appointment_date": 1
+                }
+            }
+        ]
+        
+        cursor = collection_apointment.aggregate(pipeline)
+        appointments = await cursor.to_list(length=None)
+        
+        # Create day count mapping using Python's weekday
+        day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        day_counts = []
+        total_appointments = 0
+        
+        # Initialize count for each day
+        day_count_map = {i: 0 for i in range(7)}  # 0=Monday, 6=Sunday
+        
+        for appointment in appointments:
+            appointment_date = appointment.get("appointment_date")
+            if isinstance(appointment_date, datetime):
+                day_index = appointment_date.weekday()  # 0=Monday, 6=Sunday
+                day_count_map[day_index] += 1
+                total_appointments += 1
+            elif isinstance(appointment_date, dict) and "$date" in appointment_date:
+                # Handle MongoDB extended JSON format
+                date_obj = datetime.fromisoformat(appointment_date["$date"].replace("Z", "+00:00"))
+                day_index = date_obj.weekday()  # 0=Monday, 6=Sunday
+                day_count_map[day_index] += 1
+                total_appointments += 1
+        
+        for i, day_name in enumerate(day_names):
+            count = day_count_map[i]
+            # Calculate the actual date for this day of the week
+            day_date = monday + timedelta(days=i)
+            
+            day_count = DayCount(
+                day_of_week=day_name,
+                date_number=day_date.strftime("%Y-%m-%d"),
+                appointment_count=count,
+                status="active" if count > 0 else "no_appointments"
+            )
+            day_counts.append(day_count)
+        
+        return WeeklyCountResponse(
+            sub_service_id=query.sub_service_id,
+            week_start=monday,
+            week_end=sunday,
+            day_counts=day_counts,
+            total_appointments=total_appointments
+        )
+        
+    except Exception as e:
+        raise Exception(f"Error getting weekly appointment counts: {str(e)}")
+
+async def get_weekly_appointment_counts_main_service(query: WeeklyMainServiceCountQuery) -> WeeklyCountResponse:
+    """
+    Get appointment counts for each day of the week for a specific sub_service and main_service
+    """
+    try:
+        # Calculate the start and end of the week (Monday to Sunday)
+        day_of_week = query.date.weekday()
+        monday = query.date - timedelta(days=day_of_week)
+        sunday = monday + timedelta(days=6)
+        
+        # Convert dates to datetime for MongoDB query
+        start_date = datetime.combine(monday, datetime.min.time())
+        end_date = datetime.combine(sunday, datetime.max.time())
+        
+        # Convert string sub_service_id to ObjectId
+        try:
+            sub_service_object_id = ObjectId(query.sub_service_id)
+        except Exception:
+            raise ValueError(f"Invalid sub_service_id format: {query.sub_service_id}")
+        
+        # First, get the main_service_id from sub_services collection
+        sub_service = await collection_sub_services.find_one({"service_sub_id": query.sub_service_id})
+        if not sub_service:
+            raise ValueError(f"Sub-service with ID {query.sub_service_id} not found")
+        
+        # Verify that the sub_service belongs to the specified main_service
+        if sub_service.get("service_id") != query.main_service_id:
+            raise ValueError(f"Sub-service {query.sub_service_id} does not belong to main-service {query.main_service_id}")
+        
+        # Query appointments for the specific sub_service and week
+        pipeline = [
+            {
+                "$match": {
+                    "sub_service_id": sub_service_object_id,
+                    "appointment_date": {
+                        "$gte": start_date,
+                        "$lte": end_date
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "appointment_date": 1
+                }
+            }
+        ]
+        
+        cursor = collection_apointment.aggregate(pipeline)
+        appointments = await cursor.to_list(length=None)
+        
+        # Create day count mapping using Python's weekday
+        day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        day_counts = []
+        total_appointments = 0
+        
+        # Initialize count for each day
+        day_count_map = {i: 0 for i in range(7)}  # 0=Monday, 6=Sunday
+        
+        for appointment in appointments:
+            appointment_date = appointment.get("appointment_date")
+            if isinstance(appointment_date, datetime):
+                day_index = appointment_date.weekday()  # 0=Monday, 6=Sunday
+                day_count_map[day_index] += 1
+                total_appointments += 1
+            elif isinstance(appointment_date, dict) and "$date" in appointment_date:
+                # Handle MongoDB extended JSON format
+                date_obj = datetime.fromisoformat(appointment_date["$date"].replace("Z", "+00:00"))
+                day_index = date_obj.weekday()  # 0=Monday, 6=Sunday
+                day_count_map[day_index] += 1
+                total_appointments += 1
+        
+        for i, day_name in enumerate(day_names):
+            count = day_count_map[i]
+            # Calculate the actual date for this day of the week
+            day_date = monday + timedelta(days=i)
+            
+            day_count = DayCount(
+                day_of_week=day_name,
+                date_number=day_date.strftime("%Y-%m-%d"),
+                appointment_count=count,
+                status="active" if count > 0 else "no_appointments"
+            )
+            day_counts.append(day_count)
+        
+        return WeeklyCountResponse(
+            sub_service_id=query.sub_service_id,
+            week_start=monday,
+            week_end=sunday,
+            day_counts=day_counts,
+            total_appointments=total_appointments
+        )
+        
+    except Exception as e:
+        raise Exception(f"Error getting weekly appointment counts for main service: {str(e)}")
