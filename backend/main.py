@@ -1,18 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from database_config import connect_to_mongo, close_mongo_connection
-
-from routes.dashboard import router as dashboard_router
-
-from routes.appoinment import router as appointment_router
-from routes.document import router as document_router
-from routes.insights import router as insights_router
-from routes.insights_derect import router as insights_direct_router
-
-
 from routes.routes import api_router
-from config import settings
 from fastapi.middleware.cors import CORSMiddleware
-from routes.routes import api_router
 
 import stripe
 from pydantic import BaseModel
@@ -29,7 +18,7 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # Frontend URLs
+    allow_origins=["*"],  # Frontend URLs
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

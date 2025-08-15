@@ -30,8 +30,15 @@ collection_required_documents = db["required_documents"]
 collection_users = db["users"]
 collection_uploaded_documents = db["uploaded_documents"]
 collection_sub_services = db["sub_services"] 
- # Sub-services are stored in sub_services collection
 
+
+
+
+
+# JWT Configuration
+SECRET_KEY = os.getenv("JWT_SECRET")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 async def connect_to_mongo():
 	pass
 

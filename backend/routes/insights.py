@@ -1,12 +1,15 @@
 from fastapi import APIRouter, HTTPException
 from schemas.insights import (
-    InsightQuery, InsightDetail, MainServiceQuery, WeeklyInsightQuery, WeeklyMainServiceQuery
+    InsightQuery, InsightDetail, MainServiceQuery, WeeklyInsightQuery, WeeklyMainServiceQuery,
+    WeeklyCountQuery, WeeklyMainServiceCountQuery, WeeklyCountResponse
 )
 from services.insights import (
     get_insights_by_date_sub_service, 
     get_insights_by_date_main_service,
     get_weekly_insights_by_sub_service,
-    get_weekly_insights_by_main_service
+    get_weekly_insights_by_main_service,
+    get_weekly_appointment_counts,
+    get_weekly_appointment_counts_main_service
 )
 from datetime import date
 
@@ -55,6 +58,30 @@ async def view_weekly_mainservice_insights(query: WeeklyMainServiceQuery):
     """
     try:
         return await get_weekly_insights_by_main_service(query)
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@router.post("/weekly-appointment-counts", response_model=WeeklyCountResponse)
+async def get_weekly_counts(query: WeeklyCountQuery):
+    """
+    POST endpoint to retrieve appointment counts for each day of the week for a specific sub_service
+    """
+    try:
+        return await get_weekly_appointment_counts(query)
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@router.post("/weekly-appointment-counts-mainservice", response_model=WeeklyCountResponse)
+async def get_weekly_counts_mainservice(query: WeeklyMainServiceCountQuery):
+    """
+    POST endpoint to retrieve appointment counts for each day of the week for a specific sub_service and main_service
+    """
+    try:
+        return await get_weekly_appointment_counts_main_service(query)
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
