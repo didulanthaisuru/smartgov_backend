@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from database_config import connect_to_mongo, close_mongo_connection
 
 from routes.dashboard import router as dashboard_router
@@ -13,6 +13,11 @@ from routes.routes import api_router
 from config import settings
 from fastapi.middleware.cors import CORSMiddleware
 from routes.routes import api_router
+
+import stripe
+from pydantic import BaseModel
+
+stripe.api_key = "sk_test_51RwId9Agvx5HIouQNwqI5N51tJR0Xd53CxTAdRT6zBwqhSSkFamyYygq5txef9AuWsiDbBMzxreWV78vBgkSDyoh00rYqRORiy"
 
 # Create FastAPI app
 app = FastAPI(
@@ -42,6 +47,21 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "service": "SmartGov Backend"}
+
+class PaymentRequest(BaseModel):
+    amount: int  # amount in cents
+
+@app.post("/create-payment-intent")
+def create_payment_intent(request: PaymentRequest):
+    try:
+        intent = stripe.PaymentIntent.create(
+            amount=request.amount,
+            currency="usd",
+            automatic_payment_methods={"enabled": True},
+        )
+        return {"clientSecret": intent["client_secret"]}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
