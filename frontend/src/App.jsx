@@ -181,9 +181,9 @@ function App() {
             <Route 
               path="/admin/task-details/:taskId" 
               element={
-                <AdminRoute>
+                //<AdminRoute>
                   <AdminTaskDetailsPage />
-                </AdminRoute>
+                //</AdminRoute>
               } 
             />
             <Route 
