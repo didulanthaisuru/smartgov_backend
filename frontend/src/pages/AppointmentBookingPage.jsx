@@ -68,7 +68,8 @@ const AppointmentBookingPage = () => {
         date: payload.appointment_date,
         time: selectedTime,
         duration: '2 hrs',
-        paymentAmount: paymentAmount
+        paymentAmount: paymentAmount,
+        subServiceId: subServiceId
       };
 
       navigate(
