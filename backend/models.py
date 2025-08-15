@@ -18,6 +18,7 @@ class user(BaseModel):
     email: str
 
 
+admin_appointment_updates
 class required_documents(BaseModel):
     doc_id: str = Field(...)
     doc_name: str = Field(...)
@@ -70,4 +71,18 @@ class AppointmentNew1(BaseModel):
     appointment_time: Optional[time] = None
     predicted_duration: Optional[int] = None
     is_fully_completed: bool = Field(default=False)
+
+
+class services(BaseModel):
+    service_name: str
+    service_id: int
+    main_service: str
+    department_id: int
+    required_documents: List[str]  # list of document names
+
+
+class admin(BaseModel):
+    admin_id: int
+    admin_name: str
+    service_id: str
 
