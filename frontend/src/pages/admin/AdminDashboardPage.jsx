@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
+import axios from "axios";
 import {
   BarChart,
   Bar,
@@ -9,6 +10,7 @@ import {
   CartesianGrid
 } from "recharts";
 import { Bell, Calendar } from "lucide-react";
+import { set } from "date-fns";
 
 const Pill = ({ label, value }) => (
   <div className="bg-white p-4 rounded-lg shadow flex flex-col items-center transform transition-all duration-300 hover:scale-105">
@@ -20,102 +22,200 @@ const Pill = ({ label, value }) => (
 export default function Dashboard() {
   const [startDate, setStartDate] = useState("");
   const [fullWeekDates, setFullWeekDates] = useState([]);
-  const [serviceData, setServiceData] = useState([]);
-  
-  // Function to get full week dates (Monday to Sunday) for a given date
-  const getFullWeekDates = (selectedDate) => {
-    if (!selectedDate) return [];
+  const [weeklyServiceTraffic, setWeeklyServiceTraffic] = useState([]);
+  const [weeklySubServiceTraffic, setWeeklySubServiceTraffic] = useState([]);
+  const [TotalCount, setTotalCount] = useState(0);
+  const [noShowCount, setNoShowCount] = useState(0);
+  const [predicted_count, setPredictedCount] = useState(0);
+  const [ProcessingTime, setProcessingTime] = useState(0);
     
-    const date = new Date(selectedDate);
-    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    
-    // Calculate Monday of the week (start of week)
-    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // If Sunday, go back 6 days
-    const monday = new Date(date);
-    monday.setDate(date.getDate() + mondayOffset);
-    
-    // Generate all 7 days of the week
-    const weekDates = [];
-    for (let i = 0; i < 7; i++) {
-      const currentDay = new Date(monday);
-      currentDay.setDate(monday.getDate() + i);
-      weekDates.push({
-        date: currentDay.toISOString().split('T')[0], // YYYY-MM-DD format
-        dayName: currentDay.toLocaleDateString('en-US', { weekday: 'short' }),
-        fullDate: currentDay.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        })
-      });
-    }
-    
-    return weekDates;
-  };
-  
-  // Handle date selection
-  const handleDateChange = (selectedDate) => {
-    setStartDate(selectedDate);
-    const weekDates = getFullWeekDates(selectedDate);
-    setFullWeekDates(weekDates);
-    console.log('Selected Date:', selectedDate);
-    console.log('Full Week Dates:', weekDates);
-  };
-  
-  useEffect(() => {
-    // Simulate API call with dummy data
-    const mockServiceData = [
-      { day: "Mon", traffic: 850 },
-      { day: "Tue", traffic: 1220 },
-      { day: "Wed", traffic: 680 },
-      { day: "Thu", traffic: 980 },
-      { day: "Fri", traffic: 1450 },
-      { day: "Sat", traffic: 720 },
-      { day: "Sun", traffic: 450 },
-    ];
-    setServiceData(mockServiceData);
-  }, []);
 
-  // Weekly Service Traffic (Left vertical chart)
-  const weeklyServiceTraffic = [
-    { name: "Mon", traffic: 850 },
-    { name: "Tue", traffic: 1220 },
-    { name: "Wed", traffic: 680 },
-    { name: "Thu", traffic: 980 },
-    { name: "Fri", traffic: 1450 },
-  ];
-
-  // Sub Service Weekly Traffic (Right vertical chart)
   const subServiceWeeklyTraffic = [
     { name: "Mon", traffic: 2850 },
     { name: "Tue", traffic: 1950 },
     { name: "Wed", traffic: 1150 },
     { name: "Thu", traffic: 3200 },
-    { name: "Fri", traffic: 2890 },
+    { name: "Fri", traffic: 2890 }
   ];
 
-  // Time-based Service Traffic (Left horizontal chart)
   const timeBasedServiceTraffic = [
     { name: "8:30-10:30", traffic: 1245 },
     { name: "10:30-12:30", traffic: 1850 },
     { name: "12:30-2:30", traffic: 2340 },
-    { name: "2:30-4:30", traffic: 1680 },
+    { name: "2:30-4:30", traffic: 1680 }
   ];
 
-  // Time-based Sub Service Traffic (Right horizontal chart)
   const timeBasedSubServiceTraffic = [
     { name: "8:30-10:30", traffic: 950 },
     { name: "10:30-12:30", traffic: 1650 },
     { name: "12:30-2:30", traffic: 2100 },
-    { name: "2:30-4:30", traffic: 1420 },
+    { name: "2:30-4:30", traffic: 1420 }
   ];
+
+  // Generate full week dates (Monday to Sunday) based on selected date
+  const getFullWeekDates = (selectedDate) => {
+    if (!selectedDate) return [];
+    const date = new Date(selectedDate);
+    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const monday = new Date(date);
+    monday.setDate(date.getDate() + mondayOffset);
+
+    const weekDates = [];
+    for (let i = 0; i < 7; i++) {
+      const currentDay = new Date(monday);
+      currentDay.setDate(monday.getDate() + i);
+      weekDates.push({
+        date: currentDay.toISOString().split("T")[0],
+        dayName: currentDay.toLocaleDateString("en-US", { weekday: "short" }),
+        fullDate: currentDay.toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        })
+      });
+    }
+    return weekDates;
+  };
+
+  // Handle date selection
+  const handleDateChange = (selectedDate) => {
+    setStartDate(selectedDate);
+    const weekDates = getFullWeekDates(selectedDate);
+    setFullWeekDates(weekDates);
+  };
+
+
+
+
+// Fetch weekly service traffic whenever startDate changes
+useEffect(() => {
+  if (!startDate) return;
+
+  const fetchWeeklyData = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/insights/weekly-appointment-counts",
+        {
+          sub_service_id: "689b93230d3364bd64eaa075",
+          date: startDate
+        }
+      );
+
+      const data = response.data;
+      console.log("Fetched weekly data:", data);
+      const chartData = data.day_counts.map((day) => ({
+        name: day.day_of_week,
+        traffic: day.appointment_count
+      }));
+      setWeeklyServiceTraffic(chartData);
+    } catch (err) {
+      console.error("Error fetching weekly data:", err);
+
+      // fallback dummy data
+      setWeeklyServiceTraffic([
+        { name: "Mon", traffic: 850 },
+        { name: "Tue", traffic: 1220 },
+        { name: "Wed", traffic: 680 },
+        { name: "Thu", traffic: 980 },
+        { name: "Fri", traffic: 1450 },
+        { name: "Sat", traffic: 720 },
+        { name: "Sun", traffic: 450 }
+      ]);
+    }
+  };
+
+  const fetchWeeklySubData = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/insights/weekly-appointment-counts-mainService",
+        {
+          sub_service_id: "689b93230d3364bd64eaa075",
+          main_service_id: "689cd830ef2618d4dfe5a596",
+          date: startDate
+        }
+      );
+
+      const data = response.data;
+      //console.log("Fetched weekly sub-service data:", data);
+      const chartData = data.day_counts.map((day) => ({
+        name: day.day_of_week,
+        traffic: day.appointment_count
+      }));
+      setWeeklySubServiceTraffic(chartData);
+    } catch (err) {
+      console.error("Error fetching weekly sub-service data:", err);
+
+      // fallback dummy data
+      setWeeklySubServiceTraffic([
+        { name: "Mon", traffic: 850 },
+        { name: "Tue", traffic: 1220 },
+        { name: "Wed", traffic: 680 },
+        { name: "Thu", traffic: 980 },
+        { name: "Fri", traffic: 1450 },
+        { name: "Sat", traffic: 720 },
+        { name: "Sun", traffic: 450 }
+      ]);
+    }
+  };
+
+  const fetchTotalCount = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/v1/insights-direct/sub-service/689b93230d3364bd64eaa075/date/${startDate}`
+      );
+      const data = response.data;
+      setTotalCount(data.predicted_count);
+      //console.log("Fetched total count:", data.predicted_count);
+    } catch (err) {
+      console.error("Error fetching total count:", err);
+    }
+  };
+
+  const fetchAvgProcessingTime = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/v1/insights-direct/sub-service/689b93230d3364bd64eaa075/main-service/689b93230d3364bd64eaa075/date/${startDate}`);
+      const data = response.data;
+      setNoShowCount(data.no_show_count);
+      setPredictedCount(data.predicted_count);
+
+      console.log("Fetched no show count:", data.no_show_count);
+      
+    }catch (err) {
+      console.error("Error fetching no show count:", err);
+      // Handle error, maybe set a state to show an error message
+  }};
+
+    const fetchNoShowCount = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/v1/insights-direct/main-service/689b93230d3364bd64eaa075/date/${startDate}`);
+      const data = response.data;
+      setProcessingTime(data.avg_processing_time);
+
+      console.log("Fetched no show count:", data.no_show_count);
+      
+    }catch (err) {
+      console.error("Error fetching no show count:", err);
+      // Handle error, maybe set a state to show an error message
+  }};
+
+
+  // Call all async functions
+  fetchWeeklyData();
+  fetchWeeklySubData();
+  fetchTotalCount();
+  fetchNoShowCount();
+}, [startDate]);
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Service Traffic Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Service Traffic Dashboard
+        </h1>
         <div className="flex items-center space-x-4">
           <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
             <Bell className="w-5 h-5 text-gray-600" />
@@ -132,7 +232,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Debug Info - Shows selected week dates */}
+      {/* Week Dates */}
       {fullWeekDates.length > 0 && (
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
           <h4 className="text-sm font-semibold text-blue-800 mb-2">
@@ -151,74 +251,89 @@ export default function Dashboard() {
 
       {/* Stats Pills */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Pill label="Predicted Count" value="187" />
-        <Pill label="Avg Processing Time" value="12.5m" />
-        <Pill label="No Show Count" value="23" />
-        <Pill label="Appointment Count" value="4,250" />
+        <Pill label="Predicted Count" value={predicted_count} />
+        <Pill label="Avg Processing Time" value={ProcessingTime} />
+        <Pill label="No Show Count" value={noShowCount} />
+        <Pill label="Appointment Count" value={TotalCount} />
         <Pill label="Service Count" value="42" />
       </div>
 
-      {/* 2x2 Grid of Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Weekly Service Traffic (Top Left - Vertical) */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Weekly Service Traffic</h3>
-          <div style={{ height: "250px" }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyServiceTraffic}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#f8f9fa', 
-                    border: '1px solid #dee2e6',
-                    borderRadius: '6px'
-                  }} 
-                />
-                <Bar dataKey="traffic" fill="#10b981" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Weekly Service Traffic Chart */}
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Weekly Sub Service Traffic
+        </h3>
+        <div style={{ height: "250px" }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={weeklyServiceTraffic}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#f8f9fa",
+                  border: "1px solid #dee2e6",
+                  borderRadius: "6px"
+                }}
+              />
+              <Bar dataKey="traffic" fill="#10b981" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
+      </div>
 
-        {/* Sub Service Weekly Traffic (Top Right - Vertical) */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Sub Service Weekly Traffic</h3>
-          <div style={{ height: "250px" }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={subServiceWeeklyTraffic}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-45} textAnchor="end" />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#f8f9fa', 
-                    border: '1px solid #dee2e6',
-                    borderRadius: '6px'
-                  }} 
-                />
-                <Bar dataKey="traffic" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Sub Service Weekly Traffic */}
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Main Service Weekly Traffic
+        </h3>
+        <div style={{ height: "250px" }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={weeklySubServiceTraffic}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 10 }}
+                angle={-45}
+                textAnchor="end"
+              />
+              <YAxis tick={{ fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#f8f9fa",
+                  border: "1px solid #dee2e6",
+                  borderRadius: "6px"
+                }}
+              />
+              <Bar dataKey="traffic" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
+      </div>
 
-        {/* Time-based Service Traffic (Bottom Left - Horizontal) */}
+      {/* Horizontal Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Time-based Service Traffic</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Time-based Service Traffic
+          </h3>
           <div style={{ height: "250px" }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={timeBasedServiceTraffic} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis type="number" tick={{ fontSize: 12 }} />
-                <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={90} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#f8f9fa', 
-                    border: '1px solid #dee2e6',
-                    borderRadius: '6px'
-                  }} 
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  tick={{ fontSize: 10 }}
+                  width={90}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#f8f9fa",
+                    border: "1px solid #dee2e6",
+                    borderRadius: "6px"
+                  }}
                 />
                 <Bar dataKey="traffic" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
               </BarChart>
@@ -226,21 +341,27 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Time-based Sub Service Traffic (Bottom Right - Horizontal) */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Time-based Sub Service Traffic</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Time-based Sub Service Traffic
+          </h3>
           <div style={{ height: "250px" }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={timeBasedSubServiceTraffic} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis type="number" tick={{ fontSize: 12 }} />
-                <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={90} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#f8f9fa', 
-                    border: '1px solid #dee2e6',
-                    borderRadius: '6px'
-                  }} 
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  tick={{ fontSize: 10 }}
+                  width={90}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#f8f9fa",
+                    border: "1px solid #dee2e6",
+                    borderRadius: "6px"
+                  }}
                 />
                 <Bar dataKey="traffic" fill="#ef4444" radius={[0, 4, 4, 0]} />
               </BarChart>

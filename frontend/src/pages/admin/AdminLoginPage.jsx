@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { AuthService } from '../../services';
 import logoImage from '../../assets/images/logo3.png';
@@ -7,11 +7,15 @@ import logoImage from '../../assets/images/logo3.png';
 const AdminLoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [savePassword, setSavePassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Get sub_service_id from URL parameters
+  const sub_service_id = searchParams.get('service_id');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,7 +47,12 @@ const AdminLoginPage = () => {
           localStorage.setItem('savedAdminPassword', password);
         }
 
-        navigate('/admin/dashboard');
+        // Navigate to dashboard with sub_service_id if available
+        const dashboardPath = sub_service_id 
+          ? `/admin/dashboard?sub_service_id=${sub_service_id}`
+          : '/admin/dashboard';
+        
+        navigate(dashboardPath);
       } else {
         setError(result.error || 'Login failed. Please check your credentials.');
       }
@@ -73,7 +82,14 @@ const AdminLoginPage = () => {
         <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
           <div className="text-center mb-6">
             <h1 className="text-2xl font-semibold text-gray-900 mb-1">Administrator Login</h1>
-            <p className="text-gray-600">Access the administration portal</p>
+            <p className="text-gray-600">
+              Access the administration portal
+              {sub_service_id && (
+                <span className="block text-sm text-green-600 mt-1">
+                  Service ID: {sub_service_id}
+                </span>
+              )}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} noValidate>
