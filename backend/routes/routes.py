@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 
 # Import all API routers
-from .auth import router as auth_router
-from .admin import router as admin_router
+#from .auth import router as auth_router
+#from .admin import router as admin_router  # Commented out due to missing dependencies
 #from .admin_portal import router as admin_portal_router
 from .dashboard import router as dashboard_router
 from .appoinment import router as appointment_router
@@ -17,8 +17,8 @@ from .user_appointment_get import router as user_appointment_get_router
 api_router = APIRouter()
 
 # Include all routers
-api_router.include_router(auth_router)
-api_router.include_router(admin_router)
+#api_router.include_router(auth_router)
+#api_router.include_router(admin_router)  # Commented out due to missing dependencies
 #api_router.include_router(admin_portal_router)
 api_router.include_router(dashboard_router)
 api_router.include_router(appointment_router)

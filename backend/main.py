@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from database_config import connect_to_mongo, close_mongo_connection
 from routes.routes import api_router
-from config import settings
+# from config import settings  # Commented out - config module not found
 from fastapi.middleware.cors import CORSMiddleware
 
 # Create FastAPI app
