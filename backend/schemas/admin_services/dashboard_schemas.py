@@ -26,6 +26,7 @@ class AppointmentIdsResponse(BaseModel):
 class AppointmentDocument(BaseModel):
     _id: str
     user_id: str
+    user_name: str
     sub_service_id: str
     sub_service_steps: List[Dict[str, Any]]
     created_at: datetime
