@@ -1,5 +1,21 @@
 __pycache__/
 .env
+venv
+dsvenv
+sakkavenv
 sakkavenv
 devvenv
+venv/
 
+./venv/
+../venv
+
+
+./venv/
+
+
+
+
+*/venv/
+*/.venv/
+devvenv
