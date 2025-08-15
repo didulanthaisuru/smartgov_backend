@@ -1,11 +1,12 @@
-from pydantic import BaseModel,Field
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, date as date_type, time as time_type
 from uuid import uuid4
 from typing import List
 from typing import Dict
-from datetime import date, time
 from enum import Enum
+from bson import ObjectId
+from bson import ObjectId
 
 
 
@@ -23,6 +24,7 @@ class user(BaseModel):
 
 class UserInDB(BaseModel):
     """User model for database operations with authentication fields"""
+    _id: Optional[str] = None
     nic: str
     first_name: str
     last_name: str
@@ -33,6 +35,24 @@ class UserInDB(BaseModel):
     created_at: datetime
     updated_at: datetime
     user_id: Optional[int] = None  # Optional for backward compatibility
+
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce_objectid(cls, data):
+        """Coerce Mongo ObjectId to str before model initialization."""
+        if isinstance(data, dict):
+            v = data.get("_id")
+            if isinstance(v, ObjectId):
+                data["_id"] = str(v)
+        return data
+
+    model_config = {
+        "arbitrary_types_allowed": True,
+        "json_encoders": {ObjectId: str},
+        "populate_by_name": True,
+        # Allow fields starting with '_' (e.g., _id) to be treated as normal fields
+        "protected_namespaces": ()
+    }
 class services(BaseModel):
     service_name: str
     service_id: int
@@ -44,10 +64,10 @@ class booking(BaseModel):
     booking_id: int
     service_id: int
     document_list: List[str]  
-    date: date
-    time: time
+    date: date_type
+    time: time_type
     booking_state: str
-    predicted_duration: time
+    predicted_duration: time_type
 
 
 class UploadedDocument(BaseModel):
@@ -110,10 +130,24 @@ class AdminInDB(BaseModel):
     admin_name: str
     service_id: str
     email: str
-    hashed_password: str
+    passcode: Optional[str] = None  # Make it optional to handle both field names
+    hashed_password: Optional[str] = None  # Temporary field for backward compatibility
     is_active: bool = True
     created_at: datetime
     updated_at: datetime
+
+    @model_validator(mode='before')
+    @classmethod
+    def handle_password_field(cls, data):
+        """Handle both passcode and hashed_password fields"""
+        if isinstance(data, dict):
+            # If passcode is missing but hashed_password exists, use hashed_password as passcode
+            if 'passcode' not in data and 'hashed_password' in data:
+                data['passcode'] = data['hashed_password']
+            # Ensure passcode is not None
+            if 'passcode' not in data:
+                data['passcode'] = ''
+        return data
 
 
 # Document state model for tracking uploaded documents
@@ -168,11 +202,11 @@ class Appointment(BaseModel):
 
 class DailyMetrics(BaseModel):
     matrics_id: str = Field(..., alias="matrics_id")
-    date: date
+    date: date_type
     day_of_week: str
     service_id: int
     main_service_id: int
-    average_processing_time: time
+    average_processing_time: time_type
     no_show_count: int
 
 # Additional models for appointment management
@@ -187,7 +221,7 @@ class AppointmentStatus(str, Enum):
 
 class AppointmentFilter(BaseModel):
     """Model for filtering appointments"""
-    date: Optional[date] = None
+    date: Optional[date_type] = None
     service_id: Optional[str] = None
     user_id: Optional[int] = None
     status: Optional[str] = None
@@ -200,7 +234,7 @@ class AppointmentResponse(BaseModel):
     appointment_date: Optional[datetime] = None
     appointment_time: Optional[datetime] = None
     status: str
-    duration: Optional[time] = None
+    duration: Optional[time_type] = None
     documents_uploaded: int = 0
     total_documents: int = 0
 

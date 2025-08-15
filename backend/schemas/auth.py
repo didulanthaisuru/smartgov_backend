@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
+from bson import ObjectId
 
 class UserLogin(BaseModel):
     nic: str = Field(..., description="User NIC")
@@ -15,12 +16,18 @@ class UserRegister(BaseModel):
     passcode: str = Field(..., min_length=6, description="User password")
 
 class UserResponse(BaseModel):
+    id: str = Field(alias="_id")  # MongoDB ObjectId as string
     nic: str
     first_name: str
     last_name: str
     phone_number: str
     email: str
     created_at: Optional[datetime] = None
+    
+    model_config = {
+        "populate_by_name": True,
+        "json_encoders": {ObjectId: str}
+    }
 
 class Token(BaseModel):
     access_token: str

@@ -52,7 +52,13 @@ class AuthService:
         )
         
         # Prepare user response
+        print(f"Creating user response for user: {user}")
+        print(f"User _id: {user._id if hasattr(user, '_id') else 'No _id attribute'}")
+        print(f"User _id type: {type(user._id) if hasattr(user, '_id') else 'N/A'}")
+        print(f"User dict representation: {user.__dict__ if hasattr(user, '__dict__') else 'No __dict__'}")
+        
         user_response = UserResponse(
+            _id=str(user._id) if hasattr(user, '_id') and user._id else "",
             nic=user.nic,
             first_name=user.first_name,
             last_name=user.last_name,
@@ -60,6 +66,9 @@ class AuthService:
             email=user.email,
             created_at=user.created_at
         )
+        
+        print(f"Created user response: {user_response}")
+        print(f"User response dict: {user_response.dict()}")
         
         return Token(
             access_token=access_token,
@@ -71,6 +80,7 @@ class AuthService:
     async def get_current_user_info(self, current_user: UserInDB) -> UserResponse:
         """Get current user information"""
         return UserResponse(
+            _id=str(current_user._id) if hasattr(current_user, '_id') and current_user._id else "",
             nic=current_user.nic,
             first_name=current_user.first_name,
             last_name=current_user.last_name,

@@ -49,6 +49,7 @@ import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminCompletedTasksPage from './pages/admin/AdminCompletedTasksPage';
 import AdminChatPage from './pages/admin/AdminChatPage';
 import AdminQRScanPage from './pages/admin/AdminQRScanPage';
+import UserChatPage from './pages/UserChatPage';
 
 // Initial Route Component (handles app startup routing)
 const InitialRoute = () => {
@@ -336,6 +337,16 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+
+            <Route 
+              path="/chatpage" 
+              element={
+                <ProtectedRoute>
+                  <UserChatPage />
+                </ProtectedRoute>
+              } 
+            />
+
             <Route 
               path="/contact-us" 
               element={

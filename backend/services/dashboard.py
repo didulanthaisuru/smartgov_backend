@@ -1,12 +1,14 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from typing import List, Dict, Any, Optional
-from database_config import collection_main_services, collection_sub_services, collection_required_documents
 
 # Get all main services 
 async def get_all_main_services(db: AsyncIOMotorClient) -> List[Dict[str, Any]]:
     """Retrieves a list of all main services."""
-    services= await collection_main_services.find({}, {"_id": 1, "service_name": 1, "icon_name": 1}).to_list(1000)
+    if db is None:
+        return []
+    collection_main_services = db["main_services"]
+    services = await collection_main_services.find({}, {"_id": 1, "service_name": 1, "icon_name": 1}).to_list(1000)
 
     # Convert ObjectId to string
     for service in services:
@@ -17,7 +19,9 @@ async def get_all_main_services(db: AsyncIOMotorClient) -> List[Dict[str, Any]]:
 # Get sub-service list for a main service 
 async def get_sub_services_for_main_service(db: AsyncIOMotorClient, main_service_id: str) -> Optional[List[Dict[str, Any]]]:
     """Finds a main service and joins its sub-services using $lookup."""
-    if not ObjectId.is_valid(main_service_id): return None
+    if db is None or not ObjectId.is_valid(main_service_id):
+        return None
+    collection_main_services = db["main_services"]
     
     pipeline = [
         {"$match": {"_id": ObjectId(main_service_id)}},
@@ -41,7 +45,9 @@ async def get_sub_services_for_main_service(db: AsyncIOMotorClient, main_service
 # Get details for a specific sub-service 
 async def get_sub_service_details(db: AsyncIOMotorClient, main_service_id: str, sub_service_id: str) -> Optional[Dict[str, Any]]:
     """Finds a sub-service and joins its required documents using $lookup."""
-    if not ObjectId.is_valid(sub_service_id): return None
+    if db is None or not ObjectId.is_valid(sub_service_id):
+        return None
+    collection_sub_services = db["sub_services"]
         
     pipeline = [
         {"$match": {"_id": ObjectId(sub_service_id)}},

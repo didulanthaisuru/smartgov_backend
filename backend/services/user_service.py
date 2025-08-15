@@ -2,17 +2,21 @@ from typing import Optional
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorCollection
 from pymongo.errors import DuplicateKeyError
-from database_config import db
+import database_config
 from models import user, UserInDB
 from schemas.auth import UserRegister, UserResponse
 from utils.auth import get_password_hash, verify_password
 
 class UserService:
     def __init__(self):
-        self.collection: AsyncIOMotorCollection = db["users"]
-        # Create unique indexes
-        self.collection.create_index("email", unique=True)
-        self.collection.create_index("nic", unique=True)
+        # Collection resolved at runtime to avoid None before DB connects
+        self.collection: Optional[AsyncIOMotorCollection] = None
+        # Indexes are ensured on app startup to avoid sync calls here.
+
+    def _col(self) -> AsyncIOMotorCollection:
+        if database_config.db is None:
+            raise RuntimeError("Database not connected yet")
+        return database_config.db["users"]
     
     async def create_user(self, user_data: UserRegister) -> Optional[UserResponse]:
         """Create a new user"""
@@ -36,10 +40,11 @@ class UserService:
                 "updated_at": datetime.utcnow()
             }
             
-            result = await self.collection.insert_one(user_doc)
+            result = await self._col().insert_one(user_doc)
             
             if result.inserted_id:
                 return UserResponse(
+                    _id=str(result.inserted_id),
                     nic=user_data.nic,
                     first_name=user_data.first_name,
                     last_name=user_data.last_name,
@@ -57,14 +62,14 @@ class UserService:
     
     async def get_user_by_email(self, email: str) -> Optional[UserInDB]:
         """Get user by email"""
-        user_doc = await self.collection.find_one({"email": email})
+        user_doc = await self._col().find_one({"email": email})
         if user_doc:
             return UserInDB(**user_doc)
         return None
     
     async def get_user_by_nic(self, nic: str) -> Optional[UserInDB]:
         """Get user by NIC"""
-        user_doc = await self.collection.find_one({"nic": nic})
+        user_doc = await self._col().find_one({"nic": nic})
         if user_doc:
             return UserInDB(**user_doc)
         return None

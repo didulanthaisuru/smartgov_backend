@@ -47,6 +47,7 @@ def decode_access_token(token: str):
     """Decode access token and return user/admin data"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print(f"JWT decode: Full payload: {payload}")
         
         # Check if it's an admin token (has admin_id and role)
         if "admin_id" in payload and "role" in payload:
@@ -54,7 +55,9 @@ def decode_access_token(token: str):
             email = payload.get("email")
             role = payload.get("role")
             service_id = payload.get("service_id")
+            print(f"JWT decode: Admin token - admin_id={admin_id}, email={email}, role={role}, service_id={service_id}")
             if admin_id is None or email is None or role != "admin":
+                print(f"JWT decode: Admin token validation failed - admin_id={admin_id}, email={email}, role={role}")
                 return None
             return {"admin_id": admin_id, "email": email, "role": role, "service_id": service_id}
         
@@ -62,10 +65,13 @@ def decode_access_token(token: str):
         elif "nic" in payload and "email" in payload:
             nic = payload.get("nic")
             email = payload.get("email")
+            print(f"JWT decode: User token - nic={nic}, email={email}")
             if nic is None or email is None:
                 return None
             return {"nic": nic, "email": email}
         
+        print(f"JWT decode: Token doesn't match admin or user format")
         return None
-    except JWTError:
+    except JWTError as e:
+        print(f"JWT decode error: {e}")
         return None

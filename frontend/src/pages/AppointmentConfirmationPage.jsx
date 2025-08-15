@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import LanguageSwitcher from '../components/languageSwitcher';
+import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
+
 
 // Helper Icon Components
 const ConfirmationIcon = () => (

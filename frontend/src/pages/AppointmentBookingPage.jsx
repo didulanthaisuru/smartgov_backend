@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Menu, ChevronDown, Circle } from "lucide-react";
-import LanguageSwitcher from "../components/languageSwitcher";
+import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import Header from '../components/Header';
 
 // --- Chart Components (no change) ---
