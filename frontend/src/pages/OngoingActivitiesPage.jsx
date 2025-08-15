@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AppointmentService from '../services/appointmentService';
+import AuthService from '../services/authService';
 
 const OngoingActivitiesPage = () => {
   const navigate = useNavigate();
@@ -7,42 +9,79 @@ const OngoingActivitiesPage = () => {
   const [orderBy, setOrderBy] = useState('date');
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activities, setActivities] = useState([]);
+  const [overallProgress, setOverallProgress] = useState(0);
 
-  const activities = [
-    {
-      id: 1,
-      title: 'Getting Birth Certificate',
-      progress: 63,
-      status: 'Form CRO1 Received',
-      steps: [
-        { name: 'GN Submitted Form B23', completed: true, date: null },
-        { name: 'Form CRO1 Received', completed: 'current', date: null },
-        { name: 'Printing The New Certificate', completed: false, date: null }
-      ]
-    },
-    {
-      id: 2,
-      title: 'Business Registration',
-      progress: 55,
-      status: 'Working on document proofing',
-      steps: [
-        { name: 'Relevent Documents Recived', completed: true, date: null },
-        { name: 'Working on document proofing', completed: 'current', date: null },
-        { name: 'Sent for the final signature', completed: false, date: null }
-      ]
-    },
-    {
-      id: 3,
-      title: 'NIC Application',
-      progress: 48,
-      status: 'Send Documents to district secratrait office',
-      steps: [
-        { name: 'DS verified the doccuments ', completed: true, date: null },
-        { name: 'Send Documents to district secratrait office', completed: 'current', date: null },
-        { name: 'Send to the Department of Registration', completed: false, date: null }
-      ]
-    }
-  ];
+  // Fetch ongoing activities on component mount
+  useEffect(() => {
+    const fetchOngoingActivities = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Get user ID from auth service
+        const authData = AuthService.getAuthData();
+        if (!authData?.userData?.id) {
+          throw new Error('User ID not found. Please login again.');
+        }
+
+        const userId = authData.userData.id;
+        console.log('Fetching ongoing activities for user:', userId);
+
+        // Fetch ongoing appointments
+        const result = await AppointmentService.getOngoingAppointments(userId);
+        
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to fetch ongoing activities');
+        }
+
+        // Transform the data to match the UI structure
+        const transformedActivities = result.data.map((appointment, index) => ({
+          id: appointment.appointment_id,
+          title: appointment.service_name,
+          progress: appointment.is_fully_completed ? 100 : 50, // Simple progress calculation
+          status: appointment.is_fully_completed ? 'Completed' : 'In Progress',
+          appointment_date: appointment.appointment_date,
+          is_fully_completed: appointment.is_fully_completed,
+          // Add steps based on appointment data (you can enhance this)
+          steps: [
+            { 
+              name: 'Application Submitted', 
+              completed: true, 
+              date: appointment.appointment_date ? 'Completed' : null 
+            },
+            { 
+              name: 'Processing', 
+              completed: appointment.is_fully_completed ? true : 'current', 
+              date: null 
+            },
+            { 
+              name: 'Final Review', 
+              completed: appointment.is_fully_completed, 
+              date: null 
+            }
+          ]
+        }));
+
+        setActivities(transformedActivities);
+
+        // Calculate overall progress
+        const totalProgress = transformedActivities.length > 0 ? 
+          transformedActivities.reduce((sum, activity) => sum + activity.progress, 0) / transformedActivities.length : 0;
+        setOverallProgress(Math.round(totalProgress));
+
+      } catch (err) {
+        console.error('Error fetching ongoing activities:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOngoingActivities();
+  }, []);
 
   const filteredActivities = activities.filter(activity =>
     activity.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -57,6 +96,41 @@ const OngoingActivitiesPage = () => {
     setSelectedActivity(null);
     setIsModalOpen(false);
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8C3C2A] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading ongoing activities...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="text-red-500 mb-4">
+            <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Activities</h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-[#8C3C2A] text-white px-4 py-2 rounded-lg hover:bg-[#7A3424] transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
@@ -103,9 +177,9 @@ const OngoingActivitiesPage = () => {
         {/* Progress Bar */}
         <div className="mb-8 flex items-center space-x-4">
           <div className="w-52 bg-white border border-black h-3">
-            <div className="bg-[#8C322A] h-3" style={{ width: '63%' }}></div>
+            <div className="bg-[#8C322A] h-3" style={{ width: `${overallProgress}%` }}></div>
           </div>
-          <span className="text-sm text-black">63%</span>
+          <span className="text-sm text-black">{overallProgress}%</span>
         </div>
       </div>
 
@@ -145,64 +219,76 @@ const OngoingActivitiesPage = () => {
 
         {/* Enhanced Activities List */}
         <div className="space-y-4">
-          {filteredActivities.map((activity) => (
-            <div 
-              key={activity.id} 
-              className="bg-[rgba(242,151,39,0.5)] rounded-xl p-6 shadow-[0_4px_15px_rgba(0,0,0,0.25)] backdrop-blur-[15px] cursor-pointer hover:bg-[rgba(242,151,39,0.6)] transition-colors"
-              onClick={() => openModal(activity)}
-            >
-              <div className="flex items-start mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-6">
-                    <h3 className="text-sm font-normal text-black">{activity.title}</h3>
-                    <p className="text-xs text-black">{activity.progress}% Completed</p>
+          {filteredActivities.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Ongoing Activities</h3>
+              <p className="text-gray-500">You don't have any ongoing activities at the moment.</p>
+            </div>
+          ) : (
+            filteredActivities.map((activity) => (
+              <div 
+                key={activity.id} 
+                className="bg-[rgba(242,151,39,0.5)] rounded-xl p-6 shadow-[0_4px_15px_rgba(0,0,0,0.25)] backdrop-blur-[15px] cursor-pointer hover:bg-[rgba(242,151,39,0.6)] transition-colors"
+                onClick={() => openModal(activity)}
+              >
+                <div className="flex items-start mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-6">
+                      <h3 className="text-sm font-normal text-black">{activity.title}</h3>
+                      <p className="text-xs text-black">{activity.progress}% Completed</p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Enhanced Progress Steps with Timeline */}
-              <div className="relative">
-                <div className="space-y-2">
-                  {activity.steps.map((step, index) => (
-                    <div key={index}>
-                      <p className={`text-sm text-left ${
-                        step.completed === 'current' ? 'font-bold text-black' : 
-                        step.completed === true ? 'text-black opacity-50' : 
-                        'text-black opacity-50'
-                      }`}>
-                        {step.name}
-                      </p>
-                      {step.date && (
-                        <p className={`text-xs mt-1 text-left ${
-                          step.date.includes('completed') ? 'text-black opacity-50 font-normal' :
-                          'text-black opacity-50 font-bold'
+                {/* Enhanced Progress Steps with Timeline */}
+                <div className="relative">
+                  <div className="space-y-2">
+                    {activity.steps.map((step, index) => (
+                      <div key={index}>
+                        <p className={`text-sm text-left ${
+                          step.completed === 'current' ? 'font-bold text-black' : 
+                          step.completed === true ? 'text-black opacity-50' : 
+                          'text-black opacity-50'
                         }`}>
-                          {step.date}
+                          {step.name}
                         </p>
-                      )}
-                    </div>
-                  ))}
+                        {step.date && (
+                          <p className={`text-xs mt-1 text-left ${
+                            step.date.includes('completed') ? 'text-black opacity-50 font-normal' :
+                            'text-black opacity-50 font-bold'
+                          }`}>
+                            {step.date}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bottom Icons */}
+                <div className="flex justify-end space-x-3 mt-4">
+                  {/* Eye Icon */}
+                  <button className="bg-transparent border-none p-0 hover:opacity-70 transition-opacity">
+                    <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                  </button>
+                  
+                  {/* More Information Icon */}
+                  <button className="bg-transparent border-none p-0 hover:opacity-70 transition-opacity">
+                    <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                  </button>
                 </div>
               </div>
-
-              {/* Bottom Icons */}
-              <div className="flex justify-end space-x-3 mt-4">
-                {/* Eye Icon */}
-                <button className="bg-transparent border-none p-0 hover:opacity-70 transition-opacity">
-                  <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                  </svg>
-                </button>
-                
-                {/* More Information Icon */}
-                <button className="bg-transparent border-none p-0 hover:opacity-70 transition-opacity">
-                  <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* Help Section */}
