@@ -1,239 +1,159 @@
-# Service Layer Architecture
+# Services Layer Documentation
 
-This directory contains the service layer for the SmartGov frontend application, following standard practices and maintaining good code quality.
+This directory contains the service layer for the SmartGov frontend application. The services are designed to handle all API communication and data processing logic.
 
-## 📁 File Structure
+## Service Architecture
+
+### Core Services
+
+#### 1. **ApiService** (`api.js`)
+- Base service for HTTP requests
+- Handles authentication headers
+- Provides centralized error handling
+- Base URL configuration
+
+#### 2. **AuthService** (`authService.js`)
+- User authentication and authorization
+- Token management
+- User data storage and retrieval
+- Login/logout functionality
+
+#### 3. **AppointmentService** (`appointmentService.js`)
+- Appointment-related API calls
+- Appointment statistics and calculations
+- Progress tracking
+- Document counting utilities
+
+#### 4. **MessageService** (`messageService.js`)
+- Message-related functionality
+- Unread message counting
+- Message status management
+- Mock data for development
+
+#### 5. **ProfileService** (`profileService.js`)
+- **Main orchestrator service**
+- Combines data from multiple services
+- Profile page data aggregation
+- Utility functions for UI display
+
+#### 6. **UserService** (`userService.js`)
+- User profile management
+- User data updates
+- User preferences
+
+## Service Integration Flow
 
 ```
-services/
-├── api.js              # Base API service with HTTP methods and error handling
-├── authService.js      # Authentication-related API calls
-├── userService.js      # User-related API calls
-├── index.js           # Centralized exports for easy importing
-└── README.md          # This documentation file
+ProfilePage.jsx
+    ↓
+ProfileService.getProfileData()
+    ↓
+├── AppointmentService.getAppointmentStatistics()
+├── MessageService.getMessageStatistics()
+└── AuthService.getAuthData()
+    ↓
+Returns combined profile data
 ```
 
-## 🏗️ Architecture Overview
+## Key Features
 
-### Base API Service (`api.js`)
-- **Purpose**: Provides common HTTP methods and error handling
-- **Features**:
-  - Automatic token management
-  - Centralized error handling
-  - Response status code handling
-  - Network error detection
-  - Automatic logout on 401 errors
+### 1. **Data Aggregation**
+- `ProfileService.getProfileData()` fetches all necessary data in parallel
+- Combines appointments, messages, and user data
+- Provides fallback values for error scenarios
 
-### Authentication Service (`authService.js`)
-- **Purpose**: Handles all authentication-related operations
-- **Methods**:
-  - `login()` - User login
-  - `register()` - User registration
-  - `verifyToken()` - Verify user token
-  - `getCurrentUser()` - Get current user info
-  - `adminLogin()` - Admin login
-  - `adminRegister()` - Admin registration
-  - `verifyAdminToken()` - Verify admin token
-  - `logout()` - Client-side logout
-  - `isAuthenticated()` - Check auth status
-  - `getAuthData()` - Get stored auth data
-  - `saveAuthData()` - Save auth data
+### 2. **Real-time Calculations**
+- Progress percentages for ongoing activities
+- Document requirement counts
+- Unread message counts
+- Dynamic menu item generation
 
-### User Service (`userService.js`)
-- **Purpose**: Handles user-related operations
-- **Methods**:
-  - `getProfile()` - Get user profile
-  - `updateProfile()` - Update user profile
-  - `changePassword()` - Change password
-  - `requestPasswordReset()` - Request password reset
-  - `resetPassword()` - Reset password
-  - `getActivities()` - Get user activities
-  - `getAppointments()` - Get user appointments
-  - `getDocuments()` - Get user documents
-  - `uploadDocument()` - Upload document
-  - `deleteDocument()` - Delete document
+### 3. **Error Handling**
+- Graceful degradation when services fail
+- Fallback data structures
+- User-friendly error messages
 
-## 🚀 Usage Examples
+### 4. **Performance Optimization**
+- Parallel API calls using `Promise.all()`
+- Caching strategies (can be implemented)
+- Efficient data processing
 
-### Basic Import
+## Usage Examples
+
+### Basic Profile Data Fetching
 ```javascript
-import { AuthService, UserService, ApiService } from '../services';
-```
+import ProfileService from '../services/profileService';
 
-### Authentication
-```javascript
-// Login
-const result = await AuthService.login({
-  nic: '123456789012',
-  passcode: 'password123'
-});
-
-if (result.success) {
-  // Handle successful login
-  console.log(result.data);
-} else {
-  // Handle error
-  console.error(result.error);
-}
-
-// Registration
-const registerResult = await AuthService.register({
-  first_name: 'John',
-  last_name: 'Doe',
-  nic: '123456789012',
-  phone_number: '+1234567890',
-  email: 'john@example.com',
-  passcode: 'password123'
-});
-```
-
-### User Operations
-```javascript
-// Get user profile
-const profileResult = await UserService.getProfile();
-
-// Update profile
-const updateResult = await UserService.updateProfile({
-  first_name: 'Jane',
-  last_name: 'Smith'
-});
-
-// Get user activities
-const activitiesResult = await UserService.getActivities();
-```
-
-### Direct API Calls
-```javascript
-// GET request
-const data = await ApiService.get('/some-endpoint');
-
-// POST request
-const response = await ApiService.post('/some-endpoint', {
-  key: 'value'
-});
-
-// PUT request
-const updateResponse = await ApiService.put('/some-endpoint', {
-  key: 'new-value'
-});
-```
-
-## 🔧 Configuration
-
-### API Base URL
-The API base URL is configured in `api.js`:
-```javascript
-const API_BASE_URL = 'http://localhost:8000/api/v1';
-```
-
-### Authentication Headers
-Authentication headers are automatically added to requests when `includeAuth` is not set to `false`:
-```javascript
-// With auth header (default)
-await ApiService.get('/protected-endpoint');
-
-// Without auth header
-await ApiService.get('/public-endpoint', { includeAuth: false });
-```
-
-## 🛡️ Error Handling
-
-All services return consistent error responses:
-```javascript
-{
-  success: false,
-  error: 'Error message'
+const profileData = await ProfileService.getProfileData(userId);
+if (profileData.success) {
+  // Use profileData.data
+  const { user, appointments, messages } = profileData.data;
 }
 ```
 
-### Common Error Scenarios
-- **401 Unauthorized**: Automatic logout and redirect to login
-- **403 Forbidden**: Access denied error
-- **404 Not Found**: Resource not found error
-- **500+ Server Error**: Server error message
-- **Network Error**: Connection error message
-
-## 📝 Best Practices
-
-### 1. Always Check Success Status
+### Menu Item Generation
 ```javascript
-const result = await AuthService.login(credentials);
-if (result.success) {
-  // Handle success
-} else {
-  // Handle error
-  console.error(result.error);
-}
+import ProfileService from '../services/profileService';
+
+const menuItems = ProfileService.generateMenuItems(profileData, navigate);
 ```
 
-### 2. Use Try-Catch for Error Handling
+### Utility Functions
 ```javascript
-try {
-  const result = await UserService.getProfile();
-  // Handle result
-} catch (error) {
-  console.error('Unexpected error:', error);
-}
+import ProfileService from '../services/profileService';
+
+const displayName = ProfileService.getUserDisplayName(userData);
+const maskedNIC = ProfileService.getMaskedNIC(userData.nic);
 ```
 
-### 3. Consistent Response Format
-All service methods return objects with `success` and either `data` or `error` properties.
+## API Endpoints Used
 
-### 4. Automatic Token Management
-The service layer automatically:
-- Adds authentication headers
-- Handles token expiration
-- Redirects to login on authentication failures
+### Appointment Endpoints
+- `POST /appointments_view/ongoing` - Get ongoing appointments
+- `POST /appointments_view/incomplete` - Get incomplete appointments
+- `POST /appointments_view/previous` - Get completed appointments
+- `POST /appointments_view/ongoing/{id}` - Get ongoing appointment details
+- `POST /appointments_view/incomplete/{id}` - Get incomplete appointment details
+- `POST /appointments_view/previous/{id}` - Get completed appointment details
 
-## 🔄 Integration with Components
+### Message Endpoints (Planned)
+- `GET /messages` - Get user messages
+- `GET /messages/unread-count` - Get unread count
+- `PUT /messages/{id}/read` - Mark message as read
 
-### Login Component
-```javascript
-import { AuthService } from '../../services';
+## Development Notes
 
-const handleLogin = async () => {
-  const result = await AuthService.login({
-    nic: nicNumber,
-    passcode: password
-  });
-  
-  if (result.success) {
-    login(result.data.user, 'user', result.data.access_token);
-    navigate('/services');
-  } else {
-    setError(result.error);
-  }
-};
-```
+### Mock Data
+- MessageService currently uses mock data
+- Replace with actual API endpoints when available
+- Maintain same data structure for seamless transition
 
-### SignUp Component
-```javascript
-import { AuthService } from '../../services';
+### Error Handling
+- All services return consistent error format
+- `{ success: boolean, error?: string, data?: any }`
+- Components should check `success` before using `data`
 
-const handleSignUp = async () => {
-  const result = await AuthService.register(formData);
-  
-  if (result.success) {
-    setSuccess('Account created successfully!');
-    // Auto-login logic...
-  } else {
-    setError(result.error);
-  }
-};
-```
+### Testing
+- Use `test-profile-integration.js` for service testing
+- Run in browser console: `testProfileIntegration()`
+- Test utility functions: `testUtilityFunctions()`
 
-## 🧪 Testing
+## Future Enhancements
 
-The service layer is designed to be easily testable:
-- Mock the `ApiService` for unit tests
-- Test error scenarios
-- Verify response format consistency
+1. **Caching Layer**
+   - Implement service worker for offline support
+   - Add Redis-like caching for frequently accessed data
 
-## 📈 Future Enhancements
+2. **Real-time Updates**
+   - WebSocket integration for live updates
+   - Push notifications for new messages
 
-- Add request/response interceptors
-- Implement request caching
-- Add request retry logic
-- Support for different API environments (dev, staging, prod)
-- Add request/response logging
-- Implement offline support
+3. **Advanced Analytics**
+   - User behavior tracking
+   - Performance metrics
+   - Error reporting
+
+4. **Service Worker**
+   - Offline functionality
+   - Background sync
+   - Push notifications

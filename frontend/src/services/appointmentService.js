@@ -145,15 +145,21 @@ class AppointmentService {
   static calculateProgress(appointments) {
     if (!appointments || appointments.length === 0) return 0;
     
-    // For now, we'll use a simple calculation based on completed vs total
-    // This can be enhanced based on your business logic
-    const totalSteps = appointments.length * 4; // Assuming 4 steps per appointment
-    const completedSteps = appointments.reduce((total, appointment) => {
-      // Add logic here based on your progress calculation requirements
-      return total + 2; // Placeholder: assuming 2 steps completed per appointment
-    }, 0);
+    // Calculate progress based on appointment completion status
+    // This is a simplified calculation - you can enhance it based on your business logic
+    const totalAppointments = appointments.length;
+    const completedAppointments = appointments.filter(appointment => 
+      appointment.is_fully_completed
+    ).length;
     
-    return Math.round((completedSteps / totalSteps) * 100);
+    // If all appointments are completed, return 100%
+    if (completedAppointments === totalAppointments) return 100;
+    
+    // Calculate progress based on completion ratio
+    const progress = Math.round((completedAppointments / totalAppointments) * 100);
+    
+    // Ensure progress is between 0 and 100
+    return Math.max(0, Math.min(100, progress));
   }
 
   /**
@@ -164,9 +170,90 @@ class AppointmentService {
   static countRequiredDocuments(appointments) {
     if (!appointments || appointments.length === 0) return 0;
     
-    // This would need to be enhanced based on your actual data structure
-    // For now, returning a placeholder count
-    return appointments.length * 2; // Placeholder: assuming 2 docs per appointment
+    // This is a placeholder calculation
+    // In a real implementation, you would need to fetch the required documents
+    // for each incomplete appointment and count them
+    // For now, we'll assume each incomplete appointment needs 2-3 documents
+    return appointments.length * 2;
+  }
+
+  /**
+   * Get comprehensive appointment statistics for profile page
+   * @param {string} userId - User ID
+   * @returns {Promise<Object>} Statistics object
+   */
+  static async getAppointmentStatistics(userId) {
+    try {
+      const [ongoingResult, incompleteResult, previousResult] = await Promise.all([
+        this.getOngoingAppointments(userId),
+        this.getIncompleteAppointments(userId),
+        this.getPreviousAppointments(userId)
+      ]);
+
+      const ongoing = ongoingResult.success ? ongoingResult.data || [] : [];
+      const incomplete = incompleteResult.success ? incompleteResult.data || [] : [];
+      const previous = previousResult.success ? previousResult.data || [] : [];
+
+      return {
+        success: true,
+        data: {
+          ongoing,
+          incomplete,
+          previous,
+          ongoingProgress: this.calculateProgress(ongoing),
+          requiredDocumentsCount: this.countRequiredDocuments(incomplete),
+          totalAppointments: ongoing.length + incomplete.length + previous.length
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: {
+          ongoing: [],
+          incomplete: [],
+          previous: [],
+          ongoingProgress: 0,
+          requiredDocumentsCount: 0,
+          totalAppointments: 0
+        }
+      };
+    }
+  }
+
+  /**
+   * Get appointment summary for dashboard
+   * @param {string} userId - User ID
+   * @returns {Promise<Object>} Summary object
+   */
+  static async getAppointmentSummary(userId) {
+    try {
+      const stats = await this.getAppointmentStatistics(userId);
+      if (!stats.success) {
+        return stats;
+      }
+
+      const { ongoing, incomplete, previous } = stats.data;
+
+      return {
+        success: true,
+        data: {
+          ongoingCount: ongoing.length,
+          incompleteCount: incomplete.length,
+          previousCount: previous.length,
+          ongoingProgress: this.calculateProgress(ongoing),
+          requiredDocumentsCount: this.countRequiredDocuments(incomplete),
+          hasOngoing: ongoing.length > 0,
+          hasIncomplete: incomplete.length > 0,
+          hasPrevious: previous.length > 0
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
   }
 }
 
