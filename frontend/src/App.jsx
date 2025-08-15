@@ -189,9 +189,9 @@ function App() {
             <Route 
               path="/admin/completed-tasks" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminCompletedTasksPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
             <Route 
@@ -403,9 +403,9 @@ function App() {
             <Route 
               path="/previous-activities" 
               element={
-                <UserRoute>
+                // <UserRoute>
                   <PreviousActivitiesPage />
-                </UserRoute>
+                // </UserRoute>
               } 
             />
             <Route 
