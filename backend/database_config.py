@@ -1,15 +1,9 @@
 import motor.motor_asyncio
 import os
 from dotenv import load_dotenv
-# Add async stubs for FastAPI startup/shutdown compatibility
-
 
 load_dotenv()
 
-# load environment variables from the .env file
-# load environment variables from the .env file
-
-# MongoDB URI from .env file
 # MongoDB URI from .env file
 MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = "SmartGov" 
@@ -30,25 +24,17 @@ collection_required_documents = db["required_documents"]
 collection_users = db["users"]
 collection_uploaded_documents = db["uploaded_documents"]
 collection_sub_services = db["sub_services"] 
-
-
-
-
+collection_ratings = db["ratings"]
 
 # JWT Configuration
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
-async def connect_to_mongo():
-	pass
-
-async def close_mongo_connection():
-	pass
 
 # Add async stubs for FastAPI startup/shutdown compatibility
 async def connect_to_mongo():
-	pass
+    pass
 
 async def close_mongo_connection():
-	pass
+    pass
 
