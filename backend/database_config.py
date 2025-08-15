@@ -30,6 +30,7 @@ collection_required_documents = db["required_documents"]
 collection_users = db["users"]
 collection_uploaded_documents = db["uploaded_documents"]
 collection_sub_services = db["sub_services"] 
+collection_ratings = db["ratings"]
 
 
 
