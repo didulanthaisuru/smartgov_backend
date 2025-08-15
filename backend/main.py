@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from database_config import connect_to_mongo, close_mongo_connection
 from routes.routes import api_router
-from config import settings
 from fastapi.middleware.cors import CORSMiddleware
 
 # Create FastAPI app
@@ -14,7 +13,7 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # Frontend URLs
+    allow_origins=["*"],  # Frontend URLs
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
