@@ -1,17 +1,9 @@
 from fastapi import HTTPException
 from datetime import datetime
 from bson import ObjectId
-from motor.motor_asyncio import AsyncIOMotorClient
-import os
-from dotenv import load_dotenv
 from database_config import db
 
-load_dotenv()
-
-# Async MongoDB setup
-MONGO_URI = os.getenv("MONGO_URI")
-client = AsyncIOMotorClient(MONGO_URI)
-db = client["SmartGov"]
+# Use the database connection from database_config.py
 appointment_collection = db["appointmentdetails"]
 
 def serialize_doc(doc):
