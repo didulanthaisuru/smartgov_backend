@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom"; // UPDATED: Added hooks
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { 
     Elements, 
@@ -11,7 +11,6 @@ import {
 } from "@stripe/react-stripe-js";
 import axios from "axios";
 import { Menu, ChevronDown, Check, X } from "lucide-react";
-
 
 const stripePromise = loadStripe("pk_test_51RwId9Agvx5HIouQWVYHeLSJO5e5wCdnlrINloASxF0JgfaMBBF4Jc4mV1XP1S7SK5kbf6Aude9N3aao2kRDJLC100ysekAN53");
 
@@ -25,18 +24,17 @@ const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   
-  // NEW: Get routing information
   const navigate = useNavigate();
   const location = useLocation();
   const { appointmentId } = useParams();
 
-  // NEW: Get appointment details and payment amount dynamically
   const appointmentDetails = location.state?.appointmentDetails || {};
   const paymentAmount = appointmentDetails.paymentAmount || 0;
 
   const [cardHolder, setCardHolder] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPopup, setShowPopup] = useState({ visible: false, status: '', message: '' });
+  const [isFinalizing, setIsFinalizing] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,7 +46,7 @@ const CheckoutForm = () => {
 
     try {
       const { data } = await axios.post("http://localhost:8000/create-payment-intent", {
-        amount: Math.round((paymentAmount/300) * 100) // UPDATED: Use dynamic amount
+        amount: Math.round((paymentAmount / 300) * 100)
       });
       const clientSecret = data.clientSecret;
       const cardNumberElement = elements.getElement(CardNumberElement);
@@ -70,25 +68,34 @@ const CheckoutForm = () => {
     setIsProcessing(false);
   };
 
-  // UPDATED: Handle navigation after closing the popup
-  const handlePopupClose = () => {
+  const handlePopupClose = async () => {
     const status = showPopup.status;
-    setShowPopup({ visible: false, status: '', message: '' });
-
+    
     if (status === 'success') {
-      // On success, go to the confirmation page with all details
-      navigate(`/confirmation/${appointmentId}`, { 
-        state: { appointmentDetails } 
-      });
+      setIsFinalizing(true);
+      try {
+        await axios.patch(`http://127.0.0.1:8000/api/v1/appointment_creation/${appointmentId}`, {
+          payment_status: true
+        });
+
+        setShowPopup({ visible: false, status: '', message: '' });
+        navigate(`/confirmation/${appointmentId}`, { 
+          state: { appointmentDetails } 
+        });
+
+      } catch (error) {
+        console.error("Failed to update payment status:", error);
+        setShowPopup({ visible: true, status: 'failed', message: 'Payment succeeded but failed to update status. Please contact support.' });
+      } finally {
+        setIsFinalizing(false);
+      }
     } else {
-      // On failure, go back to the booking page with the necessary details
-      navigate(`/appointment/${appointmentId}`, {
-        state: {
-          subServiceName: appointmentDetails.service,
-          subServiceId: appointmentDetails.subServiceId,
-          paymentAmount: appointmentDetails.paymentAmount
-        }
-      });
+      // --- FIXED LOGIC FOR FAILED PAYMENTS ---
+      setShowPopup({ visible: false, status: '', message: '' });
+      
+      // Option 1: Go back to the previous page in history
+      navigate(-1);
+      
     }
   };
 
@@ -104,12 +111,27 @@ const CheckoutForm = () => {
                     <div className="grid grid-cols-2 gap-4"><StripeInput component={CardExpiryElement} /><StripeInput component={CardCvcElement} /></div>
                     <input type="text" placeholder="Card holder" value={cardHolder} onChange={(e) => setCardHolder(e.target.value)} required className="w-full bg-gray-100 border-gray-200 border rounded-lg p-4 text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"/>
                 </div>
-                {/* UPDATED: Display dynamic amount */}
                 <div className="flex justify-between items-center mt-8 py-4 border-t border-b border-gray-100"><span className="text-base font-medium text-gray-600">Amount</span><span className="text-lg font-bold text-black">Rs. {paymentAmount.toFixed(2)}</span></div>
             </main>
             <footer className="p-6"><button type="submit" disabled={!stripe || isProcessing} className={`w-full py-4 rounded-xl text-lg font-semibold transition-colors ${isProcessing ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#8B3C2B] text-white hover:bg-[#7A3024]'}`}>{isProcessing ? 'Processing...' : 'Pay'}</button></footer>
         </form>
-        {showPopup.visible && (<div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50"><div className="bg-white rounded-2xl shadow-xl w-full max-w-xs p-6 flex flex-col items-center text-center"><div className={`w-20 h-20 rounded-full flex items-center justify-center mb-5 ${showPopup.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>{showPopup.status === 'success' ? <Check className="w-12 h-12 text-white" strokeWidth={3} /> : <X className="w-12 h-12 text-white" strokeWidth={3} />}</div><h2 className={`text-2xl font-bold mb-6 ${showPopup.status === 'success' ? 'text-green-600' : 'text-red-600'}`}>{showPopup.message}</h2><button onClick={handlePopupClose} className={`w-full py-3 rounded-lg text-white font-semibold ${showPopup.status === 'success' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}`}>{showPopup.status === 'success' ? 'Ok' : 'Try Again'}</button></div></div>)}
+        {showPopup.visible && (
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                <div className="bg-white rounded-2xl shadow-xl w-full max-w-xs p-6 flex flex-col items-center text-center">
+                    <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-5 ${showPopup.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+                        {showPopup.status === 'success' ? <Check className="w-12 h-12 text-white" strokeWidth={3} /> : <X className="w-12 h-12 text-white" strokeWidth={3} />}
+                    </div>
+                    <h2 className={`text-2xl font-bold mb-6 ${showPopup.status === 'success' ? 'text-green-600' : 'text-red-600'}`}>{showPopup.message}</h2>
+                    <button 
+                        onClick={handlePopupClose} 
+                        disabled={isFinalizing}
+                        className={`w-full py-3 rounded-lg text-white font-semibold ${showPopup.status === 'success' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'} disabled:bg-gray-400`}
+                    >
+                        {isFinalizing ? 'Finalizing...' : (showPopup.status === 'success' ? 'Ok' : 'Try Again')}
+                    </button>
+                </div>
+            </div>
+        )}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Menu, ChevronDown, Circle } from "lucide-react";
+import Header from '../components/Header';
 
 // Chart Components
 const VerticalBarChart = ({ data }) => ( 
@@ -25,12 +26,7 @@ const HorizontalBarChart = ({ data }) => (
   </div> 
 );
 
-// Simple Header component (since original wasn't provided)
-const Header = () => (
-  <div className="bg-red-800 text-white p-4">
-    <h1 className="text-lg font-semibold">Appointment Booking</h1>
-  </div>
-);
+
 
 const AppointmentBookingPage = () => {
   const navigate = useNavigate();
