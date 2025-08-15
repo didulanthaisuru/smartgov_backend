@@ -17,24 +17,7 @@ const AdminHeader = ({ title, setShowSidebar, children }) => {
       <div className="flex justify-between items-center p-4 lg:p-6">
         <div className="flex items-center">
           {/* Admin Hamburger Menu */}
-          <button
-            onClick={() => setShowSidebar(true)}
-            className="w-12 h-12 bg-blue-100 hover:bg-blue-200 rounded-lg flex items-center justify-center transition-colors shadow-sm border border-blue-300 mr-4"
-          >
-            <svg
-              className="w-6 h-6 text-blue-700"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
+          
           
           {title && (
             <div className="ml-2">

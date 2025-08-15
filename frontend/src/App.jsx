@@ -165,9 +165,9 @@ function App() {
             <Route 
               path="/admin/tasks" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminTasksPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
             <Route 
@@ -205,9 +205,9 @@ function App() {
             <Route 
               path="/admin/qr-scan" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminQRScanPage />
-                </AdminRoute>
+                 //</AdminRoute>
               } 
             />
 

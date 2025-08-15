@@ -31,9 +31,9 @@ const ContactUsPage = () => {
   const [error, setError] = useState(false);
 
   // Replace these with your EmailJS values
-  const SERVICE_ID = "your_service_id";
-  const TEMPLATE_ID = "your_template_id";
-  const PUBLIC_KEY = "your_public_key";
+  const SERVICE_ID = "service_fodl4s2";
+  const TEMPLATE_ID = "template_017cocw";
+  const PUBLIC_KEY = "By2yEdwSnOVqqGAXa" ;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,6 +54,9 @@ const ContactUsPage = () => {
       };
 
       const result = await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams);
+
+      console.log("Emailjs public key",PUBLIC_KEY);
+      
 
       console.log("Email sent:", result);
       setSuccess(true);

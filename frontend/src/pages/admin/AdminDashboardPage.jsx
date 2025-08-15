@@ -129,7 +129,7 @@ useEffect(() => {
   const fetchWeeklySubData = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/v1/insights/weekly-appointment-counts-mainService",
+        "http://localhost:8000/api/v1/insights/weekly-appointment-counts-mainservice",
         {
           sub_service_id: "689b93230d3364bd64eaa075",
           main_service_id: "689cd830ef2618d4dfe5a596",
