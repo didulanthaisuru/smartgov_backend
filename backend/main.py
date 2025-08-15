@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database_config import connect_to_mongo, close_mongo_connection
 from routes.routes import api_router
-from routes.user_profile import router as user_profile_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -36,4 +35,3 @@ def health_check():
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
-app.include_router(user_profile_router, prefix="/api", tags=["user_profile"])

@@ -3,12 +3,12 @@ from schemas.usr_profile import UserProfile
 from services.user_profile import get_user, update_user
 from typing import Optional
 
-router = APIRouter()
+router = APIRouter(prefix="/profile", tags=["UserProfile"])
 
 # GET user profile
 @router.get("/user/{nic}", response_model=UserProfile)
-def read_user_profile(nic: str):
-    return get_user(nic)
+async def read_user_profile(nic: str):
+    return await get_user(nic)
 
 # PUT update user profile
 @router.put("/user/{nic}")

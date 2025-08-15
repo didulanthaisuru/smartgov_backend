@@ -18,8 +18,8 @@ def user_to_dict(user):
     return result
 
 # Get user by ID
-def get_user(nic: str):
-    user = users_collection.find_one({"nic": nic})
+async def get_user(nic: str):
+    user = await users_collection.find_one({"nic": nic})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user_to_dict(user)
@@ -27,7 +27,7 @@ def get_user(nic: str):
 # Update user profile
 async def update_user(nic: str, first_name: str = None, phone_number: str = None,
                       address: str = None, profile_picture: UploadFile = None):
-    user = users_collection.find_one({"nic": nic})
+    user = await users_collection.find_one({"nic": nic})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -45,6 +45,6 @@ async def update_user(nic: str, first_name: str = None, phone_number: str = None
 
     if update_data:
         update_data["updated_at"] = datetime.utcnow()
-        users_collection.update_one({"nic": nic}, {"$set": update_data})
+        await users_collection.update_one({"nic": nic}, {"$set": update_data})
 
     return {"message": "Profile updated successfully", "updated_at": update_data.get("updated_at")}
