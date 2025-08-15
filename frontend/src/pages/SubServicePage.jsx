@@ -3,6 +3,7 @@ import axios from "axios";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { FaBars, FaUser } from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
+import Header from '../components/Header';
 
 const SubServicesPage = () => {
   const userId = "689b0fce51fe72cd1df58f06";
@@ -82,13 +83,7 @@ const SubServicesPage = () => {
   return (
     <div className="w-[430px] h-[932px] bg-white shadow-lg mx-auto border border-gray-200 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-300 bg-white">
-        <FaBars className="text-2xl text-gray-800" />
-        <h1 className="text-lg font-bold text-gray-800">Smart Gov</h1>
-        <select className="border border-gray-300 rounded-md px-2 py-1 text-sm">
-          <option>English</option>
-        </select>
-      </div>
+      <Header></Header>
 
       {/* Title */}
       <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-300 bg-gray-50">
