@@ -51,10 +51,7 @@ const QRCodePage = () => {
                                 />
                             </div>
                         </div>
-                        <div className="text-center mb-4">
-                            {/* The original ID is still displayed for human readability */}
-                            <p className="text-lg font-semibold text-black">{appointmentId}</p>
-                        </div>
+                        
                         <div className="text-center mb-6">
                             <p className="text-base text-black leading-relaxed">
                                 Use The QR Code when you meet the officer
