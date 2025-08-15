@@ -23,12 +23,18 @@ class AdminServiceInfoResponse(BaseModel):
 class AppointmentIdsResponse(BaseModel):
     appointment_ids: List[str]
 
+class SubServiceStep(BaseModel):
+    step_id: int
+    step_name: str
+    status: bool
+    completed_by: Optional[str] = None
+
 class AppointmentDocument(BaseModel):
-    _id: str
+    appointment_id: str = Field(alias="_id")  # Explicit appointment ID
     user_id: str
     user_name: str
     sub_service_id: str
-    sub_service_steps: List[Dict[str, Any]]
+    sub_service_steps: List[SubServiceStep]
     created_at: datetime
     is_fully_completed: bool
     appointment_date: Optional[datetime] = None
@@ -38,6 +44,9 @@ class AppointmentDocument(BaseModel):
     appointment_confirmed: bool
     completed_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    
+    class Config:
+        populate_by_name = True
 
 class AppointmentsResponse(BaseModel):
     appointments: List[AppointmentDocument]

@@ -26,6 +26,12 @@ async def get_admin_service_info_route(admin_id: str):
 async def get_appointments_by_sub_service_route(sub_service_id: str):
     """
     Gets full appointment details for a specific sub_service_id where appointment_confirmed is true.
+    
+    Args:
+        sub_service_id (str): The sub service ID to get appointments for
+        
+    Returns:
+        AppointmentsResponse: List of appointments with full details including appointment_id
     """
     appointments = await get_appointments_by_sub_service(sub_service_id=sub_service_id)
     
