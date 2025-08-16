@@ -1,0 +1,9 @@
+__pycache__
+.venv
+venv
+*.pyc
+*.pyo
+*.pyd
+.Python
+python_env
+uploads
