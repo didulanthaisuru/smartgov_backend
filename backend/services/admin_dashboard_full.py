@@ -122,6 +122,7 @@ async def get_appointment_details_by_id(appointment_id: str):
                     # Get required document details
                     for doc_id in sub_service["required_docs"]:
                         try:
+                            # doc_id in sub_service.required_docs is ObjectId, use it to find in required_documents collection
                             doc_details = await collection_required_documents.find_one({"_id": doc_id})
                             if doc_details:
                                 doc_details["_id"] = str(doc_details["_id"])
@@ -134,14 +135,22 @@ async def get_appointment_details_by_id(appointment_id: str):
         # Get uploaded documents for this appointment
         uploaded_documents = []
         try:
-            cursor = collection_uploaded_documents.find({"appointment_id": ObjectId(appointment_id)})
+            # Use booking_id (which is the appointment_id as string) to find uploaded documents
+            cursor = collection_uploaded_documents.find({"booking_id": appointment_id})
             async for uploaded_doc in cursor:
-                uploaded_doc["_id"] = str(uploaded_doc["_id"])
-                if "appointment_id" in uploaded_doc:
-                    uploaded_doc["appointment_id"] = str(uploaded_doc["appointment_id"])
-                if "required_doc_id" in uploaded_doc:
-                    uploaded_doc["required_doc_id"] = str(uploaded_doc["required_doc_id"])
-                uploaded_documents.append(uploaded_doc)
+                # Map database fields to schema fields
+                mapped_doc = {
+                    "_id": str(uploaded_doc["_id"]),
+                    "appointment_id": uploaded_doc.get("booking_id", ""),  # Map booking_id to appointment_id
+                    "user_id": appointment.get("user_id", ""),  # Use user_id from appointment
+                    "required_doc_id": str(uploaded_doc.get("required_doc_id", "")),
+                    "file_name": uploaded_doc.get("file_name", ""),
+                    "file_path": uploaded_doc.get("file_path", ""),
+                    "accuracy": uploaded_doc.get("accuracy"),
+                    "doc_status": uploaded_doc.get("doc_status", "pending"),
+                    "uploaded_at": uploaded_doc.get("uploaded_at")
+                }
+                uploaded_documents.append(mapped_doc)
         except Exception as e:
             print(f"Error fetching uploaded documents: {e}")
         
@@ -154,6 +163,11 @@ async def get_appointment_details_by_id(appointment_id: str):
     except Exception as e:
         print(f"Error retrieving appointment details: {e}")
         return None
+
+
+
+
+
 
 async def get_appointment_step_details(appointment_id: str):
     """
@@ -229,6 +243,7 @@ async def get_appointment_step_details(appointment_id: str):
         print(f"Error retrieving appointment step details: {e}")
         return None
 
+
 async def approve_uploaded_document(document_id: str):
     """
     Approves an uploaded document by updating its status from 'pending' to 'approved'.
@@ -240,10 +255,10 @@ async def approve_uploaded_document(document_id: str):
         dict: Approval result with message and document_id, or None if document not found or already approved
     """
     try:
-        # Find the document and check if it exists and is pending
+        # Find the document and check if it exists and is pending (case insensitive)
         document = await collection_uploaded_documents.find_one({
             "_id": ObjectId(document_id),
-            "doc_status": "Pending"
+            "doc_status": {"$in": ["pending", "Pending"]}
         })
         
         if not document:
@@ -252,7 +267,7 @@ async def approve_uploaded_document(document_id: str):
         # Update the document status to approved
         result = await collection_uploaded_documents.update_one(
             {"_id": ObjectId(document_id)},
-            {"$set": {"doc_status": "Approved"}}
+            {"$set": {"doc_status": "approved"}}
         )
         
         if result.modified_count > 0:

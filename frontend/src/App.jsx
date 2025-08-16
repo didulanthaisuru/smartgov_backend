@@ -44,7 +44,7 @@ import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminRegisterPage from './pages/admin/AdminRegisterPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminTasksPage from './pages/admin/AdminTasksPage';
-import AdminTaskDetailsPage from './pages/admin/AdminTaskDetailsPage';
+import AdminTaskDetailsPage from './pages/AdminTaskDetailsPage';
 import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminCompletedTasksPage from './pages/admin/AdminCompletedTasksPage';
 import AdminChatPage from './pages/admin/AdminChatPage';
@@ -181,9 +181,9 @@ function App() {
             <Route 
               path="/admin/task-details/:taskId" 
               element={
-                <AdminRoute>
+                //<AdminRoute>
                   <AdminTaskDetailsPage />
-                </AdminRoute>
+                //</AdminRoute>
               } 
             />
             <Route 
