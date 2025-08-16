@@ -154,3 +154,77 @@ async def get_appointment_details_by_id(appointment_id: str):
     except Exception as e:
         print(f"Error retrieving appointment details: {e}")
         return None
+
+async def get_appointment_step_details(appointment_id: str):
+    """
+    Retrieves step details for a specific appointment_id with proper mapping between sub-service steps and appointment step status.
+    
+    Args:
+        appointment_id (str): The appointment ID to search for (MongoDB ObjectId as string)
+        
+    Returns:
+        dict: Step details with proper mapping between sub-service steps and appointment status,
+        or None if appointment not found
+    """
+    try:
+        # Get appointment details
+        appointment = await collection_apointment.find_one({"_id": ObjectId(appointment_id)})
+        
+        if not appointment:
+            return None
+        
+        # Convert ObjectId to string for JSON serialization
+        appointment_id_str = str(appointment["_id"])
+        sub_service_id_str = str(appointment["sub_service_id"]) if "sub_service_id" in appointment else None
+        
+        # Get sub-service details
+        sub_service = None
+        if sub_service_id_str:
+            sub_service = await collection_sub_services.find_one({"_id": ObjectId(sub_service_id_str)})
+        
+        if not sub_service:
+            return None
+        
+        # Extract sub-service information
+        sub_service_name = sub_service.get("service_name", "Unknown Service")
+        payment_amount = sub_service.get("payment_amount", 0.0)
+        sub_service_steps = sub_service.get("steps", [])
+        
+        # Get appointment step status
+        appointment_step_status = appointment.get("sub_service_steps", [])
+        
+        # Ensure both lists have the same structure
+        processed_sub_service_steps = []
+        processed_appointment_steps = []
+        
+        # Process sub-service steps (template)
+        for step in sub_service_steps:
+            if isinstance(step, dict):
+                processed_sub_service_steps.append({
+                    "step_id": step.get("step_id", 0),
+                    "step_name": step.get("step_name", "Unknown Step")
+                })
+        
+        # Process appointment step status (actual status)
+        for step in appointment_step_status:
+            if isinstance(step, dict):
+                processed_appointment_steps.append({
+                    "step_id": step.get("step_id", 0),
+                    "step_name": step.get("step_name", "Unknown Step"),
+                    "status": step.get("status", False),
+                    "completed_by": step.get("completed_by", None)
+                })
+        
+        return {
+            "appointment_id": appointment_id_str,
+            "sub_service_id": sub_service_id_str,
+            "sub_service_name": sub_service_name,
+            "payment_amount": payment_amount,
+            "sub_service_steps": processed_sub_service_steps,
+            "appointment_step_status": processed_appointment_steps,
+            "is_fully_completed": appointment.get("is_fully_completed", False)
+        }
+            
+    except Exception as e:
+        print(f"Error retrieving appointment step details: {e}")
+        return None

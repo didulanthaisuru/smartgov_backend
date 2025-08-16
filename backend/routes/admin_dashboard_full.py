@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
 # Import the service function and the response schema
-from services.admin_dashboard_full import get_appointments_by_sub_service_full, get_appointment_details_by_id
-from schemas.admin_dashboard_full import AppointmentsFullResponse, AppointmentDetailsResponse
+from services.admin_dashboard_full import get_appointments_by_sub_service_full, get_appointment_details_by_id, get_appointment_step_details
+from schemas.admin_dashboard_full import AppointmentsFullResponse, AppointmentDetailsResponse, AppointmentStepDetailsResponse
 
 # Create a new router for the admin dashboard full
 router = APIRouter(
@@ -46,3 +46,21 @@ async def get_appointment_details_by_id_route(appointment_id: str):
         raise HTTPException(status_code=404, detail="Appointment not found")
     
     return appointment_details
+
+@router.get("/appointment_step_details/{appointment_id}", response_model=AppointmentStepDetailsResponse)
+async def get_appointment_step_details_route(appointment_id: str):
+    """
+    Gets step details for a specific appointment_id with proper mapping between sub-service steps and appointment step status.
+    
+    Args:
+        appointment_id (str): The appointment ID to get step details for
+        
+    Returns:
+        AppointmentStepDetailsResponse: Step details with proper mapping between sub-service steps and appointment status
+    """
+    step_details = await get_appointment_step_details(appointment_id=appointment_id)
+    
+    if step_details is None:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+    
+    return step_details

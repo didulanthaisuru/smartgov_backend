@@ -193,10 +193,82 @@ curl -X GET "http://localhost:8000/api/admin/dashboard-full/appointments_by_subs
 curl -X GET "http://localhost:8000/api/admin/dashboard-full/appointment_details/689e179f0a2b385df7944b4d"
 ```
 
+### 3. Get Appointment Step Details by Appointment ID
+
+**Endpoint:** `GET /appointment_step_details/{appointment_id}`
+
+**Description:** Retrieves step details for a specific appointment ID with proper mapping between sub-service steps and appointment step status.
+
+**Path Parameters:**
+- `appointment_id` (string, required): The appointment ID to get step details for
+
+**Query Parameters:** None
+
+**Request Body:** None
+
+**Response:**
+```json
+{
+  "appointment_id": "689e179f0a2b385df7944b4d",
+  "sub_service_id": "689cd830ef2618d4dfe5a594",
+  "sub_service_name": "New Born Certificate at hospital",
+  "payment_amount": 250.0,
+  "sub_service_steps": [
+    {
+      "step_id": 1,
+      "step_name": "Document Verification"
+    },
+    {
+      "step_id": 2,
+      "step_name": "Certificate Issuance"
+    }
+  ],
+  "appointment_step_status": [
+    {
+      "step_id": 1,
+      "step_name": "Document Verification",
+      "status": false,
+      "completed_by": null
+    },
+    {
+      "step_id": 2,
+      "step_name": "Certificate Issuance",
+      "status": false,
+      "completed_by": null
+    }
+  ],
+  "is_fully_completed": false
+}
+```
+
+**Response Fields:**
+- `appointment_id` (string): The appointment identifier
+- `sub_service_id` (string): The sub-service identifier
+- `sub_service_name` (string): Name of the sub-service
+- `payment_amount` (float): Payment amount for the service
+- `sub_service_steps` (array): List of step definitions from sub-service (template)
+  - `step_id` (integer): Step identifier
+  - `step_name` (string): Name of the step
+- `appointment_step_status` (array): List of step status for this appointment (actual status)
+  - `step_id` (integer): Step identifier
+  - `step_name` (string): Name of the step
+  - `status` (boolean): Whether the step is completed
+  - `completed_by` (string, nullable): Who completed the step
+- `is_fully_completed` (boolean): Whether all steps are completed
+
+**Error Responses:**
+- `404`: Appointment not found
+- `500`: Internal server error
+
+**Example Usage:**
+```bash
+curl -X GET "http://localhost:8000/api/admin/dashboard-full/appointment_step_details/689e179f0a2b385df7944b4d"
+```
+
 ## Database Collections Used
 - `appointments`: Main appointment data
 - `users`: User information for name resolution
-- `sub_services`: Sub-service information and required documents
+- `sub_services`: Sub-service information, steps, and required documents
 - `required_documents`: Required document details
 - `uploaded_documents`: Uploaded document details
 
@@ -207,3 +279,4 @@ curl -X GET "http://localhost:8000/api/admin/dashboard-full/appointment_details/
 - User names are constructed by combining first_name and last_name
 - If user details cannot be retrieved, "Unknown User" is used as the user_name
 - The second endpoint retrieves all documents (required and uploaded) for a specific appointment
+- The third endpoint provides proper mapping between sub-service step definitions and appointment step status
