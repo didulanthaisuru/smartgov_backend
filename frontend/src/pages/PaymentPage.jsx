@@ -12,7 +12,16 @@ import {
 import axios from "axios";
 import { Menu, ChevronDown, Check, X } from "lucide-react";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+// Initialize Stripe with error handling
+const stripePromise = (() => {
+  try {
+    const key = import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_51RwId9Agvx5HIouQNwqI5N51tJR0Xd53CxTAdRT6zBwqhSSkFamyYygq5txef9AuWsiDbBMzxreWV78vBgkSDyoh00rYqRORiy';
+    return loadStripe(key);
+  } catch (error) {
+    console.error('Failed to initialize Stripe:', error);
+    return null;
+  }
+})();
 
 // --- Reusable UI Components & Styling ---
 const MastercardIcon = () => ( <svg width="32" height="24" viewBox="0 0 32 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="12" r="9" fill="#EB001B"/><circle cx="23" cy="12" r="9" fill="#F79E1B" fillOpacity="0.8"/></svg> );
@@ -138,5 +147,22 @@ const CheckoutForm = () => {
 
 // --- The Page Wrapper Component ---
 export default function PaymentPage() {
+  if (!stripePromise) {
+    return (
+      <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-6 text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Payment System Unavailable</h2>
+          <p className="text-gray-600 mb-4">The payment system is currently unavailable. Please try again later or contact support.</p>
+          <button 
+            onClick={() => window.history.back()}
+            className="bg-[#8B3C2B] text-white px-6 py-2 rounded-lg hover:bg-[#7A3024] transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
   return (<div className="min-h-screen w-full bg-gray-100 flex items-center justify-center p-4"><Elements stripe={stripePromise}><CheckoutForm /></Elements></div>);
 }

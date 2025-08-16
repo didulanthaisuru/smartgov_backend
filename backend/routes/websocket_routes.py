@@ -1,7 +1,3 @@
-# =============================================================================
-# WEB SOCKET ROUTES
-# =============================================================================
-
 from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
 
