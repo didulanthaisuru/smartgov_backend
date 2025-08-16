@@ -75,18 +75,14 @@ const AdminDashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white relative">
+    <div className="min-h-screen bg-gray-50">
       {/* Admin Sidebar */}
       <AdminSidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       
       {/* Header */}
       <AdminHeader 
-        title={`${user?.service_id || 'Birth Certificate'} Admin`}
         setShowSidebar={setShowSidebar}
-      >
-        {/* Profile Icon */}
-        <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-      </AdminHeader>
+      />
 
       {/* Main Content */}
       <div className="p-6 space-y-6">
