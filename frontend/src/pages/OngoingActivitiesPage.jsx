@@ -272,11 +272,20 @@ const OngoingActivitiesPage = () => {
 
                 {/* Bottom Icons */}
                 <div className="flex justify-end space-x-3 mt-4">
-                  {/* Eye Icon */}
-                  <button className="bg-transparent border-none p-0 hover:opacity-70 transition-opacity">
-                    <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
+                  {/* View Details Button */}
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/appointment-details/${activity.id}`, {
+                        state: { appointmentData: activity }
+                      });
+                    }}
+                    className="bg-[#8C3C2A] text-white text-xs font-medium px-3 py-1.5 rounded-md hover:bg-[#7A3424] transition-colors flex items-center gap-1"
+                  >
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                     </svg>
+                    <span>View Details</span>
                   </button>
                   
                   {/* More Information Icon */}
