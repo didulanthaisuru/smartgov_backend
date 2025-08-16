@@ -75,3 +75,7 @@ class AppointmentStepDetailsResponse(BaseModel):
     sub_service_steps: List[SubServiceStepDefinition]
     appointment_step_status: List[AppointmentStepStatus]
     is_fully_completed: bool
+
+class DocumentApprovalResponse(BaseModel):
+    message: str
+    document_id: str

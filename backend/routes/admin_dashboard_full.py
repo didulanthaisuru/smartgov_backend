@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
 # Import the service function and the response schema
-from services.admin_dashboard_full import get_appointments_by_sub_service_full, get_appointment_details_by_id, get_appointment_step_details
-from schemas.admin_dashboard_full import AppointmentsFullResponse, AppointmentDetailsResponse, AppointmentStepDetailsResponse
+from services.admin_dashboard_full import get_appointments_by_sub_service_full, get_appointment_details_by_id, get_appointment_step_details, approve_uploaded_document
+from schemas.admin_dashboard_full import AppointmentsFullResponse, AppointmentDetailsResponse, AppointmentStepDetailsResponse, DocumentApprovalResponse
 
 # Create a new router for the admin dashboard full
 router = APIRouter(
@@ -64,3 +64,15 @@ async def get_appointment_step_details_route(appointment_id: str):
         raise HTTPException(status_code=404, detail="Appointment not found")
     
     return step_details
+
+@router.put("/approve_document/{document_id}", response_model=DocumentApprovalResponse)
+async def approve_document_route(document_id: str):
+    """
+    Approves an uploaded document by updating its status from 'pending' to 'approved'.
+    """
+    result = await approve_uploaded_document(document_id=document_id)
+    
+    if result is None:
+        raise HTTPException(status_code=404, detail="Document not found or already approved")
+    
+    return result
