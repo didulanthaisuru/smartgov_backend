@@ -31,7 +31,6 @@ import ProfilePage from './pages/ProfilePage';
 import OngoingActivitiesPage from './pages/OngoingActivitiesPage';
 import IncompleteActivitiesPage from './pages/IncompleteActivitiesPage';
 import PreviousActivitiesPage from './pages/PreviousActivitiesPage';
-import AppointmentDetailsPage from './pages/AppointmentDetailsPage';
 import UpdateInformationPage from './pages/UpdateInformationPage';
 import AnalyticsDashboardPage from './pages/AnalyticsDashboardPage';
 import SmartGovWelcome1 from './pages/Instructions1';
@@ -206,9 +205,9 @@ function App() {
             <Route 
               path="/admin/chat" 
               element={
-                // <AdminRoute>
+                <AdminRoute>
                   <AdminChatPage />
-                // </AdminRoute>
+                </AdminRoute>
               } 
             />
             <Route 
@@ -438,14 +437,6 @@ function App() {
               element={
                 // <ProtectedRoute>
                   <OngoingActivitiesPage />
-                // </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/appointment-details/:appointmentId" 
-              element={
-                // <ProtectedRoute>
-                  <AppointmentDetailsPage />
                 // </ProtectedRoute>
               } 
             />
