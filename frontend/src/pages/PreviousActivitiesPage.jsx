@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthService from '../services/authService';
 
-const PreviousActivitiesPage = () => {
+const PreviousActivitiesPage = ({ userId="689f4c15c5f5564c686445e2" }) => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [activities, setActivities] = useState([]);
@@ -192,22 +193,18 @@ const PreviousActivitiesPage = () => {
 
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between px-6 py-6">
-        <button 
-          onClick={() => navigate('/profile')}
-          className="w-9 h-9 flex items-center justify-center"
-        >
+        <button onClick={() => navigate('/profile')} className="w-9 h-9 flex items-center justify-center">
           <div className="w-9 h-9 bg-gray-300 rounded"></div>
         </button>
 
         <div className="flex items-center">
-          {/* History Icon */}
           <div className="w-8 h-8 flex items-center justify-center mr-4 bg-white shadow-md rounded-lg">
             <svg className="w-6 h-6 text-black" stroke="currentColor" fill="none" viewBox="0 0 24 24" strokeWidth="2.5">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12,6 12,12 16,14"/>
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12,6 12,12 16,14" />
             </svg>
           </div>
-          
+
           <div className="flex items-center">
             <div className="w-15 h-20 bg-gray-300 rounded mr-4"></div>
             <h1 className="text-2xl font-medium text-black">Smart Gov</h1>
@@ -255,7 +252,7 @@ const PreviousActivitiesPage = () => {
 
       {/* Main Content Area */}
       <div className="relative z-10 bg-white rounded-3xl shadow-[0_4px_250px_rgba(0,0,0,0.25)] mx-9 min-h-[500px] p-6">
-        {/* Search and Filter Bar */}
+        {/* Search Bar */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1 mr-4">
             <div className="relative bg-[#F8CB93] rounded-xl px-6 py-3 flex items-center shadow-md">
@@ -266,28 +263,11 @@ const PreviousActivitiesPage = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="flex-1 bg-transparent text-sm text-black placeholder-black placeholder-opacity-25 border-none outline-none"
               />
-              <svg 
-                onClick={() => console.log('Search clicked:', searchTerm)}
-                className="w-6 h-6 text-black opacity-50 ml-3 hover:opacity-75 transition-opacity cursor-pointer" 
-                fill="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-              </svg>
             </div>
           </div>
-          
-          <button className="bg-[#F8CB93] rounded-xl px-4 py-3 shadow-md flex items-center hover:bg-[rgba(248,203,147,0.8)] transition-colors">
-            <span className="text-sm text-black opacity-75 mr-2">Order By</span>
-            <div className="w-4 h-4 flex items-center justify-center opacity-75">
-              <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M7 10l5 5 5-5z"/>
-              </svg>
-            </div>
-          </button>
         </div>
 
-        {/* Previous Activities List */}
+        {/* Activities List */}
         <div className="space-y-6">
           {filteredActivities.length === 0 ? (
             <div className="text-center py-12">

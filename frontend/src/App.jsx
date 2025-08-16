@@ -166,17 +166,17 @@ function App() {
             <Route 
               path="/admin/dashboard" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminDashboardPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
             <Route 
               path="/admin/tasks" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminTasksPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
             <Route 
@@ -198,9 +198,9 @@ function App() {
             <Route 
               path="/admin/completed-tasks" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminCompletedTasksPage />
-                </AdminRoute>
+                // </AdminRoute>
               } 
             />
             <Route 
@@ -214,9 +214,9 @@ function App() {
             <Route 
               path="/admin/qr-scan" 
               element={
-                <AdminRoute>
+                // <AdminRoute>
                   <AdminQRScanPage />
-                </AdminRoute>
+                 //</AdminRoute>
               } 
             />
 
@@ -271,7 +271,7 @@ function App() {
             />
            
             <Route 
-              path="/services/:mainServiceId/subservices/:subServiceId" 
+              path="/services/:serviceId/detail" 
               element={
                 <UserRoute>
                   <ServiceDetailBooking />
@@ -279,6 +279,14 @@ function App() {
               } 
             />
             <Route 
+              path="/services/:serviceId/upload/:docId" 
+              element={
+                <UserRoute>
+                  <UploadPage />
+                </UserRoute>
+              } 
+            />
+            <Route
               path="/appointment/:appointmentId/upload/:docId" 
               element={
                 <UserRoute>
@@ -294,13 +302,6 @@ function App() {
                 </UserRoute>
               } 
             />
-            <Route 
-              path="/admin-tasks"
-              element={
-                // <ProtectedRoute>
-                  <AdminTasks />
-                // </ProtectedRoute>
-              }/>
             <Route 
               path="/services/:serviceId/payment" 
               element={
@@ -404,9 +405,9 @@ function App() {
             <Route 
               path="/contact-us" 
               element={
-                //<ProtectedRoute>
+                // <ProtectedRoute>
                   <ContactUsPage />
-                //</ProtectedRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
@@ -460,17 +461,17 @@ function App() {
             <Route 
               path="/previous-activities" 
               element={
-                // <ProtectedRoute>
+                // <UserRoute>
                   <PreviousActivitiesPage />
-                // </ProtectedRoute>
+                // </UserRoute>
               } 
             />
             <Route 
               path="/update-information" 
               element={
-                <UserRoute>
+                // <UserRoute>
                   <UpdateInformationPage />
-                </UserRoute>
+               // </UserRoute>
               } 
             />
             <Route 
