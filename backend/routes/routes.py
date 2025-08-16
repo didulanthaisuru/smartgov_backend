@@ -2,28 +2,42 @@ from fastapi import APIRouter
 
 # Import all API routers
 from .auth import router as auth_router
-from .admin import router as admin_router
+from .admin import router as admin_router  # Commented out due to missing dependencies
 #from .admin_portal import router as admin_portal_router
 from .dashboard import router as dashboard_router
 from .appoinment import router as appointment_router
 from .document import router as document_router
 from .insights import router as insights_router
+from .insights_derect import router as insights_direct_router
+from .qr_scanner import router as qr_scanner_router
+#rom .user import router as user_router
+from .user_appointment_get import router as user_appointment_get_router
+from .admin_appointment_updates import router as admin_appointment_updates_router
+from .admin_dashboard import router as admin_dashboard_router
+from .admin_dashboard_full import router as admin_dashboard_full_router
+from .rating import router as rating_router
+from .user_profile import router as user_profile_router
 
 # Create main API router
 api_router = APIRouter()
 
-api_router.include_router(auth_router, tags=["Authentication"])
-
-api_router.include_router(admin_router, tags=["Admin Authentication"])
-#api_router.include_router(admin_portal_router, tags=["Admin Portal"])
-
-api_router.include_router(dashboard_router, tags=["Dashboard Services"])
-
-api_router.include_router(appointment_router, tags=["Appointments"])
-
-api_router.include_router(document_router, tags=["Documents"])
-
-api_router.include_router(insights_router, tags=["Analytics & Insights"])
+# Include all routers
+api_router.include_router(auth_router)
+api_router.include_router(admin_router)  # Commented out due to missing dependencies
+#api_router.include_router(admin_portal_router)
+api_router.include_router(dashboard_router)
+api_router.include_router(appointment_router)
+api_router.include_router(document_router)
+api_router.include_router(insights_router)
+api_router.include_router(insights_direct_router)
+api_router.include_router(qr_scanner_router)
+#pi_router.include_router(user_router)
+api_router.include_router(user_appointment_get_router)
+api_router.include_router(admin_appointment_updates_router)
+api_router.include_router(admin_dashboard_router)
+api_router.include_router(admin_dashboard_full_router)
+api_router.include_router(rating_router)
+api_router.include_router(user_profile_router)
 
 # api_router.include_router(health_router, tags=["Health Check"])
 # api_router.include_router(utility_router, tags=["Utilities"])

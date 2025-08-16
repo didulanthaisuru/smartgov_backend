@@ -5,27 +5,28 @@ from fastapi import HTTPException, status
 from services.user_service import user_service
 from schemas.auth import UserRegister, UserResponse, UserLogin, Token
 from models import UserInDB
-from utils.auth import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
+from database_config import  ACCESS_TOKEN_EXPIRE_MINUTES
+from utils.auth import create_access_token
 
 class AuthService:
     
     async def register_user_validation(self, user_data: UserRegister) -> UserResponse:
         """Handle user registration business logic"""
         # Check if user already exists
-        if user_service.get_user_by_email(user_data.email):
+        if await user_service.get_user_by_email(user_data.email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="User with this email already exists"
             )
         
-        if user_service.get_user_by_nic(user_data.nic):
+        if await user_service.get_user_by_nic(user_data.nic):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="User with this NIC already exists"
             )
         
         # Create new user
-        new_user = user_service.create_user(user_data)
+        new_user = await user_service.create_user(user_data)
         if not new_user:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -36,7 +37,7 @@ class AuthService:
     
     async def sign_in_validation(self, login_data: UserLogin) -> Token:
         """Handle user login business logic"""
-        user = user_service.authenticate_user_by_nic(login_data.nic, login_data.passcode)
+        user = await user_service.authenticate_user_by_nic(login_data.nic, login_data.passcode)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

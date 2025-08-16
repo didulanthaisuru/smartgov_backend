@@ -13,6 +13,7 @@ class AppointmentAdd(BaseModel):
     predicted_duration: Optional[datetime] = Field(..., description="Predicted duration of the appointment")
     payment_status: Optional[bool] = Field(default=False, description="Payment status of the appointment")
 
+
 class EmptyAppointmentCreate(BaseModel):
     user_id: str = Field(..., description="ID of the user making the appointment")
     sub_service_id: str = Field(..., description="ID of the sub-service being booked")
@@ -25,8 +26,8 @@ class AppointmentUpdate(BaseModel):
     appointment_date: Optional[datetime] = Field(None, description="Date and time of the appointment")
     appoinment_time: Optional[datetime] = Field(None, description="Time of the appointment")
     predicted_duration: Optional[datetime] = Field(None, description="Predicted duration of the appointment")
-    payment_status: Optional[bool] = Field(None, description="Payment status of the appointment")
-    is_fully_completed: Optional[bool] = Field(None, description="Flag indicating if the appointment is fully completed")
+    payment_status: Optional[bool] = Field(default=False, description="Payment status of the appointment")
+    is_fully_completed: Optional[bool] = Field(default=False, description="Flag indicating if the appointment is fully completed")
 
 class AppointmentUpdateResponse(BaseModel):
     appointment_id: str = Field(..., description="The ObjectId of the updated appointment")
@@ -59,4 +60,13 @@ class AppointmentCreateResponse(BaseModel):
     appointment_id: str = Field(..., description="The ObjectId of the created appointment")
     steps_copied: int = Field(..., description="Number of steps copied from sub-service")
 
+class AppointmentConfirmUpdate(BaseModel):
+    appointment_confirmed: bool = Field(..., description="Whether the appointment is confirmed")
 
+class AppointmentConfirmResponse(BaseModel):
+    appointment_id: str = Field(..., description="The ObjectId of the confirmed appointment")
+    message: str = Field(..., description="Success message")
+    appointment_confirmed: bool = Field(..., description="Updated confirmation status")
+    sub_service_name: str | None = Field(None, description="Name of the sub-service")
+    appointment_date: datetime | None = Field(None, description="Date and time of the appointment")
+    predicted_duration: datetime | None = Field(None, description="Predicted duration of the appointment")
