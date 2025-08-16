@@ -44,7 +44,7 @@ api_router = APIRouter()
 
 # Authentication & Authorization
 api_router.include_router(auth_router)
-# api_router.include_router(admin_router)  # Commented out due to missing dependencies
+api_router.include_router(admin_router)  # Commented out due to missing dependencies
 
 # Core Service Routes
 api_router.include_router(dashboard_router)
