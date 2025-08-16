@@ -7,7 +7,7 @@ from schemas.document import DocumentUpload, UploadDocumentRequest
 from database_config import collection_uploaded_documents
 
 
-async def uploaded_document(request: UploadDocumentRequest, file: UploadFile) -> DocumentUpload:
+async def uploaded_document(request: UploadDocumentRequest, file: UploadFile ) -> DocumentUpload:
     try:
         if collection_uploaded_documents is None:
             raise HTTPException(
@@ -60,7 +60,7 @@ async def uploaded_document(request: UploadDocumentRequest, file: UploadFile) ->
         document_data = {
             "booking_id": request.booking_id,
             "doc_id": doc_id,
-            "required_doc_id": getattr(request, "required_doc_id", None),
+            "required_doc_id": request.required_doc_id,
             "file_name": file.filename,
             "original_filename": file.filename,
             "stored_filename": unique_filename,

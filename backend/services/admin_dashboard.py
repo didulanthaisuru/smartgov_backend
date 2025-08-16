@@ -55,9 +55,21 @@ async def get_appointments_by_sub_service(sub_service_id: str):
         appointments = []
         async for appointment in cursor:
             # Convert ObjectId to string for JSON serialization
-            appointment["_id"] = str(appointment["_id"])
+            appointment["_id"] = str(appointment["_id"])  # This will be mapped to appointment_id in the schema
             if "sub_service_id" in appointment:
                 appointment["sub_service_id"] = str(appointment["sub_service_id"])
+            
+            # Ensure sub_service_steps is properly structured
+            if "sub_service_steps" in appointment and isinstance(appointment["sub_service_steps"], list):
+                # Validate each step has required fields
+                for step in appointment["sub_service_steps"]:
+                    if not isinstance(step, dict):
+                        step = {}
+                    # Ensure all required fields exist
+                    step.setdefault("step_id", 0)
+                    step.setdefault("step_name", "Unknown Step")
+                    step.setdefault("status", False)
+                    step.setdefault("completed_by", None)
             
             # Get user details from users collection using user_id (which references user's _id)
             user_name = "Unknown User"
