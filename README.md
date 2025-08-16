@@ -185,6 +185,10 @@ The backend folder contains comprehensive documentation in the `documents/` dire
 - `VITE_NODE_ENV` - Environment (development/production)
 - `VITE_FEATURE_ADMIN_DASHBOARD` - Admin dashboard feature flag
 - `VITE_FEATURE_REAL_TIME_UPDATES` - Real-time updates feature flag
+- `VITE_STRIPE_PUBLIC_KEY` - Payment Gateway API Key
+-  `REACT_APP_EMAILJS_PUBLIC_KEY` - EmailJs public Key
+-  `REACT_APP_EMAILJS_SERVICE_ID ` - EmailJs Service Id
+-  `REACT_APP_EMAILJS_TEMPLATE_ID` - Email Js Template Id
 
 ### Root (`.env`):
 - `MONGO_URI` - MongoDB connection string
