@@ -1,10 +1,8 @@
 
 from fastapi import FastAPI, HTTPException
-
-
 from fastapi.middleware.cors import CORSMiddleware
-
 from database_config import connect_to_mongo, close_mongo_connection
+# Comment out api_router due to QR scanner dependency issues
 from routes.routes import api_router
 
 # from config import settings
@@ -15,10 +13,15 @@ from routes.appoinment import router as appointment_router
 from routes.document import router as document_router
 from routes.insights import router as insights_router
 from routes.insights_derect import router as insights_direct_router
-#rom routes.adminimport router as admin_router
 
+# Comment out admin router due to syntax error
+from routes.admin import router as admin_router
 
-from fastapi.middleware.cors import CORSMiddleware
+# Remove duplicate CORS import
+import stripe
+from pydantic import BaseModel
+
+stripe.api_key = "sk_test_51RwId9Agvx5HIouQNwqI5N51tJR0Xd53CxTAdRT6zBwqhSSkFamyYygq5txef9AuWsiDbBMzxreWV78vBgkSDyoh00rYqRORiy"
 
 
 # Create FastAPI app
@@ -50,7 +53,7 @@ def read_root():
 
 
 # Include all routers from the centralized routes file
-app.include_router(api_router, prefix=settings.API_V1_STR)
+# app.include_router(api_router, prefix=settings.API_V1_STR)
 
 # Include all routers
 app.include_router(dashboard_router)
@@ -58,7 +61,8 @@ app.include_router(appointment_router)
 app.include_router(document_router)
 app.include_router(insights_router)
 app.include_router(insights_direct_router)
-#pp.include_router(admin_router)
+# Comment out admin router
+app.include_router(admin_router)
 
 
 @app.get("/health")
@@ -80,8 +84,6 @@ def create_payment_intent(request: PaymentRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# Include API routes
-
-app.include_router(api_router, prefix="/api/v1")
+# Include API routes (commented out due to QR scanner dependency)
 app.include_router(api_router, prefix="/api/v1")
 
