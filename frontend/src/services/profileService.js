@@ -12,7 +12,7 @@ class ProfileService {
   static extractUserId(userData) {
     if (!userData) return null;
     
-    // Try different possible field names for user ID (prioritize actual ObjectId)
+    // Try different possible field names for user ID (prioritize 'id' field from backend)
     const possibleIdFields = ['id', 'user_id', '_id', 'userId', 'userID'];
     
     for (const field of possibleIdFields) {
@@ -30,16 +30,54 @@ class ProfileService {
   }
 
   /**
+   * Get user ID from authentication data
+   * @returns {string|null} User ID or null if not found
+   */
+  static getUserIdFromAuth() {
+    try {
+      const authData = AuthService.getAuthData();
+      if (!authData.userData) {
+        console.warn('No user data found in authentication');
+        return null;
+      }
+      
+      const userId = this.extractUserId(authData.userData);
+      if (!userId) {
+        console.warn('User ID not found in user data');
+        return null;
+      }
+      
+      return userId;
+    } catch (error) {
+      console.error('Error extracting user ID from auth:', error);
+      return null;
+    }
+  }
+
+  /**
    * Get comprehensive profile data including appointments and messages
    * @param {string} userId - User ID (MongoDB ObjectId)
    * @returns {Promise<Object>} Complete profile data
    */
   static async getProfileData(userId) {
     try {
-      // Fetch all data in parallel for better performance
+      // Add timeout to prevent hanging requests
+      const timeout = 10000; // 10 seconds
+      
+      // Fetch all data in parallel for better performance with timeout
       const [appointmentStats, messageStats] = await Promise.all([
-        AppointmentService.getAppointmentStatistics(userId),
-        MessageService.getMessageStatistics(userId)
+        Promise.race([
+          AppointmentService.getAppointmentStatistics(userId),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Appointment service timeout')), timeout)
+          )
+        ]),
+        Promise.race([
+          MessageService.getMessageStatistics(userId),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Message service timeout')), timeout)
+          )
+        ])
       ]);
 
       // Get user data from auth service
@@ -242,49 +280,72 @@ class ProfileService {
    * @returns {Array} Menu items data array
    */
   static generateMenuItemsData(profileData) {
+    // Add safety checks for profileData structure
+    if (!profileData) {
+      console.warn('ProfileService.generateMenuItemsData: profileData is null or undefined');
+      return [];
+    }
+
     const { appointments, messages } = profileData;
+    
+    // Ensure appointments and messages have default values
+    const safeAppointments = appointments || {
+      ongoing: [],
+      incomplete: [],
+      previous: [],
+      ongoingProgress: 0,
+      requiredDocumentsCount: 0,
+      totalAppointments: 0
+    };
+    
+    const safeMessages = messages || {
+      unreadCount: 0,
+      totalCount: 0,
+      hasUnread: false,
+      hasMessages: false
+    };
 
     return [
       {
         id: 1,
         title: 'Ongoing Activities',
-        description: appointments.ongoing.length > 0 
-          ? `${appointments.ongoing.length} ongoing activities`
+        description: safeAppointments.ongoing.length > 0 
+          ? `${safeAppointments.ongoing.length} ongoing activities`
           : 'No ongoing activities',
         iconType: 'ongoing',
         showProgress: false, // Remove progress bar
         route: '/ongoing-activities',
-        count: appointments.ongoing.length
+        count: safeAppointments.ongoing.length
       },
       {
         id: 2,
         title: 'Incomplete Activities',
-        description: appointments.incomplete.length > 0 
-          ? `${appointments.incomplete.length} incomplete activities`
+        description: safeAppointments.incomplete.length > 0 
+          ? `${safeAppointments.incomplete.length} incomplete activities`
           : 'No incomplete activities',
         iconType: 'incomplete',
         route: '/incomplete-activities',
-        count: appointments.incomplete.length
+        count: safeAppointments.incomplete.length
       },
       {
         id: 3,
         title: 'Messages',
-        description: messages.unreadCount > 0 
-          ? `You have ${messages.unreadCount} unread messages`
+        description: safeMessages.unreadCount > 0 
+          ? `You have ${safeMessages.unreadCount} unread messages`
           : 'No unread messages',
         iconType: 'messages',
         route: '/messages',
-        count: messages.unreadCount
+        count: safeMessages.unreadCount
       },
       {
         id: 4,
         title: 'Previous Activities',
-        description: appointments.previous.length > 0 
-          ? `${appointments.previous.length} completed activities`
+        description: safeAppointments.previous.length > 0 
+          ? `${safeAppointments.previous.length} completed activities`
           : 'No previous activities',
         iconType: 'previous',
         route: '/previous-activities',
-        count: appointments.previous.length
+        count: safeAppointments.previous.length
       },
       {
         id: 6,

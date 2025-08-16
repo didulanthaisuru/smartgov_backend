@@ -80,8 +80,16 @@ const ProfilePage = () => {
         setLoading(true);
         setError(null);
 
-        // Use the new method that handles user ID extraction automatically
-        const result = await ProfileService.getProfileDataWithAutoUserId();
+        // Add timeout to prevent hanging requests
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout - please check your connection')), 15000)
+        );
+
+        // Use the new method that handles user ID extraction automatically with timeout
+        const result = await Promise.race([
+          ProfileService.getProfileDataWithAutoUserId(),
+          timeoutPromise
+        ]);
         
         if (!result.success) {
           throw new Error(result.error);
@@ -91,7 +99,13 @@ const ProfilePage = () => {
 
       } catch (err) {
         console.error('Error fetching profile data:', err);
-        setError(err.message);
+        if (err.message.includes('timeout')) {
+          setError('Connection timeout. Please check your internet connection and try again.');
+        } else if (err.message.includes('network')) {
+          setError('Network error. Please check your connection and try again.');
+        } else {
+          setError(err.message || 'Failed to load profile data. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
@@ -100,8 +114,19 @@ const ProfilePage = () => {
     fetchProfileData();
   }, []);
 
-  // Generate menu items using the service
-  const menuItemsData = ProfileService.generateMenuItemsData(profileData);
+  // Generate menu items using the service with error handling
+  const menuItemsData = (() => {
+    try {
+      if (!profileData || !profileData.appointments || !profileData.messages) {
+        console.warn('Profile data not fully loaded yet, using default menu items');
+        return [];
+      }
+      return ProfileService.generateMenuItemsData(profileData);
+    } catch (error) {
+      console.error('Error generating menu items:', error);
+      return [];
+    }
+  })();
 
   // Get user display name and masked NIC
   const userDisplayName = ProfileService.getUserDisplayName(profileData.user);
@@ -183,7 +208,8 @@ const ProfilePage = () => {
 
       {/* Menu Items */}
       <div className="relative z-10 px-10 space-y-4">
-        {menuItemsData.map((item) => (
+        {menuItemsData && menuItemsData.length > 0 ? (
+          menuItemsData.map((item) => (
           <button
             key={item.id}
             onClick={() => navigate(item.route)}
@@ -206,7 +232,12 @@ const ProfilePage = () => {
               )}
             </div>
           </button>
-        ))}
+        ))
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500">Loading menu items...</p>
+          </div>
+        )}
       </div>
 
       {/* Bottom Padding */}

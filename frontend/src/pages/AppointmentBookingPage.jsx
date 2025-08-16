@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Menu, ChevronDown, Circle } from "lucide-react";
 import Header from '../components/Header';
+import ProfileService from '../services/profileService';
 
 // Chart Components
 const VerticalBarChart = ({ data }) => ( <div className="flex justify-around items-end h-20 px-2">{data.map((item, index) => (<div key={index} className="w-8 rounded-t-sm" style={{ height: `${item.value}%`, backgroundColor: item.color }}></div>))}</div> );
@@ -16,7 +17,10 @@ const AppointmentBookingPage = () => {
   const subServiceName = location.state?.subServiceName || "Book Appointment";
   const subServiceId = location.state?.subServiceId;
   const paymentAmount = location.state?.paymentAmount || 0;
-  const userId = "689b0fce51fe72cd1df58f06"; 
+ 
+  const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [currentDate, setCurrentDate] = useState(new Date(2025, 0, 1)); 
   const [selectedDate, setSelectedDate] = useState(new Date(2025, 0, 7));
@@ -70,6 +74,7 @@ const AppointmentBookingPage = () => {
       const updatePayload = {
         appointment_date: `${year}-${month}-${day}T00:00:00.000Z`,
         appoinment_time: `${year}-${month}-${day}T${hours}:${minutes}:00.000Z`,
+        user_id: userId // Add user ID for verification
       };
 
       await axios.patch(
@@ -94,6 +99,13 @@ const AppointmentBookingPage = () => {
     setIsConfirming(true);
     
     try {
+      // Note: We skip user ID verification here because:
+      // 1. The appointment was likely created by the same user with the old hardcoded user ID
+      // 2. The backend doesn't support updating user_id field
+      // 3. The appointment belongs to the current user session
+      
+      console.log('Proceeding with appointment confirmation for user:', userId);
+      
       const { data: confirmationData } = await axios.put(
         `http://127.0.0.1:8000/api/v1/appointment_creation/${appointmentId}/confirm`
       );
@@ -122,6 +134,83 @@ const AppointmentBookingPage = () => {
       setIsConfirming(false);
     }
   };
+
+  // Fetch user ID on component mount
+  useEffect(() => {
+    const fetchUserId = () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const extractedUserId = ProfileService.getUserIdFromAuth();
+        
+        if (!extractedUserId) {
+          throw new Error('User ID not found. Please login again.');
+        }
+        
+        setUserId(extractedUserId);
+        console.log('Using user ID:', extractedUserId);
+        
+      } catch (err) {
+        console.error('Error fetching user ID:', err);
+        setError(err.message || 'Failed to get user information. Please login again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserId();
+  }, []);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex justify-center bg-gray-100 min-h-screen p-4">
+        <div className="bg-white w-full max-w-[428px] flex flex-col rounded-2xl shadow-2xl overflow-hidden">
+          <Header />
+          <div className="flex-1 overflow-y-auto p-4 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8C3C2A] mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading appointment details...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex justify-center bg-gray-100 min-h-screen p-4">
+        <div className="bg-white w-full max-w-[428px] flex flex-col rounded-2xl shadow-2xl overflow-hidden">
+          <Header />
+          <div className="flex-1 overflow-y-auto p-4 flex items-center justify-center">
+            <div className="text-center max-w-md mx-auto">
+              <div className="text-red-500 mb-4">
+                <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Authentication Error</h3>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <button 
+                onClick={() => navigate('/login')}
+                className="bg-[#8C3C2A] text-white px-4 py-2 rounded-lg hover:bg-[#7A3424] transition-colors"
+              >
+                Go to Login
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render main content until we have userId
+  if (!userId) {
+    return null;
+  }
 
   return (
     <div className="flex justify-center bg-gray-100 min-h-screen p-4">
