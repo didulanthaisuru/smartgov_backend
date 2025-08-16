@@ -116,9 +116,9 @@ function App() {
             <Route 
               path="/login" 
               element={
-                // <PublicRoute>
+                <PublicRoute>
                   <LoginPage />
-                // </PublicRoute>
+                </PublicRoute>
               } 
             />
             <Route 
@@ -137,9 +137,9 @@ function App() {
             <Route 
               path="/admin-notifications"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <AdminNotifications />
-                // </ProtectedRoute> 
+                </ProtectedRoute> 
               }
             />
 
@@ -181,9 +181,9 @@ function App() {
             <Route 
               path="/admin/task-details/:taskId" 
               element={
-                //<AdminRoute>
+                <AdminRoute>
                   <AdminTaskDetailsPage />
-                //</AdminRoute>
+                </AdminRoute>
               } 
             />
             <Route 
@@ -213,9 +213,9 @@ function App() {
             <Route 
               path="/admin/qr-scan" 
               element={
-                // <AdminRoute>
+                <AdminRoute>
                   <AdminQRScanPage />
-                // </AdminRoute>
+                </AdminRoute>
               } 
             />
 
@@ -223,17 +223,17 @@ function App() {
             <Route 
               path="/services" 
               element={
-                //<UserRoute>
+                <UserRoute>
                   <Services />
-                //</UserRoute>
+                </UserRoute>
               } 
             />
             <Route 
               path="/services/:serviceId/detail" 
               element={
-                //<UserRoute>
+                <UserRoute>
                   <SubServicesPage />
-                //</UserRoute>
+                </UserRoute>
               } 
             />
 
@@ -256,9 +256,9 @@ function App() {
             <Route
               path="admin-rates"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <AdminRates />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }/>
             <Route 
               path="/services/:serviceId" 
@@ -296,9 +296,9 @@ function App() {
             <Route 
               path="/admin-tasks"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <AdminTasks />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }/>
             <Route 
               path="/services/:serviceId/payment" 
@@ -395,17 +395,17 @@ function App() {
             <Route 
               path="/chatbot" 
               element={
-                //<ProtectedRoute>
+                <ProtectedRoute>
                   <ChatbotPage />
-                //</ProtectedRoute>
+                </ProtectedRoute>
               } 
             />
             <Route 
               path="/contact-us" 
               element={
-                //<ProtectedRoute>
+                <ProtectedRoute>
                   <ContactUsPage />
-                //</ProtectedRoute>
+                </ProtectedRoute>
               } 
             />
             <Route 
@@ -427,33 +427,33 @@ function App() {
             <Route 
               path="/profile" 
               element={
-                //<ProtectedRoute>
+                <ProtectedRoute>
                   <ProfilePage />
-                //</ProtectedRoute>
+                </ProtectedRoute>
               } 
             />
             <Route 
               path="/ongoing-activities" 
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <OngoingActivitiesPage />
-                // </ProtectedRoute>
+                 </ProtectedRoute>
               } 
             />
             <Route 
               path="/incomplete-activities" 
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <IncompleteActivitiesPage />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               } 
             />
             <Route 
               path="/previous-activities" 
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <PreviousActivitiesPage />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               } 
             />
             <Route 
