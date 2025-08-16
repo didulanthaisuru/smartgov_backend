@@ -228,3 +228,41 @@ async def get_appointment_step_details(appointment_id: str):
     except Exception as e:
         print(f"Error retrieving appointment step details: {e}")
         return None
+
+async def approve_uploaded_document(document_id: str):
+    """
+    Approves an uploaded document by updating its status from 'pending' to 'approved'.
+    
+    Args:
+        document_id (str): The document ID to approve (MongoDB ObjectId as string)
+        
+    Returns:
+        dict: Approval result with message and document_id, or None if document not found or already approved
+    """
+    try:
+        # Find the document and check if it exists and is pending
+        document = await collection_uploaded_documents.find_one({
+            "_id": ObjectId(document_id),
+            "doc_status": "Pending"
+        })
+        
+        if not document:
+            return None
+        
+        # Update the document status to approved
+        result = await collection_uploaded_documents.update_one(
+            {"_id": ObjectId(document_id)},
+            {"$set": {"doc_status": "Approved"}}
+        )
+        
+        if result.modified_count > 0:
+            return {
+                "message": "Document approved successfully",
+                "document_id": document_id
+            }
+        else:
+            return None
+            
+    except Exception as e:
+        print(f"Error approving document: {e}")
+        return None

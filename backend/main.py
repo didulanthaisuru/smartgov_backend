@@ -1,45 +1,13 @@
 
-"""
-SmartGov API with WebSocket Support
-
-This application integrates FastAPI with Socket.IO for real-time chat functionality.
-The architecture uses Starlette to mount both FastAPI and Socket.IO applications:
-
-- FastAPI: Handles HTTP API endpoints at root path "/"
-- Socket.IO: Handles WebSocket connections at "/socket.io"
-
-WebSocket Events Supported:
-- connect/disconnect: Connection management
-- join_room/leave_room: Room management
-- send_message: Real-time messaging
-- typing: Typing indicators
-- mark_read: Message read status
-- get_online_users: User presence
-- heartbeat: Connection keep-alive
-- get_connection_info: Connection details
-
-API Endpoints:
-- /api/chat/*: Chat-related HTTP endpoints
-- /websocket/health: WebSocket health check
-- /api/chat/test: WebSocket test endpoint
-"""
-
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from starlette.applications import Starlette
-
 from fastapi.middleware.cors import CORSMiddleware
 
 from database_config import connect_to_mongo, close_mongo_connection, collection_users, db
 from routes.routes import api_router
 
-import stripe
-from pydantic import BaseModel
-
-
 from routes import chat_web_socket as chat_web_socket_routes
 from services import chat_web_socket
-
-stripe.api_key = "sk_test_51RwId9Agvx5HIouQNwqI5N51tJR0Xd53CxTAdRT6zBwqhSSkFamyYygq5txef9AuWsiDbBMzxreWV78vBgkSDyoh00rYqRORiy"
 
 # Create FastAPI app
 fastapi_app = FastAPI(
@@ -82,47 +50,6 @@ def read_root():
 @fastapi_app.get("/health")
 def health_check():
     return {"status": "healthy", "service": "SmartGov Backend"}
-
-@fastapi_app.get("/websocket/health")
-async def websocket_health_check():
-    """Check WebSocket server health and status."""
-    try:
-        # Get active connections count
-        active_count = len(chat_web_socket.active_connections)
-        
-        return {
-            "status": "healthy",
-            "service": "SmartGov WebSocket",
-            "active_connections": active_count,
-            "socket_io_path": "/socket.io",
-            "server_info": {
-                "async_mode": "asgi",
-                "cors_enabled": True,
-                "logger_enabled": True
-            }
-        }
-    except Exception as e:
-        return {
-            "status": "unhealthy",
-            "service": "SmartGov WebSocket",
-            "error": str(e),
-            "active_connections": 0
-        }
-
-class PaymentRequest(BaseModel):
-    amount: int  # amount in cents
-
-@fastapi_app.post("/create-payment-intent")
-def create_payment_intent(request: PaymentRequest):
-    try:
-        intent = stripe.PaymentIntent.create(
-            amount=request.amount,
-            currency="usd",
-            automatic_payment_methods={"enabled": True},
-        )
-        return {"clientSecret": intent["client_secret"]}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
 
 # Include chat_web_socket routes
 fastapi_app.include_router(chat_web_socket_routes.router, prefix="/api")

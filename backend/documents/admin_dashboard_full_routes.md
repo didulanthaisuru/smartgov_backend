@@ -265,6 +265,40 @@ curl -X GET "http://localhost:8000/api/admin/dashboard-full/appointment_details/
 curl -X GET "http://localhost:8000/api/admin/dashboard-full/appointment_step_details/689e179f0a2b385df7944b4d"
 ```
 
+### 4. Approve Uploaded Document
+
+**Endpoint:** `PUT /approve_document/{document_id}`
+
+**Description:** Approves an uploaded document by updating its status from 'pending' to 'approved'.
+
+**Path Parameters:**
+- `document_id` (string, required): The document ID to approve
+
+**Query Parameters:** None
+
+**Request Body:** None
+
+**Response:**
+```json
+{
+  "message": "Document approved successfully",
+  "document_id": "689cd830ef2618d4dfe5a59b"
+}
+```
+
+**Response Fields:**
+- `message` (string): Success message
+- `document_id` (string): The ID of the approved document
+
+**Error Responses:**
+- `404`: Document not found or already approved
+- `500`: Internal server error
+
+**Example Usage:**
+```bash
+curl -X PUT "http://localhost:8000/api/admin/dashboard-full/approve_document/689cd830ef2618d4dfe5a59b"
+```
+
 ## Database Collections Used
 - `appointments`: Main appointment data
 - `users`: User information for name resolution
