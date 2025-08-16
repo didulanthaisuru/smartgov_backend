@@ -5,6 +5,7 @@ import AppointmentService from './appointmentService.js';
 import MessageService from './messageService.js';
 import ProfileService from './profileService.js';
 import UserService from './userService.js';
+import UserProfileService from './userProfileService.js';
 
 // Export all services for easy importing
 export { default as ApiService } from './api.js';
@@ -13,6 +14,7 @@ export { default as AppointmentService } from './appointmentService.js';
 export { default as MessageService } from './messageService.js';
 export { default as ProfileService } from './profileService.js';
 export { default as UserService } from './userService.js';
+export { default as UserProfileService } from './userProfileService.js';
 
 // Re-export commonly used methods for convenience
 export const api = {
