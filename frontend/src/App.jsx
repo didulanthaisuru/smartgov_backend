@@ -96,8 +96,7 @@ const PublicRoute = ({ children }) => {
   
   // If authenticated, redirect to appropriate dashboard
   if (isAuthenticated()) {
-    const redirectPath = role === 'admin' ? '/admin/dashboard' : '/services';
-    return <Navigate to={redirectPath} replace />;
+    return <Navigate to={role === 'admin' ? '/admin/dashboard' : '/services'} replace />;
   }
   return children;
 };
@@ -117,9 +116,9 @@ function App() {
             <Route 
               path="/login" 
               element={
-                <PublicRoute>
+                // <PublicRoute>
                   <LoginPage />
-                </PublicRoute>
+                // </PublicRoute>
               } 
             />
             <Route 
@@ -133,6 +132,15 @@ function App() {
             <Route 
               path="/welcome-screen-1"
               element={<SmartGovWelcome1 />}
+            />
+
+            <Route 
+              path="/admin-notifications"
+              element={
+                // <ProtectedRoute>
+                  <AdminNotifications />
+                // </ProtectedRoute> 
+              }
             />
 
             {/* Admin Public Routes */}
@@ -215,11 +223,43 @@ function App() {
             <Route 
               path="/services" 
               element={
-                <UserRoute>
+                //<UserRoute>
                   <Services />
-                </UserRoute>
+                //</UserRoute>
               } 
             />
+            <Route 
+              path="/services/:serviceId/detail" 
+              element={
+                //<UserRoute>
+                  <SubServicesPage />
+                //</UserRoute>
+              } 
+            />
+
+            <Route 
+              path="/payment/:appointmentId" 
+              element={<PaymentPage />} 
+            />
+
+            {/* **NEW**: Route for the final confirmation page */}
+            <Route 
+              path="/confirmation/:appointmentId" 
+              element={<AppointmentConfirmationPage />} 
+            />
+
+            <Route 
+              path="/qr-code/:appointmentId" 
+              element={<QRCodePage />} 
+            />
+
+            <Route
+              path="admin-rates"
+              element={
+                // <ProtectedRoute>
+                  <AdminRates />
+                // </ProtectedRoute>
+              }/>
             <Route 
               path="/services/:serviceId" 
               element={
@@ -228,6 +268,7 @@ function App() {
                 </UserRoute>
               } 
             />
+           
             <Route 
               path="/services/:serviceId/detail" 
               element={
@@ -310,6 +351,14 @@ function App() {
                 </UserRoute>
               } 
             />
+
+            <Route 
+              path="/sub-services"
+              element={
+                <SubServicesPage/>
+              }
+            />
+
             <Route 
               path="/admin" 
               element={
@@ -347,9 +396,9 @@ function App() {
             <Route 
               path="/chatbot" 
               element={
-                <UserRoute>
+                //<ProtectedRoute>
                   <ChatbotPage />
-                </UserRoute>
+                //</ProtectedRoute>
               } 
             />
             <Route 
@@ -379,25 +428,25 @@ function App() {
             <Route 
               path="/profile" 
               element={
-                <UserRoute>
+                //<ProtectedRoute>
                   <ProfilePage />
-                </UserRoute>
+                //</ProtectedRoute>
               } 
             />
             <Route 
               path="/ongoing-activities" 
               element={
-                <UserRoute>
+                // <ProtectedRoute>
                   <OngoingActivitiesPage />
-                </UserRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/incomplete-activities" 
               element={
-                <UserRoute>
+                // <ProtectedRoute>
                   <IncompleteActivitiesPage />
-                </UserRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
@@ -411,9 +460,9 @@ function App() {
             <Route 
               path="/update-information" 
               element={
-                <UserRoute>
+                // <UserRoute>
                   <UpdateInformationPage />
-                </UserRoute>
+               // </UserRoute>
               } 
             />
             <Route 

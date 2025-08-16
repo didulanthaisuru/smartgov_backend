@@ -1,26 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const UpdateInformationPage = () => {
+const UpdateInformationPage = ({ nic }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: 'kavindu',
-    email: 'kavindu@gmail.com',
-    phone: '+94 77 123 4567',
-    address: 'No. 123, Main Street, Colombo'
+    username: '',
+    email: '',
+    phone: '',
+    address: '',
   });
+  const [profileImage, setProfileImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch existing data from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/v1/profile/user/${nic}`);
+        const data = response.data;
+        setFormData({
+          username: data.username || '',
+          email: data.email || '',
+          phone: data.phone || '',
+          address: data.address || '',
+        });
+        setPreviewImage(data.profile_image || null);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+    fetchData();
+  }, [nic]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleUpdate = () => {
-    setShowSuccessModal(true);
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImage(file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpdate = async () => {
+    setLoading(true);
+    try {
+      const updateData = new FormData();
+      updateData.append('username', formData.username);
+      updateData.append('email', formData.email);
+      updateData.append('phone', formData.phone);
+      updateData.append('address', formData.address);
+      if (profileImage) updateData.append('profile_image', profileImage);
+
+      await axios.put(`http://localhost:8000/api/v1/profile/user/${nic}`, updateData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,12 +109,17 @@ const UpdateInformationPage = () => {
           {/* Profile Picture Section */}
           <div className="flex justify-center mb-8">
             <div className="relative">
-              <div className="w-24 h-24 bg-gray-300 rounded-full"></div>
-              <button className="absolute bottom-0 right-0 w-8 h-8 bg-[#8C322A] rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 bg-gray-300 rounded-full overflow-hidden">
+                {previewImage && (
+                  <img src={previewImage} alt="Profile" className="w-full h-full object-cover" />
+                )}
+              </div>
+              <label htmlFor="profileImage" className="absolute bottom-0 right-0 w-8 h-8 bg-[#8C322A] rounded-full flex items-center justify-center cursor-pointer">
                 <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                 </svg>
-              </button>
+              </label>
+              <input id="profileImage" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
             </div>
           </div>
 
@@ -128,67 +181,37 @@ const UpdateInformationPage = () => {
             <button 
               onClick={handleUpdate}
               className="flex-1 bg-[#8C322A] text-white rounded-xl py-3 px-6 text-sm font-medium hover:bg-[#7A2A22] transition-colors"
+              disabled={loading}
             >
-              Update
+              {loading ? 'Updating...' : 'Update'}
             </button>
           </div>
         </div>
 
-        {/* Help Section */}
-        <div className="mt-12 pt-6 border-t border-gray-200">
-          <div className="flex items-center justify-center space-x-4">
-            <button 
-              onClick={() => navigate('/chatbot')}
-              className="bg-blue-100 rounded-lg px-4 py-2 flex items-center space-x-2 hover:bg-blue-200 transition-colors"
-            >
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <span className="text-sm text-blue-600">Need Help?</span>
-            </button>
-            
-            <button 
-              onClick={() => navigate('/contact-us')}
-              className="bg-green-100 rounded-lg px-4 py-2 flex items-center space-x-2 hover:bg-green-200 transition-colors"
-            >
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26c.31.17.69.17 1-.01L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              <span className="text-sm text-green-600">Contact Us</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Success Modal */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 m-6 max-w-xs w-full text-center">
-            {/* Success Icon */}
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+        {/* Success Modal */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 m-6 max-w-xs w-full text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-medium text-black mb-2">Updated</h3>
+              <p className="text-sm text-gray-600 mb-6">Your information has been updated successfully.</p>
+              <button 
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  navigate('/profile');
+                }}
+                className="w-full bg-[#8C322A] text-white rounded-xl py-3 px-6 text-sm font-medium hover:bg-[#7A2A22] transition-colors"
+              >
+                OK
+              </button>
             </div>
-            
-            <h3 className="text-xl font-medium text-black mb-2">Updated</h3>
-            <p className="text-sm text-gray-600 mb-6">Your information has been updated successfully.</p>
-            
-            <button 
-              onClick={() => {
-                setShowSuccessModal(false);
-                navigate('/profile');
-              }}
-              className="w-full bg-[#8C322A] text-white rounded-xl py-3 px-6 text-sm font-medium hover:bg-[#7A2A22] transition-colors"
-            >
-              OK
-            </button>
           </div>
-        </div>
-      )}
-
-      {/* Bottom Padding */}
-      <div className="h-8"></div>
+        )}
+      </div>
     </div>
   );
 };
