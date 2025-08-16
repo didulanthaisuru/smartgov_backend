@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LanguageSwitcher from '../components/languageSwitcher'; // Correct import path
+import LanguageSwitcher from '../components/LanguageSwitcher'; // Correct import path
 import HamburgerMenu from '../components/HamburgerMenu';
 import { CheckCircle, AlertCircle, Bell, MessageSquare } from 'lucide-react';
 

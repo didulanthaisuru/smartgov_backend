@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smartgov-backend
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=${MONGO_URI}  # points to Atlas
+      - SECRET_KEY=${SECRET_KEY:-change-me}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+    ports:
+      - "8000:8000"
+    networks:
+      - smartgov-net
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000}
+    container_name: smartgov-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"  # Serve SPA on 5173 so CORS matches existing config
+    networks:
+      - smartgov-net
+
+volumes:
+  mongo-data:
+
+networks:
+  smartgov-net:
+    driver: bridge
