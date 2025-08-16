@@ -56,3 +56,22 @@ class AppointmentDetailsResponse(BaseModel):
     appointment: AppointmentFull
     required_documents: List[RequiredDocument]
     uploaded_documents: List[UploadedDocument]
+
+class SubServiceStepDefinition(BaseModel):
+    step_id: int
+    step_name: str
+
+class AppointmentStepStatus(BaseModel):
+    step_id: int
+    step_name: str
+    status: bool
+    completed_by: Optional[str] = None
+
+class AppointmentStepDetailsResponse(BaseModel):
+    appointment_id: str
+    sub_service_id: str
+    sub_service_name: str
+    payment_amount: float
+    sub_service_steps: List[SubServiceStepDefinition]
+    appointment_step_status: List[AppointmentStepStatus]
+    is_fully_completed: bool
