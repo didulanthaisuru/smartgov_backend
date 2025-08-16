@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   BarChart,
@@ -10,7 +10,9 @@ import {
   CartesianGrid
 } from "recharts";
 import { Bell, Calendar } from "lucide-react";
-import { set } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import AdminSidebar from "../../components/AdminSidebar";
+import AdminHeader from "../../components/AdminHeader";
 
 const Pill = ({ label, value }) => (
   <div className="bg-white p-4 rounded-lg shadow flex flex-col items-center transform transition-all duration-300 hover:scale-105">
@@ -20,6 +22,8 @@ const Pill = ({ label, value }) => (
 );
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  const [showSidebar, setShowSidebar] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [fullWeekDates, setFullWeekDates] = useState([]);
   const [weeklyServiceTraffic, setWeeklyServiceTraffic] = useState([]);
@@ -28,7 +32,17 @@ export default function Dashboard() {
   const [noShowCount, setNoShowCount] = useState(0);
   const [predicted_count, setPredictedCount] = useState(0);
   const [ProcessingTime, setProcessingTime] = useState(0);
-    
+  
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
 
   const subServiceWeeklyTraffic = [
     { name: "Mon", traffic: 2850 },
@@ -86,139 +100,119 @@ export default function Dashboard() {
     setFullWeekDates(weekDates);
   };
 
+  // Fetch weekly service traffic whenever startDate changes
+  useEffect(() => {
+    if (!startDate) return;
 
+    const fetchWeeklyData = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/api/v1/insights/weekly-appointment-counts",
+          {
+            sub_service_id: "689b93230d3364bd64eaa075",
+            date: startDate
+          }
+        );
 
+        const data = response.data;
+        console.log("Fetched weekly data:", data);
+        const chartData = data.day_counts.map((day) => ({
+          name: day.day_of_week,
+          traffic: day.appointment_count
+        }));
+        setWeeklyServiceTraffic(chartData);
+      } catch (err) {
+        console.error("Error fetching weekly data:", err);
+        setWeeklyServiceTraffic([
+          { name: "Mon", traffic: 850 },
+          { name: "Tue", traffic: 1220 },
+          { name: "Wed", traffic: 680 },
+          { name: "Thu", traffic: 980 },
+          { name: "Fri", traffic: 1450 },
+          { name: "Sat", traffic: 720 },
+          { name: "Sun", traffic: 450 }
+        ]);
+      }
+    };
 
-// Fetch weekly service traffic whenever startDate changes
-useEffect(() => {
-  if (!startDate) return;
+    const fetchWeeklySubData = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/api/v1/insights/weekly-appointment-counts-mainservice",
+          {
+            sub_service_id: "689b93230d3364bd64eaa075",
+            main_service_id: "689cd830ef2618d4dfe5a596",
+            date: startDate
+          }
+        );
 
-  const fetchWeeklyData = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/api/v1/insights/weekly-appointment-counts",
-        {
-          sub_service_id: "689b93230d3364bd64eaa075",
-          date: startDate
-        }
-      );
+        const data = response.data;
+        const chartData = data.day_counts.map((day) => ({
+          name: day.day_of_week,
+          traffic: day.appointment_count
+        }));
+        setWeeklySubServiceTraffic(chartData);
+      } catch (err) {
+        console.error("Error fetching weekly sub-service data:", err);
+        setWeeklySubServiceTraffic([
+          { name: "Mon", traffic: 850 },
+          { name: "Tue", traffic: 1220 },
+          { name: "Wed", traffic: 680 },
+          { name: "Thu", traffic: 980 },
+          { name: "Fri", traffic: 1450 },
+          { name: "Sat", traffic: 720 },
+          { name: "Sun", traffic: 450 }
+        ]);
+      }
+    };
 
-      const data = response.data;
-      console.log("Fetched weekly data:", data);
-      const chartData = data.day_counts.map((day) => ({
-        name: day.day_of_week,
-        traffic: day.appointment_count
-      }));
-      setWeeklyServiceTraffic(chartData);
-    } catch (err) {
-      console.error("Error fetching weekly data:", err);
+    const fetchTotalCount = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/v1/insights-direct/sub-service/689b93230d3364bd64eaa075/date/${startDate}`
+        );
+        const data = response.data;
+        setTotalCount(data.predicted_count);
+      } catch (err) {
+        console.error("Error fetching total count:", err);
+      }
+    };
 
-      // fallback dummy data
-      setWeeklyServiceTraffic([
-        { name: "Mon", traffic: 850 },
-        { name: "Tue", traffic: 1220 },
-        { name: "Wed", traffic: 680 },
-        { name: "Thu", traffic: 980 },
-        { name: "Fri", traffic: 1450 },
-        { name: "Sat", traffic: 720 },
-        { name: "Sun", traffic: 450 }
-      ]);
-    }
-  };
-
-  const fetchWeeklySubData = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/api/v1/insights/weekly-appointment-counts-mainservice",
-        {
-          sub_service_id: "689b93230d3364bd64eaa075",
-          main_service_id: "689cd830ef2618d4dfe5a596",
-          date: startDate
-        }
-      );
-
-      const data = response.data;
-      //console.log("Fetched weekly sub-service data:", data);
-      const chartData = data.day_counts.map((day) => ({
-        name: day.day_of_week,
-        traffic: day.appointment_count
-      }));
-      setWeeklySubServiceTraffic(chartData);
-    } catch (err) {
-      console.error("Error fetching weekly sub-service data:", err);
-
-      // fallback dummy data
-      setWeeklySubServiceTraffic([
-        { name: "Mon", traffic: 850 },
-        { name: "Tue", traffic: 1220 },
-        { name: "Wed", traffic: 680 },
-        { name: "Thu", traffic: 980 },
-        { name: "Fri", traffic: 1450 },
-        { name: "Sat", traffic: 720 },
-        { name: "Sun", traffic: 450 }
-      ]);
-    }
-  };
-
-  const fetchTotalCount = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8000/api/v1/insights-direct/sub-service/689b93230d3364bd64eaa075/date/${startDate}`
-      );
-      const data = response.data;
-      setTotalCount(data.predicted_count);
-      //console.log("Fetched total count:", data.predicted_count);
-    } catch (err) {
-      console.error("Error fetching total count:", err);
-    }
-  };
-
-  const fetchAvgProcessingTime = async () => {
-    try {
-      const response = await axios.get(`http://localhost:8000/api/v1/insights-direct/sub-service/689b93230d3364bd64eaa075/main-service/689b93230d3364bd64eaa075/date/${startDate}`);
-      const data = response.data;
-      setNoShowCount(data.no_show_count);
-      setPredictedCount(data.predicted_count);
-
-      console.log("Fetched no show count:", data.no_show_count);
-      
-    }catch (err) {
-      console.error("Error fetching no show count:", err);
-      // Handle error, maybe set a state to show an error message
-  }};
+    const fetchAvgProcessingTime = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/v1/insights-direct/sub-service/689b93230d3364bd64eaa075/main-service/689b93230d3364bd64eaa075/date/${startDate}`);
+        const data = response.data;
+        setNoShowCount(data.no_show_count);
+        setPredictedCount(data.predicted_count);
+      } catch (err) {
+        console.error("Error fetching no show count:", err);
+      }
+    };
 
     const fetchNoShowCount = async () => {
-    try {
-      const response = await axios.get(`http://localhost:8000/api/v1/insights-direct/main-service/689b93230d3364bd64eaa075/date/${startDate}`);
-      const data = response.data;
-      setProcessingTime(data.avg_processing_time);
+      try {
+        const response = await axios.get(`http://localhost:8000/api/v1/insights-direct/main-service/689b93230d3364bd64eaa075/date/${startDate}`);
+        const data = response.data;
+        setProcessingTime(data.avg_processing_time);
+      } catch (err) {
+        console.error("Error fetching no show count:", err);
+      }
+    };
 
-      console.log("Fetched no show count:", data.no_show_count);
-      
-    }catch (err) {
-      console.error("Error fetching no show count:", err);
-      // Handle error, maybe set a state to show an error message
-  }};
-
-
-  // Call all async functions
-  fetchWeeklyData();
-  fetchWeeklySubData();
-  fetchTotalCount();
-  fetchNoShowCount();
-}, [startDate]);
-
+    // Call all async functions
+    fetchWeeklyData();
+    fetchWeeklySubData();
+    fetchTotalCount();
+    fetchNoShowCount();
+  }, [startDate]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 space-y-6">
     <div className="min-h-screen bg-gray-50">
       {/* Admin Sidebar */}
       <AdminSidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       
       {/* Header */}
-      <AdminHeader 
-        setShowSidebar={setShowSidebar}
-      />
+      <AdminHeader setShowSidebar={setShowSidebar} />
 
       {/* Main Content */}
       <div className="p-6 space-y-6">
@@ -250,70 +244,40 @@ useEffect(() => {
             />
           </div>
         </div>
-      </div>
 
-      {/* Week Dates */}
-      {fullWeekDates.length > 0 && (
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <h4 className="text-sm font-semibold text-blue-800 mb-2">
-            Selected Week: {fullWeekDates[0]?.date} to {fullWeekDates[6]?.date}
-          </h4>
-          <div className="grid grid-cols-7 gap-2 text-xs">
-            {fullWeekDates.map((day, index) => (
-              <div key={index} className="text-center">
-                <div className="font-medium text-blue-700">{day.dayName}</div>
-                <div className="text-blue-600">{day.date}</div>
-              </div>
-            ))}
+        {/* Week Dates */}
+        {fullWeekDates.length > 0 && (
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <h4 className="text-sm font-semibold text-blue-800 mb-2">
+              Selected Week: {fullWeekDates[0]?.date} to {fullWeekDates[6]?.date}
+            </h4>
+            <div className="grid grid-cols-7 gap-2 text-xs">
+              {fullWeekDates.map((day, index) => (
+                <div key={index} className="text-center">
+                  <div className="font-medium text-blue-700">{day.dayName}</div>
+                  <div className="text-blue-600">{day.date}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-      {/* Sub Service Weekly Traffic */}
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">
-          Main Service Weekly Traffic
-        </h3>
-        <div style={{ height: "250px" }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={weeklySubServiceTraffic}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis
-                dataKey="name"
-                tick={{ fontSize: 10 }}
-                angle={-45}
-                textAnchor="end"
-              />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#f8f9fa",
-                  border: "1px solid #dee2e6",
-                  borderRadius: "6px"
-                }}
-              />
-              <Bar dataKey="traffic" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Horizontal Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Sub Service Weekly Traffic */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Time-based Service Traffic
+            Main Service Weekly Traffic
           </h3>
           <div style={{ height: "250px" }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={timeBasedServiceTraffic} layout="vertical">
+              <BarChart data={weeklySubServiceTraffic}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis type="number" tick={{ fontSize: 12 }} />
-                <YAxis
+                <XAxis
                   dataKey="name"
-                  type="category"
                   tick={{ fontSize: 10 }}
-                  width={90}
+                  angle={-45}
+                  textAnchor="end"
                 />
+                <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "#f8f9fa",
@@ -321,37 +285,68 @@ useEffect(() => {
                     borderRadius: "6px"
                   }}
                 />
-                <Bar dataKey="traffic" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="traffic" fill="#f59e0b" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Time-based Sub Service Traffic
-          </h3>
-          <div style={{ height: "250px" }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={timeBasedSubServiceTraffic} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis type="number" tick={{ fontSize: 12 }} />
-                <YAxis
-                  dataKey="name"
-                  type="category"
-                  tick={{ fontSize: 10 }}
-                  width={90}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#f8f9fa",
-                    border: "1px solid #dee2e6",
-                    borderRadius: "6px"
-                  }}
-                />
-                <Bar dataKey="traffic" fill="#ef4444" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+        {/* Horizontal Charts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Time-based Service Traffic
+            </h3>
+            <div style={{ height: "250px" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={timeBasedServiceTraffic} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis type="number" tick={{ fontSize: 12 }} />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    tick={{ fontSize: 10 }}
+                    width={90}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#f8f9fa",
+                      border: "1px solid #dee2e6",
+                      borderRadius: "6px"
+                    }}
+                  />
+                  <Bar dataKey="traffic" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Time-based Sub Service Traffic
+            </h3>
+            <div style={{ height: "250px" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={timeBasedSubServiceTraffic} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis type="number" tick={{ fontSize: 12 }} />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    tick={{ fontSize: 10 }}
+                    width={90}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#f8f9fa",
+                      border: "1px solid #dee2e6",
+                      borderRadius: "6px"
+                    }}
+                  />
+                  <Bar dataKey="traffic" fill="#ef4444" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       </div>
