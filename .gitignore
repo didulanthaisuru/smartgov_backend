@@ -1,0 +1,55 @@
+# -------------------------
+# Python / Backend
+# -------------------------
+# Virtual environments
+/backend/venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Environment variables
+*.env
+/backend/.env
+/frontend/.env
+
+# Python logs
+*.log
+
+# -------------------------
+# Node / Frontend
+# -------------------------
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.cache/
+/frontend/build/
+
+# -------------------------
+# Docker
+# -------------------------
+# Ignore images, containers, and volumes if stored locally
+docker-compose.override.yml
+*.dockerfile
+*.tar
+*.log
+
+# -------------------------
+# OS & Editor
+# -------------------------
+# MacOS
+.DS_Store
+
+# Linux
+*.swp
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# -------------------------
+# Test / temporary files
+# -------------------------
+*.pytest_cache/
+*.coverage
+*.mypy_cache/
+.pytest_cache/
