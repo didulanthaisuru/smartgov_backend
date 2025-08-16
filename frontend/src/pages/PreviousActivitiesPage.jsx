@@ -223,9 +223,34 @@ const PreviousActivitiesPage = () => {
       {/* Title and Summary */}
       <div className="relative z-10 px-10 py-6">
         <h2 className="text-4xl font-normal text-black mb-4 text-left">Previous Activities</h2>
-        <p className="text-sm text-black mb-6 text-left">
-          View your previous activities here ({activities.length} total)
-        </p>
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-sm text-black">
+            View your previous activities here ({activities.length} total)
+          </p>
+          {/* Rating Statistics */}
+          <div className="flex items-center space-x-4 text-sm">
+            <div className="flex items-center space-x-1">
+              <span className="text-green-600">⭐</span>
+              <span className="text-gray-600">
+                {activities.filter(a => a.rating > 0).length} rated
+              </span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="text-gray-400">📝</span>
+              <span className="text-gray-600">
+                {activities.filter(a => a.rating === 0).length} not rated
+              </span>
+            </div>
+            {activities.filter(a => a.rating > 0).length > 0 && (
+              <div className="flex items-center space-x-1">
+                <span className="text-yellow-600">★</span>
+                <span className="text-gray-600">
+                  Avg: {(activities.reduce((sum, a) => sum + a.rating, 0) / activities.filter(a => a.rating > 0).length).toFixed(1)}/5
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Main Content Area */}
@@ -280,13 +305,24 @@ const PreviousActivitiesPage = () => {
                 <div className="mb-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-normal text-black">{activity.name}</h3>
-                    <span className={`text-sm px-3 py-1 rounded-full ${
-                      activity.is_fully_completed 
-                        ? 'bg-green-100 text-green-800 font-semibold' 
-                        : 'bg-red-100 text-red-800 font-semibold'
-                    }`}>
-                      {activity.is_fully_completed ? 'Completed' : 'Incomplete'}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      {/* Rating status indicator */}
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        activity.rating > 0 
+                          ? 'bg-yellow-100 text-yellow-800' 
+                          : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {activity.rating > 0 ? '⭐ Rated' : '📝 Not Rated'}
+                      </span>
+                      {/* Completion status */}
+                      <span className={`text-sm px-3 py-1 rounded-full ${
+                        activity.is_fully_completed 
+                          ? 'bg-green-100 text-green-800 font-semibold' 
+                          : 'bg-red-100 text-red-800 font-semibold'
+                      }`}>
+                        {activity.is_fully_completed ? 'Completed' : 'Incomplete'}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -301,65 +337,84 @@ const PreviousActivitiesPage = () => {
                   </p>
                 </div>
 
-                {/* Current Rating Display */}
-                {activity.rating > 0 && (
+                {/* Rating Section - Show existing rating or rating input */}
+                {activity.rating > 0 ? (
+                  // Show existing rating with enhanced styling
                   <div className="mb-4">
-                    <p className="text-sm text-gray-600 mb-1">Your Rating:</p>
-                    <div className="flex items-center space-x-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <svg
-                          key={star}
-                          className={`w-5 h-5 ${
-                            star <= activity.rating ? 'text-yellow-500' : 'text-gray-300'
-                          }`}
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                      ))}
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm font-semibold text-green-800">Your Rating</p>
+                        <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                          Rated
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-1 mb-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <svg
+                            key={star}
+                            className={`w-6 h-6 ${
+                              star <= activity.rating ? 'text-yellow-500' : 'text-gray-300'
+                            }`}
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ))}
+                        <span className="ml-2 text-sm font-medium text-gray-700">
+                          {activity.rating}/5
+                        </span>
+                      </div>
+                                             {activity.feedback && (
+                         <div className="bg-white rounded-lg p-3 border border-green-100">
+                           <p className="text-sm text-gray-700 italic">
+                             "{activity.feedback}"
+                           </p>
+                         </div>
+                       )}
                     </div>
-                    {activity.feedback && (
-                      <p className="text-xs text-gray-600 mt-1 italic">
-                        "{activity.feedback}"
-                      </p>
-                    )}
+                  </div>
+                ) : (
+                  // Show rating input for activities without ratings
+                  <div className="mb-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-sm font-bold text-blue-800">Rate our service</span>
+                        <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                          Not Rated
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-1 mb-3">
+                        <span className="text-xs text-blue-600 mr-2">Click to rate:</span>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <svg
+                            key={star}
+                            className="w-6 h-6 text-yellow-500 cursor-pointer hover:text-yellow-600 hover:scale-110 transition-all duration-200"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ))}
+                      </div>
+                      
+                      <div className="relative">
+                        <textarea 
+                          placeholder="Leave your feedback here..."
+                          className="w-full bg-white rounded-lg py-2 px-4 pr-12 shadow-sm resize-none h-12 text-sm text-gray-700 border border-blue-200 outline-none focus:border-blue-400 transition-colors"
+                        />
+                        <button 
+                          onClick={() => openFeedbackModal(activity)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-blue-100 rounded-lg transition-colors"
+                        >
+                          <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
-
-                {/* Rating Section */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-bold text-black">Rate our service -</span>
-                    <div className="flex items-center space-x-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <svg
-                          key={star}
-                          className="w-6 h-6 text-yellow-500 cursor-pointer"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="relative">
-                    <textarea 
-                      placeholder="Leave your feedback here..."
-                      className="w-full bg-white rounded-xl py-2 px-4 pr-12 shadow-md resize-none h-12 text-sm text-gray-700 border-none outline-none"
-                    />
-                    <button 
-                      onClick={() => openFeedbackModal(activity)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
               </div>
             ))
           )}
@@ -395,9 +450,16 @@ const PreviousActivitiesPage = () => {
       {showFeedback && selectedActivity && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl p-6 m-6 max-w-sm w-full">
-            <h3 className="text-lg font-medium text-black mb-4">
-              Leave Feedback for {selectedActivity.name}
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-black">
+                {selectedActivity.rating > 0 ? 'Edit Feedback' : 'Leave Feedback'} for {selectedActivity.name}
+              </h3>
+              {selectedActivity.rating > 0 && (
+                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                  Current: {selectedActivity.rating}/5
+                </span>
+              )}
+            </div>
             
             {/* Rating Stars */}
             <div className="mb-4">
@@ -442,7 +504,7 @@ const PreviousActivitiesPage = () => {
                 disabled={!feedbackText.trim() || rating === 0}
                 className="flex-1 py-2 px-4 bg-[#8C322A] text-white rounded-lg text-sm hover:bg-[#7A2A22] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Submit
+                {selectedActivity.rating > 0 ? 'Update' : 'Submit'}
               </button>
             </div>
           </div>
