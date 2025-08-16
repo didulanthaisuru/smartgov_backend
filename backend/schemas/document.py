@@ -5,7 +5,7 @@ from datetime import datetime
 
 class UploadDocumentRequest(BaseModel):
     booking_id: str
-    doc_id: str
+    required_doc_id: str 
     
 
 class UploadDocumentResponse(BaseModel):

@@ -47,7 +47,7 @@ const UploadPage = () => {
     // **MODIFIED**: Appending the file and IDs with the exact keys your backend requires.
     formData.append('file', selectedFile);
     formData.append('booking_id', appointmentId); // Changed 'appointment_id' to 'booking_id'
-    formData.append('doc_id', docId);           // Changed 'document_id' to 'doc_id'
+    formData.append('required_doc_id', docId);           // Changed 'document_id' to 'doc_id'
 
     try {
       // **MODIFIED**: Using the exact endpoint URL you provided.
