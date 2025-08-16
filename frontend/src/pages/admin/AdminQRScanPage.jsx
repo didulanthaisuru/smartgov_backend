@@ -1,150 +1,103 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminHeader from '../../components/AdminHeader';
-import { QrCode, Upload } from 'lucide-react';
-import jsQR from 'jsqr';
-import axios from 'axios';
+import { QrCode, Camera } from 'lucide-react';
 
 const AdminQRScanPage = () => {
   const { user } = useAuth();
   const [showSidebar, setShowSidebar] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState('');
-  const [previewImage, setPreviewImage] = useState(null);
-  const [uploadedFile, setUploadedFile] = useState(null); // store actual file
-  const [apiResponse, setApiResponse] = useState(null);
 
-  const canvasRef = useRef(null);
-
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    setUploadedFile(file);
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const image = new Image();
-      image.onload = () => {
-        setPreviewImage(e.target.result);
-
-        // Draw image on canvas for jsQR
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        canvas.width = image.width;
-        canvas.height = image.height;
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imageData.data, canvas.width, canvas.height);
-
-        if (code) {
-          setScanResult(code.data);
-        } else {
-          setScanResult('No QR code found in image.');
-        }
-      };
-      image.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+  const handleStartScan = () => {
+    setIsScanning(true);
+    // Simulate QR code scanning
+    setTimeout(() => {
+      setScanResult('QR Code Successfully Scanned!');
+      setIsScanning(false);
+    }, 3000);
   };
 
-  const handleProcessComplete = async () => {
-    if (!uploadedFile) return;
-
-    try {
-      const formData = new FormData();
-      formData.append('file', uploadedFile);
-
-      const response = await axios.post(
-        'http://localhost:8000/api/v1/qr/scan', // your API
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
-
-      const resData = response.data;
-
-      if (resData.success && resData.results && resData.results.length > 0) {
-        setApiResponse(resData.results[0].data);
-      } else {
-        setApiResponse('No valid QR data found.');
-      }
-    } catch (error) {
-      console.error('Error processing QR:', error);
-      setApiResponse('Error processing QR code.');
-    }
+  const handleStopScan = () => {
+    setIsScanning(false);
+    setScanResult('');
   };
 
   return (
     <div className="min-h-screen bg-white relative">
-      {/* Sidebar */}
+      {/* Admin Sidebar */}
       <AdminSidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
-
+      
       {/* Header */}
-      <AdminHeader
+      <AdminHeader 
         title={`${user?.service_id || 'Birth Certificate'} QR Scanner`}
         setShowSidebar={setShowSidebar}
       />
 
-      {/* Hidden Canvas */}
-      <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
-
       {/* Main Content */}
       <div className="p-6 space-y-6">
+        {/* Main Content Card */}
         <div className="bg-white rounded-xl shadow-xl p-8 max-w-md mx-auto">
+          {/* QR Scanner Section */}
           <div className="bg-orange-200 rounded-xl p-8 text-center">
             <p className="text-sm font-normal text-black mb-6">
-              Scan or Upload a QR Code
+              Scan the user's QR code
             </p>
-
-            {/* QR Display Box */}
-            <div className="relative mx-auto w-48 h-48 bg-white rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
-              {previewImage ? (
-                <img
-                  src={previewImage}
-                  alt="Uploaded QR"
-                  className="w-full h-full object-contain cursor-pointer"
-                  onClick={() => {
-                    if (scanResult) {
-                      alert(scanResult);
-                    }
-                  }}
-                />
+            
+            {/* QR Scanner Display */}
+            <div className="relative mx-auto w-48 h-48 bg-white rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+              {isScanning ? (
+                <div className="text-center">
+                  <div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-600">Scanning...</p>
+                </div>
+              ) : scanResult ? (
+                <div className="text-center">
+                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <span className="text-white text-lg">✓</span>
+                  </div>
+                  <p className="text-sm text-green-600 font-medium">{scanResult}</p>
+                </div>
               ) : (
                 <QrCode size={80} className="text-red-900" />
               )}
             </div>
-
-            {/* Controls */}
+            
+            {/* Scanner Controls */}
             <div className="mt-6 space-y-3">
-              {/* Upload Button */}
-              <label className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-medium transition-colors cursor-pointer">
-                <Upload size={20} />
-                Upload QR Image
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </label>
-
-              {/* Process Complete */}
+              {!isScanning && !scanResult && (
+                <button
+                  onClick={handleStartScan}
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                >
+                  <Camera size={20} />
+                  Start Scanning
+                </button>
+              )}
+              
+              {isScanning && (
+                <button
+                  onClick={handleStopScan}
+                  className="w-full bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+                >
+                  Stop Scanning
+                </button>
+              )}
+              
               {scanResult && (
                 <div className="space-y-2">
                   <button
                     onClick={() => {
                       setScanResult('');
-                      setPreviewImage(null);
-                      setUploadedFile(null);
-                      setApiResponse(null);
+                      setIsScanning(false);
                     }}
                     className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
                   >
                     Scan Another Code
                   </button>
-
                   <button
-                    onClick={handleProcessComplete}
+                    onClick={() => console.log('Process completed')}
                     className="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
                   >
                     Process Complete
@@ -153,14 +106,23 @@ const AdminQRScanPage = () => {
               )}
             </div>
           </div>
+          
+          {/* Instructions */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Position the QR code within the scanning area. The scanner will automatically detect and process the code.
+            </p>
+          </div>
+        </div>
 
-          {/* API Response Display */}
-          {apiResponse && (
-            <div className="mt-4 p-4 bg-green-100 rounded-lg text-center">
-              <h3 className="text-sm font-bold text-gray-700">Scanned QR Data:</h3>
-              <p className="text-lg font-semibold text-green-700">{apiResponse}</p>
-            </div>
-          )}
+        {/* Additional Info */}
+        <div className="text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-lg">
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span className="text-sm text-blue-700 font-medium">
+              QR Scanner Ready
+            </span>
+          </div>
         </div>
       </div>
     </div>

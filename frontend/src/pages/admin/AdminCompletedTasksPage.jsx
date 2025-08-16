@@ -1,29 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminHeader from '../../components/AdminHeader';
 import { Calendar, Star } from 'lucide-react';
 
 const AdminCompletedTasksPage = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [showSidebar, setShowSidebar] = useState(false);
   const [selectedTab, setSelectedTab] = useState('Completed');
-  const [completedTasks, setCompletedTasks] = useState([]);
 
-  // Fetch completed tasks from API
-  useEffect(() => {
-    const fetchCompletedTasks = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/api/v1/ratings/'); // replace with your endpoint
-        setCompletedTasks(response.data);
-      } catch (error) {
-        console.error('Error fetching completed tasks:', error);
-      }
-    };
-
-    fetchCompletedTasks();
-  }, []);
+  const completedTasks = [
+    {
+      id: 1,
+      time: '8.30',
+      clientName: 'Nimal Perera',
+      duration: '44min',
+      rating: 5
+    },
+    {
+      id: 2,
+      time: '10.30',
+      clientName: 'Kavindu Sampath',
+      duration: '30min',
+      rating: 5
+    },
+    {
+      id: 3,
+      time: '12.30',
+      clientName: 'Tharshini Raj',
+      duration: '50min',
+      rating: 5
+    },
+    {
+      id: 4,
+      time: '14.30',
+      clientName: 'Suresh Kumar',
+      duration: '20min',
+      rating: 5
+    }
+  ];
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
@@ -56,52 +73,65 @@ const AdminCompletedTasksPage = () => {
 
         {/* Tab Navigation */}
         <div className="flex gap-3">
-          {['Details', 'Appointments', 'Completed'].map((tab) => (
-            <button 
-              key={tab}
-              onClick={() => setSelectedTab(tab)}
-              className={`px-4 py-2 rounded-xl text-sm font-normal transition-colors ${
-                selectedTab === tab
-                  ? 'bg-orange-300 text-black'
-                  : 'bg-orange-200 text-black hover:bg-orange-250'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
+          <button 
+            onClick={() => setSelectedTab('Details')}
+            className={`px-4 py-2 rounded-xl text-sm font-normal transition-colors ${
+              selectedTab === 'Details' 
+                ? 'bg-orange-300 text-black' 
+                : 'bg-orange-200 text-black hover:bg-orange-250'
+            }`}
+          >
+            Details
+          </button>
+          <button 
+            onClick={() => navigate('/admin-tasks')}
+            className={`px-6 py-2 rounded-xl text-sm font-normal transition-colors ${
+              selectedTab === 'Appointments' 
+                ? 'bg-orange-300 text-black' 
+                : 'bg-orange-200 text-black hover:bg-orange-250'
+            }`}
+          >
+            Appointments
+          </button>
+          <button 
+            onClick={() => setSelectedTab('Completed')}
+            className={`px-6 py-2 rounded-xl text-sm font-normal transition-colors ${
+              selectedTab === 'Completed' 
+                ? 'bg-orange-300 text-black' 
+                : 'bg-orange-200 text-black hover:bg-orange-250'
+            }`}
+          >
+            Completed
+          </button>
         </div>
 
         {/* Completed Tasks List */}
         <div className="max-w-4xl mx-auto space-y-4">
-          {completedTasks.length === 0 ? (
-            <p className="text-black text-center">No completed tasks found.</p>
-          ) : (
-            completedTasks.map((task, index) => (
-              <div key={task._id} className="bg-blue-100 rounded-xl p-6 flex items-center">
-                {/* Time */}
-                <div className="w-16 text-xl font-normal text-black">
-                  {new Date(task.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-                
-                {/* Vertical Line */}
-                <div className="w-px h-16 bg-black mx-4"></div>
-                
-                {/* Task Details */}
-                <div className="flex-1">
-                  <h3 className="text-xl font-normal text-black">Appointment ID: {task.appointment_id}</h3>
-                  <p className="text-sm font-normal text-black">Feedback: {task.feedback}</p>
-                </div>
-                
-                {/* Rating */}
-                <div className="flex flex-col items-center gap-2">
-                  <span className="text-sm font-normal text-black">Rated</span>
-                  <div className="flex gap-1">
-                    {renderStars(task.rating)}
-                  </div>
+          {completedTasks.map((task) => (
+            <div key={task.id} className="bg-blue-100 rounded-xl p-6 flex items-center">
+              {/* Time */}
+              <div className="w-16 text-xl font-normal text-black">
+                {task.time}
+              </div>
+              
+              {/* Vertical Line */}
+              <div className="w-px h-16 bg-black mx-4"></div>
+              
+              {/* Task Details */}
+              <div className="flex-1">
+                <h3 className="text-xl font-normal text-black mb-1">{task.clientName}</h3>
+                <p className="text-sm font-normal text-black">Duration - {task.duration}</p>
+              </div>
+              
+              {/* Rating */}
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-sm font-normal text-black">Rated</span>
+                <div className="flex gap-1">
+                  {renderStars(task.rating)}
                 </div>
               </div>
-            ))
-          )}
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -14,12 +14,28 @@ import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
 
-const Pill = ({ label, value }) => (
-  <div className="bg-white p-4 rounded-lg shadow flex flex-col items-center transform transition-all duration-300 hover:scale-105">
-    <span className="text-sm font-medium text-gray-500">{label}</span>
-    <span className="text-xl font-bold">{value}</span>
-  </div>
-);
+const Pill = ({ label, value, icon, color = "blue" }) => {
+  const colorClasses = {
+    blue: "bg-blue-50 border-blue-200 text-blue-700",
+    green: "bg-green-50 border-green-200 text-green-700",
+    orange: "bg-orange-50 border-orange-200 text-orange-700",
+    purple: "bg-purple-50 border-purple-200 text-purple-700",
+    red: "bg-red-50 border-red-200 text-red-700"
+  };
+
+  return (
+    <div className={`bg-white p-6 rounded-xl shadow-lg border-2 ${colorClasses[color]} transform transition-all duration-300 hover:scale-105 hover:shadow-xl`}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center space-x-2">
+          {icon && <div className="text-2xl">{icon}</div>}
+          <span className="text-sm font-semibold uppercase tracking-wide opacity-75">{label}</span>
+        </div>
+      </div>
+      <div className="text-3xl font-bold">{value || 0}</div>
+      <div className="text-xs opacity-60 mt-1">Updated today</div>
+    </div>
+  );
+};
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -44,12 +60,26 @@ export default function Dashboard() {
     navigate(path);
   };
 
-  const subServiceWeeklyTraffic = [
+  // Hardcoded data for Weekly Sub Service Traffic
+  const weeklySubServiceTrafficData = [
     { name: "Mon", traffic: 2850 },
     { name: "Tue", traffic: 1950 },
     { name: "Wed", traffic: 1150 },
     { name: "Thu", traffic: 3200 },
-    { name: "Fri", traffic: 2890 }
+    { name: "Fri", traffic: 2890 },
+    { name: "Sat", traffic: 1800 },
+    { name: "Sun", traffic: 1200 }
+  ];
+
+  // Hardcoded data for Main Service Weekly Traffic
+  const weeklyMainServiceTrafficData = [
+    { name: "Mon", traffic: 3200 },
+    { name: "Tue", traffic: 2400 },
+    { name: "Wed", traffic: 1800 },
+    { name: "Thu", traffic: 3800 },
+    { name: "Fri", traffic: 3200 },
+    { name: "Sat", traffic: 2200 },
+    { name: "Sun", traffic: 1500 }
   ];
 
   const timeBasedServiceTraffic = [
@@ -229,7 +259,7 @@ export default function Dashboard() {
         {/* Action Buttons */}
         <div className="flex space-x-4">
           <button
-            onClick={() => handleNavigation('/admin/appointments')}
+            onClick={() => handleNavigation('/admin-tasks')}
             className="flex-1 bg-orange-200 bg-opacity-50 rounded-xl p-4 text-center text-black font-medium hover:bg-orange-200 transition-colors"
           >
             <span className="text-sm">Appointments</span>
@@ -247,49 +277,122 @@ export default function Dashboard() {
 
         {/* Week Dates */}
         {fullWeekDates.length > 0 && (
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h4 className="text-sm font-semibold text-blue-800 mb-2">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200 shadow-sm">
+            <h4 className="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+              <Calendar className="w-5 h-5 mr-2" />
               Selected Week: {fullWeekDates[0]?.date} to {fullWeekDates[6]?.date}
             </h4>
-            <div className="grid grid-cols-7 gap-2 text-xs">
+            <div className="grid grid-cols-7 gap-3">
               {fullWeekDates.map((day, index) => (
-                <div key={index} className="text-center">
-                  <div className="font-medium text-blue-700">{day.dayName}</div>
-                  <div className="text-blue-600">{day.date}</div>
+                <div key={index} className="text-center bg-white p-3 rounded-lg shadow-sm">
+                  <div className="font-semibold text-blue-700 text-sm">{day.dayName}</div>
+                  <div className="text-blue-600 text-xs mt-1">{day.date}</div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Sub Service Weekly Traffic */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Main Service Weekly Traffic
-          </h3>
-          <div style={{ height: "250px" }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklySubServiceTraffic}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fontSize: 10 }}
-                  angle={-45}
-                  textAnchor="end"
-                />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#f8f9fa",
-                    border: "1px solid #dee2e6",
-                    borderRadius: "6px"
-                  }}
-                />
-                <Bar dataKey="traffic" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        {/* Stats Pills */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <Pill 
+            label="Predicted Count" 
+            value={predicted_count} 
+            icon="📊"
+            color="blue"
+          />
+          <Pill 
+            label="Avg Processing Time" 
+            value={`${ProcessingTime || 0} min`} 
+            icon="⏱️"
+            color="green"
+          />
+          <Pill 
+            label="No Show Count" 
+            value={noShowCount} 
+            icon="❌"
+            color="red"
+          />
+          <Pill 
+            label="Appointment Count" 
+            value={TotalCount} 
+            icon="📅"
+            color="orange"
+          />
+          <Pill 
+            label="Service Count" 
+            value="42" 
+            icon="🔧"
+            color="purple"
+          />
         </div>
+
+        {/* Analytics Charts Section */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+              <span className="mr-3">📊</span>
+              Analytics & Insights
+            </h2>
+            <div className="text-sm text-gray-500">
+              Real-time data from your services
+            </div>
+          </div>
+
+                     {/* Weekly Sub Service Traffic Chart */}
+           <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+             <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+               <span className="mr-2">📈</span>
+               Weekly Sub Service Traffic
+             </h3>
+             <div style={{ height: "250px" }}>
+               <ResponsiveContainer width="100%" height="100%">
+                 <BarChart data={weeklySubServiceTrafficData}>
+                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                   <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                   <YAxis tick={{ fontSize: 12 }} />
+                   <Tooltip
+                     contentStyle={{
+                       backgroundColor: "#f8f9fa",
+                       border: "1px solid #dee2e6",
+                       borderRadius: "6px"
+                     }}
+                   />
+                   <Bar dataKey="traffic" fill="#10b981" radius={[4, 4, 0, 0]} />
+                 </BarChart>
+               </ResponsiveContainer>
+             </div>
+           </div>
+
+                     {/* Main Service Weekly Traffic Chart */}
+           <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+             <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+               <span className="mr-2">📊</span>
+               Main Service Weekly Traffic
+             </h3>
+             <div style={{ height: "250px" }}>
+               <ResponsiveContainer width="100%" height="100%">
+                 <BarChart data={weeklyMainServiceTrafficData}>
+                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                   <XAxis
+                     dataKey="name"
+                     tick={{ fontSize: 10 }}
+                     angle={-45}
+                     textAnchor="end"
+                   />
+                   <YAxis tick={{ fontSize: 12 }} />
+                   <Tooltip
+                     contentStyle={{
+                       backgroundColor: "#f8f9fa",
+                       border: "1px solid #dee2e6",
+                       borderRadius: "6px"
+                     }}
+                   />
+                   <Bar dataKey="traffic" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                 </BarChart>
+               </ResponsiveContainer>
+             </div>
+           </div>
 
         {/* Horizontal Charts */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -347,6 +450,7 @@ export default function Dashboard() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
+          </div>
           </div>
         </div>
       </div>

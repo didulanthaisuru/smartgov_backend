@@ -54,7 +54,7 @@ const CheckoutForm = () => {
     setIsProcessing(true);
 
     try {
-      const { data } = await axios.post("http://localhost:8000/create-payment-intent", {
+      const { data } = await axios.post("http://127.0.0.1:8000/api/v1/create-payment-intent", {
         amount: Math.round((paymentAmount / 300) * 100)
       });
       const clientSecret = data.clientSecret;

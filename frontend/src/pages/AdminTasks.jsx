@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Bell, Calendar, Camera } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom'; // STEP 1: Import the hook
+import { Bell, Camera } from 'lucide-react';
 import axios from 'axios';
 
-// Reusable Pill Component (No changes needed)
+// Reusable Pill Component
 const Pill = ({ label, isActive, onClick }) => (
   <button
     onClick={onClick}
@@ -16,57 +17,47 @@ const Pill = ({ label, isActive, onClick }) => (
   </button>
 );
 
-// Appointment Card Component (No changes needed)
-const AppointmentCard = ({ appointment, onCameraClick }) => {
-  const getStatusButton = (status) => {
-    if (status === 'pending') {
-      return (
-        <button className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors">
-          Pending
-        </button>
-      );
-    } else {
-      return (
-        <button className="bg-green-500 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-green-600 transition-colors">
-          Completed
-        </button>
-      );
-    }
-  };
-
+// Appointment Card Component (Pass onDetailsClick)
+const AppointmentCard = ({ appointment, onCameraClick, onDetailsClick }) => {
+  const isCompleted = appointment.status === 'approved';
+  
   return (
-    <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
+    <div className={`rounded-lg p-4 shadow-sm mb-4 transition-all duration-200 ${
+      isCompleted ? 'bg-green-50 border border-green-200' : 'bg-white'
+    }`}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          {/* Time */}
-          <div className="text-lg font-semibold text-gray-900">
-            {appointment.time}
+        <div className="flex items-center space-x-4">
+          <div className="text-center">
+            <div className="text-lg font-semibold text-gray-900">
+              {appointment.time}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              {appointment.date}
+            </div>
           </div>
-          
-          {/* Name and Duration */}
           <div>
             <div className="font-medium text-gray-900">{appointment.name}</div>
             <div className="text-sm text-gray-500">Duration: {appointment.duration}</div>
+            {isCompleted && (
+              <div className="text-xs text-green-600 font-medium mt-1">
+                ✓ Completed
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Right Side - Status and Details */}
         <div className="flex flex-col items-end space-y-2">
-          {/* Camera Icon Button */}
-          {appointment.status === 'approved' && (
+          {isCompleted && (
             <button
               onClick={() => onCameraClick(appointment)}
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors duration-200"
+              className="p-2 hover:bg-green-100 rounded-full transition-colors duration-200 bg-green-100"
+              title="Scan QR Code"
             >
-              <Camera className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+              <Camera className="w-5 h-5 text-green-600 hover:text-green-700" />
             </button>
           )}
-          
-          {/* Status Button */}
-          {getStatusButton(appointment.status)}
-          
-          {/* Details Button */}
-          <button className="text-blue-500 text-sm font-medium hover:text-blue-600 transition-colors">
+          <button
+            onClick={() => onDetailsClick(appointment.id)}
+            className="text-blue-500 text-sm font-medium hover:text-blue-600 transition-colors mt-auto">
             Details
           </button>
         </div>
@@ -75,23 +66,22 @@ const AppointmentCard = ({ appointment, onCameraClick }) => {
   );
 };
 
-
 const AdminTasks = () => {
+  const navigate = useNavigate(); // STEP 2: Initialize the hook
+
   // State for API data, loading, and errors
-  const [appointments, setAppointments] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [appointments, setAppointments] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
 
   // Other component states
-  const [activeTab, setActiveTab] = useState('Appointments');
-  const [selectedDate, setSelectedDate] = useState(new Date('2025-08-15'));
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [activeTab, setActiveTab] = React.useState('Appointments');
   
   // Statically set the sub-service ID
   const subServiceId = '689cd830ef2618d4dfe5a594';
 
   // Fetch data from the API when the component mounts
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchAppointments = async () => {
       setIsLoading(true);
       setError(null);
@@ -100,17 +90,16 @@ const AdminTasks = () => {
           `http://127.0.0.1:8000/api/v1/api/admin/dashboard-full/appointments_by_subservice/${subServiceId}`
         );
         
-        // Transform the API data to match the component's expected structure
         const formattedAppointments = response.data.appointments.map(apiAppt => ({
           id: apiAppt._id,
           name: apiAppt.user_name,
-          // Format the time, handle null cases
           time: apiAppt.appoinment_time 
             ? new Date(apiAppt.appoinment_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
             : 'N/A',
-          // Use a placeholder for duration as it's not in the API response
+          date: apiAppt.appointment_date
+            ? new Date(apiAppt.appointment_date).toLocaleDateString('en-GB')
+            : 'N/A',
           duration: 'N/A',
-          // Determine status based on the 'is_fully_completed' flag
           status: apiAppt.is_fully_completed ? 'approved' : 'pending'
         }));
         
@@ -124,26 +113,23 @@ const AdminTasks = () => {
     };
 
     fetchAppointments();
-  }, [subServiceId]); // Dependency array ensures this runs once
+  }, [subServiceId]);
 
-  // Easy to edit tabs
-  const tabs = ['Details', 'Appointments', 'Completed'];
+  const tabs = [ 'Appointments', 'Completed'];
 
-  // Navigation handlers (no changes needed)
   const handleBellClick = () => alert('Navigating to notifications...');
-  const handleCalendarClick = () => setShowCalendar(!showCalendar);
-  const handleCameraClick = (appointment) => alert(`Opening camera for ${appointment.name}'s documents...`);
-  const handleDateSelect = (event) => {
-    const newDate = new Date(event.target.value);
-    setSelectedDate(newDate);
-    setShowCalendar(false);
+  const handleCameraClick = (appointment) => {
+    navigate('/admin/qr-scan');
+  };
+  
+  // This function will now work correctly
+  const handleDetailsClick = (appointmentId) => {
+    navigate(`/admin/task-details/${appointmentId}`);
   };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 font-sans">
       <div className="w-full mx-auto" style={{ maxWidth: '430px' }}>
-
-        {/* Header */}
         <header className="flex items-center justify-between pt-4 pb-2">
           <h1 className="text-xl font-bold text-gray-800">Birth Certificate Admin</h1>
           <button
@@ -154,43 +140,23 @@ const AdminTasks = () => {
           </button>
         </header>
 
-        {/* Date Display */}
-        <div className="flex items-center justify-center my-4 relative">
-          <button
-            onClick={handleCalendarClick}
-            className="flex items-center bg-orange-100 rounded-full px-6 py-2 shadow-sm cursor-pointer hover:bg-orange-200 transition-colors duration-200"
-          >
-            <span className="text-lg font-medium text-gray-800 mr-2">
-              {selectedDate.toLocaleDateString('en-GB')}
-            </span>
-            <Calendar className="text-gray-700" size={20} />
-          </button>
-          
-          {showCalendar && (
-            <div className="absolute top-full mt-2 bg-white rounded-lg shadow-lg p-4 z-10 border">
-              <input
-                type="date"
-                value={selectedDate.toISOString().split('T')[0]}
-                onChange={handleDateSelect}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Navigation Pills */}
-        <div className="flex justify-around space-x-2 my-4">
+        <div className="flex justify-around space-x-2 my-6">
           {tabs.map((tab) => (
             <Pill
               key={tab}
               label={tab}
               isActive={activeTab === tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => {
+                if (tab === 'Completed') {
+                  navigate('/admin/completed-tasks');
+                } else {
+                  setActiveTab(tab);
+                }
+              }}
             />
           ))}
         </div>
 
-        {/* Appointments List - with Loading and Error states */}
         <div className="mt-6">
           {isLoading && <p className="text-center text-gray-500">Loading appointments...</p>}
           {error && <p className="text-center text-red-500">{error}</p>}
@@ -199,10 +165,10 @@ const AdminTasks = () => {
               key={appointment.id} 
               appointment={appointment} 
               onCameraClick={handleCameraClick}
+              onDetailsClick={handleDetailsClick}
             />
           ))}
         </div>
-
       </div>
     </div>
   );

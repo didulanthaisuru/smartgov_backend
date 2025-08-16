@@ -45,7 +45,7 @@ import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminRegisterPage from './pages/admin/AdminRegisterPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminTasksPage from './pages/admin/AdminTasksPage';
-import AdminTaskDetailsPage from './pages/admin/AdminTaskDetailsPage';
+import AdminTaskDetailsPage from './pages/AdminTaskDetailsPage';
 import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminCompletedTasksPage from './pages/admin/AdminCompletedTasksPage';
 import AdminChatPage from './pages/admin/AdminChatPage';
@@ -166,25 +166,25 @@ function App() {
             <Route 
               path="/admin/dashboard" 
               element={
-                // <AdminRoute>
+                <AdminRoute>
                   <AdminDashboardPage />
-                // </AdminRoute>
+                </AdminRoute>
               } 
             />
             <Route 
               path="/admin/tasks" 
               element={
-                // <AdminRoute>
+                <AdminRoute>
                   <AdminTasksPage />
-                // </AdminRoute>
+                </AdminRoute>
               } 
             />
             <Route 
               path="/admin/task-details/:taskId" 
               element={
-                <AdminRoute>
+                //<AdminRoute>
                   <AdminTaskDetailsPage />
-                </AdminRoute>
+                //</AdminRoute>
               } 
             />
             <Route 
@@ -198,9 +198,9 @@ function App() {
             <Route 
               path="/admin/completed-tasks" 
               element={
-                // <AdminRoute>
+                <AdminRoute>
                   <AdminCompletedTasksPage />
-                // </AdminRoute>
+                </AdminRoute>
               } 
             />
             <Route 
@@ -214,9 +214,9 @@ function App() {
             <Route 
               path="/admin/qr-scan" 
               element={
-                // <AdminRoute>
+                <AdminRoute>
                   <AdminQRScanPage />
-                 //</AdminRoute>
+                </AdminRoute>
               } 
             />
 
@@ -271,7 +271,7 @@ function App() {
             />
            
             <Route 
-              path="/services/:serviceId/detail" 
+              path="/services/:mainServiceId/subservices/:subServiceId" 
               element={
                 <UserRoute>
                   <ServiceDetailBooking />
@@ -279,14 +279,6 @@ function App() {
               } 
             />
             <Route 
-              path="/services/:serviceId/upload/:docId" 
-              element={
-                <UserRoute>
-                  <UploadPage />
-                </UserRoute>
-              } 
-            />
-            <Route
               path="/appointment/:appointmentId/upload/:docId" 
               element={
                 <UserRoute>
@@ -302,6 +294,13 @@ function App() {
                 </UserRoute>
               } 
             />
+            <Route 
+              path="/admin-tasks"
+              element={
+                // <ProtectedRoute>
+                  <AdminTasks />
+                // </ProtectedRoute>
+              }/>
             <Route 
               path="/services/:serviceId/payment" 
               element={
@@ -405,9 +404,9 @@ function App() {
             <Route 
               path="/contact-us" 
               element={
-                // <ProtectedRoute>
+                //<ProtectedRoute>
                   <ContactUsPage />
-                // </ProtectedRoute>
+                //</ProtectedRoute>
               } 
             />
             <Route 
@@ -461,17 +460,17 @@ function App() {
             <Route 
               path="/previous-activities" 
               element={
-                // <UserRoute>
+                // <ProtectedRoute>
                   <PreviousActivitiesPage />
-                // </UserRoute>
+                // </ProtectedRoute>
               } 
             />
             <Route 
               path="/update-information" 
               element={
-                // <UserRoute>
+                <UserRoute>
                   <UpdateInformationPage />
-               // </UserRoute>
+                </UserRoute>
               } 
             />
             <Route 
