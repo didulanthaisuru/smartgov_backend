@@ -51,7 +51,7 @@ const ServiceDetailBooking = () => {
             return;
         }
         navigate(`/appointment/${appointmentId}/upload/${doc.id}`, {
-            state: { docName: doc.name }
+            state: {documentDetails: doc }
         });
     };
     
